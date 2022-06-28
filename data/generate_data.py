@@ -323,7 +323,7 @@ class multicsv_data_generater:
     generate all data from single file
     """
 
-    def __init__(self, file_path_root,return_type="NParray", transform=None):
+    def __init__(self, file_path_root=os.path.dirname(__file__)+os.sep+"cleaned_data"+os.sep,return_type="NParray", transform=None):
 
         self.file_path = file_path_root
         self.transform = transform
@@ -358,7 +358,7 @@ class multicsv_data_generater:
         self.materials = tuple(self.labels_train)
 
         del self.category[file_path_root]
-
+        print(self.csv_train)
     def __getitem__(self, idx):
         """
 

@@ -58,7 +58,7 @@ All_ID = ['Methane','Ethane', 'Propane', 'N-Butane','N-Pentane', 'N-Hexane', 'He
 
 # print(check_IDexist("('Ethane', 'Propane', 'N-Butane', 'N-Pentane', 'Heptane')",".\\result_of_cleaned_data\\XGBregressor\\"))
 
-a=generate_data.multicsv_data_generater("."+os.sep+"cleaned_data"+os.sep)
+a=generate_data.multicsv_data_generater()
 
 
 import multiprocessing
@@ -79,12 +79,12 @@ if __name__ == '__main__':
     comm=MPI.COMM_WORLD
     rank=comm.Get_rank()
     size=comm.Get_size()
-    
-    for i in range(1,8):
-        for com in combinations(All_ID,i):
-            IDs.append(com)
-    for i in range(rank,len(IDs),size):
-        f(IDs[i])
+    #
+    # for i in range(1,8):
+    #     for com in combinations(All_ID,i):
+    #         IDs.append(com)
+    # for i in range(rank,len(IDs),size):
+    #     f(IDs[i])
 
 
 
