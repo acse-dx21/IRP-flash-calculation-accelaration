@@ -1,0 +1,1 @@
+Maybe only use ANN to fit part of data will be better(need more information
