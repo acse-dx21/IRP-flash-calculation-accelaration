@@ -1,0 +1,9 @@
+,epoch,loss,time_use
+0,0.0,0.18964624404907227,290.00297594070435
+# <bound method Module.parameters of simple_ANN(
+  (l1): Linear(in_features=26, out_features=50, bias=True)
+  (l2): Linear(in_features=50, out_features=100, bias=True)
+  (l3): Linear(in_features=100, out_features=30, bias=True)
+  (output): Linear(in_features=30, out_features=14, bias=True)
+  (act): Sigmoid()
+)>/n# lr=0.005bs=512/n# ('Methane', 'Propane', 'N-Butane', 'N-Pentane', 'N-Hexane', 'Heptane')/n
