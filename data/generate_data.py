@@ -16,6 +16,64 @@ sys.path.append("..")
 from tool.log import TPZs_log
 
 
+class flashdata_modified(Dataset):
+    """
+    dataset of output: phase component of
+    """
+
+    def __init__(self, constants, properties, pd_conditions ,Systems="Vapor_Liquid"):
+        '''
+        :param constants: several meterial
+        :param properties: meterial properties
+        :param conditions: dictionary:{condition1: condition1_list,condition2: condition2_list}
+
+        :param zs_list: Mole fractions of each component list, required unless there is only
+            one component, [-]
+        :param Systems: one of ["pure","Vapor_Liquid","Vapor_Multi_Liquid"]
+        example:
+        >>> constants, properties = ChemicalConstantsPackage.from_IDs(['methane', 'ethane', 'nitrogen'])
+        >>> a=flashdata(constants,properties,{"T":[177.5,120.0],"P":[1e5,2e5]},[[.25, 0.7, .05],[.25, 0.7, .05]],"Vapor_Liquid")
+        >>> train_loader = DataLoader(a, shuffle=True,batch_size=1,collate_fn=collate_VL)
+        >>> a[0]
+        EquilibriumState(T=177.5, P=100000.0, zs=[0.25, 0.7, 0.05], betas=[0.9701227587661881, 0.029877241233811858], gas=<CEOSGas, T=177.5 K, P=100000 Pa>, liquids=[CEOSLiquid(eos_class=PRMIX, eos_kwargs={"Pcs": [4599000.0, 4872000.0, 3394387.5], "Tcs": [190.564, 305.32, 126.2], "omegas": [0.008, 0.098, 0.04], "kijs": [[0.0, -0.0059, 0.0289], [-0.0059, 0.0, 0.0533], [0.0289, 0.0533, 0.0]]}, HeatCapacityGases=[HeatCapacityGas(CASRN="74-82-8", MW=16.04246, similarity_variable=0.3116728980468083, extrapolation="linear", method="TRCIG"), HeatCapacityGas(CASRN="74-84-0", MW=30.06904, similarity_variable=0.26605438683775734, extrapolation="linear", method="TRCIG"), HeatCapacityGas(CASRN="7727-37-9", MW=28.0134, similarity_variable=0.07139440410660612, extrapolation="linear", method="TRCIG")], T=177.5, P=100000.0, zs=[0.009522975422008546, 0.9902824411636479, 0.00019458341434332182])], solids=[])
+        '''
+
+        super(flashdata_modified, self).__init__()
+        assert Systems in ["pure", "Vapor_Liquid", "Vapor_Liquid_Multi"]
+
+
+        self.condition=pd.DataFrame(pd_conditions)
+        self.len=len(self.condition)
+
+        if len(constants.names) == 1:
+            Systems = "pure"
+
+        if Systems == "Vapor_Liquid_Multi":
+            self.eos_kwargs = dict(Tcs=constants.Tcs, Pcs=constants.Pcs, omegas=constants.omegas)
+            self.gas = CEOSGas(SRKMIX, self.eos_kwargs, HeatCapacityGases=properties.HeatCapacityGases)
+            self.liq = CEOSLiquid(SRKMIX, self.eos_kwargs, HeatCapacityGases=properties.HeatCapacityGases)
+            self.flash = FlashVLN(constants, properties, liquids=[self.liq, self.liq], gas=self.gas)
+        elif Systems == "Vapor_Liquid":
+            self.kijs = IPDB.get_ip_asymmetric_matrix('ChemSep PR', constants.CASs, 'kij')
+            self.eos_kwargs = {'Pcs': constants.Pcs, 'Tcs': constants.Tcs, 'omegas': constants.omegas,
+                               'kijs': self.kijs}
+            self.gas = CEOSGas(PRMIX, eos_kwargs=self.eos_kwargs, HeatCapacityGases=properties.HeatCapacityGases)
+            self.liq = CEOSLiquid(PRMIX, eos_kwargs=self.eos_kwargs, HeatCapacityGases=properties.HeatCapacityGases)
+            self.flash = FlashVL(constants, properties, liquid=self.liq, gas=self.gas)
+        elif Systems == "pure":
+            self.eos_kwargs = dict(Tcs=constants.Tcs, Pcs=constants.Pcs, omegas=constants.omegas)
+            self.liq = CEOSLiquid(PRMIX, HeatCapacityGases=properties.HeatCapacityGases, eos_kwargs=self.eos_kwargs)
+            self.gas = CEOSGas(PRMIX, HeatCapacityGases=properties.HeatCapacityGases, eos_kwargs=self.eos_kwargs)
+            self.flash = FlashPureVLS(constants, properties, gas=self.gas, liquids=[self.liq], solids=[])
+
+    def __getitem__(self, idx):
+        dic=self.condition.iloc[idx].to_dict()
+        dic["zs"] = eval(dic.pop("zs"))
+        return self.flash.flash(**dic)
+
+    def __len__(self):
+        return self.len
+
 class flashdata(Dataset):
     """
     dataset of output: phase component of
@@ -223,7 +281,7 @@ def generate_good_TPZ(target_size, constants, properties, file_name, comment="No
                 pass
             continue
 
-    data = pd.DataFrame(dict(zip(["T", "P", "Zs"], [T_list_good, P_list_good, Zs_list_good])))
+    data = pd.DataFrame(dict(zip(["T", "P", "zs"], [T_list_good, P_list_good, Zs_list_good])))
     log = TPZs_log(file_name)
     log(data)
     log.release("#" + comment)
@@ -245,19 +303,19 @@ class Generate_data_from_csv:
 
         T_set = data["T"].tolist()
         P_set = data["P"].tolist()
-        Zs_set = data["Zs"].tolist()
+        Zs_set = data["zs"].tolist()
         for i in range(Zs_set.__len__()):
             Zs_set[i] = eval(Zs_set[i])
         return T_set, P_set, Zs_set
 
     def __init__(self, path_train, path_test):
+
         self.T_set_train_all, self.P_set_train_all, self.Zs_set_train_all = Generate_data_from_csv.read_good_TPZ_from_csv(
             path_train)
         self.T_set_test_all, self.P_set_test_all, self.Zs_set_test_all = Generate_data_from_csv.read_good_TPZ_from_csv(
             path_test)
 
-        print(path_train)
-        print(open(path_train).readlines()[-1])
+
         path_train_ID = eval(open(path_train).readlines()[-1].replace("#", "").replace("\\n", "").replace("/n", "").replace("  ", ","))
         path_test_ID = eval(open(path_test).readlines()[-1].replace("#", "").replace("\\n", "").replace("/n", "").replace("  ", ","))
 
@@ -316,8 +374,6 @@ class Generate_data_from_csv:
 
 import os
 
-
-
 class multicsv_data_generater:
     """
     generate all data from single file
@@ -358,7 +414,6 @@ class multicsv_data_generater:
         self.materials = tuple(self.labels_train)
 
         del self.category[file_path_root]
-        print(self.csv_train)
     def __getitem__(self, idx):
         """
 
@@ -366,6 +421,7 @@ class multicsv_data_generater:
         :param Datatype: one of "Dataloader" and "NParray"
         :return:
         """
+        print()
         if isinstance(idx, tuple):
             target_data = Generate_data_from_csv(self.csv_train[idx], self.csv_test[idx])
             material_ID = idx

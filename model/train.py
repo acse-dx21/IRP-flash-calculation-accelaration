@@ -87,6 +87,17 @@ class DeepNetwork_Train:
         epoch_logs_test.add(self.comment)
         epoch_logs_test.add(self.material)
 
+    def fit(self,xs,ys):
+        for x, y in zip(xs,ys):
+            x, y = x.to(device), y.to(device)
+            y_pred = self.model(x)
+            self.optimizer.zero_grad()
+            # loss = self.criterion(y_pred, y,x[:,-self.material_num:])
+            loss = self.criterion(y_pred, y)
+            loss.backward()
+            self.optimizer.step()
+
+
 import os
 def check_IDexist(ID,rootpath):
     for root, _, fnames in os.walk(rootpath):
