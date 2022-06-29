@@ -50,7 +50,12 @@ def grid_i(X_train, y_train):
 
 
 
-
+# @Misc{,
+#     author = {Fernando Nogueira},
+#     title = {{Bayesian Optimization}: Open source constrained global optimization tool for {Python}},
+#     year = {2014--},
+#     url = " https://github.com/fmfn/BayesianOptimization"
+# }
 # import os
 #
 # data_path = ".." + os.sep + "cleaned_data" + os.sep
@@ -95,7 +100,6 @@ from mpi4py import MPI
 
 
 def grid_i(X_train, y_train):
-    # train across 3 folds
     grid_search = GridSearchCV(XGBRegressor(objective='reg:squarederror', n_jobs=1, random_state=42),
                                param_grid,
                                cv=3,

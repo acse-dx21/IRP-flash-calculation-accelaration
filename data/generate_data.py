@@ -443,3 +443,10 @@ class multicsv_data_generater:
 
     def __len__(self):
         return len(self.materials)
+
+    def set_return_type(self,return_type):
+        assert return_type in ["Dataloader","NParray"]
+        self.return_type=return_type
+    @property
+    def get_return_type(self):
+        return self.return_type
