@@ -39,6 +39,10 @@ All_ID = ['Methane', 'Ethane', 'Propane', 'N-Butane', 'N-Pentane', 'N-Hexane', '
 relate_data=generate_data.multicsv_data_generater(mini_data_path)
 relate_data.set_return_type("Dataloader")
 
+train_loader=0
+test_loader=0
+Material_ID = 0
+
 param_grid = [
     {'subsample': [0.2, 0.6, 1.0],
      'learning_rate': [0.01, 0.05, 0.1],
@@ -62,10 +66,6 @@ result_path = "." + os.sep + "MSELoss_data" + os.sep
 
 from mpi4py import MPI
 
-all_data = generate_data.multicsv_data_generater(data_path, return_type="Dataloader")
-train_loader=0
-test_loader=0
-Material_ID = 0
 
 
 # model=ArtificialNN.Neural_Model_Sklearn_style(ArtificialNN.simple_ANN,{"material":Material_ID})
@@ -98,7 +98,7 @@ from mpi4py import MPI
 def get_related_path(Material_ID):
     return "mix_"+str(len(Material_ID))+os.sep+str(Material_ID)+".csv"
 
-def run_bayes_optimize(num_of_iteration=10,data_index=10):
+def run_bayes_optimize(num_of_iteration=3,data_index=10):
     BO_root="."+os.sep+"BO_result_data"+os.sep
     global train_loader, test_loader, Material_ID
     train_loader, test_loader, Material_ID = relate_data[data_index]
@@ -110,14 +110,17 @@ def run_bayes_optimize(num_of_iteration=10,data_index=10):
         )
 
     rf_bo.maximize(n_iter=num_of_iteration)
-    pd.DataFrame(rf_bo.max).to_csv(BO_root+get_related_path(Material_ID))
-run_bayes_optimize()
+    pd.DataFrame(rf_bo.res).to_csv(BO_root+get_related_path(Material_ID))
 
 
-# if __name__ == "__main__":
-#     comm = MPI.COMM_WORLD
-#     rank = comm.Get_rank()
-#     size = comm.Get_size()
+
+if __name__ == "__main__":
+    comm = MPI.COMM_WORLD
+    rank = comm.Get_rank()
+    size = comm.Get_size()
+
+    for i in range(len(relate_data) - rank - 1, -1, -size):
+        run_bayes_optimize(30,i)
 #
 #     all_data = generate_data.multicsv_data_generater(data_path, return_type="Dataloader")
 #

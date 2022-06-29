@@ -52,7 +52,7 @@ class Neural_Model_Sklearn_style:
         self.data_record={}
         self.device = "cuda" if torch.cuda.is_available() else "cpu"
 
-    def fit(self, Data_loader, epoch=10, criterion=nn.MSELoss(),optimizer = None):
+    def fit(self, Data_loader, epoch=15, criterion=nn.MSELoss(),optimizer = None):
         self.model.train()
 
         if optimizer==None:

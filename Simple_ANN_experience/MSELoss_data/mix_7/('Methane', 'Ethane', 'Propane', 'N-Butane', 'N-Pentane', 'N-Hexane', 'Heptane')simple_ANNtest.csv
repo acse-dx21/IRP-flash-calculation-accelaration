@@ -5,4 +5,4 @@
   (l3): Linear(in_features=100, out_features=30, bias=True)
   (output): Linear(in_features=30, out_features=16, bias=True)
   (act): Sigmoid()
-)>\n# 7\n
+)>/n# lr=0.005bs=512/n# ('Methane', 'Ethane', 'Propane', 'N-Butane', 'N-Pentane', 'N-Hexane', 'Heptane')/n
