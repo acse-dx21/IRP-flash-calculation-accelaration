@@ -122,7 +122,7 @@ if __name__ == "__main__":
     size = comm.Get_size()
 
     for i in range(rank, 128, size):
-        run_bayes_optimize(1,i)
+        run_bayes_optimize(100,i)
 #
 #     all_data = generate_data.multicsv_data_generater(data_path, return_type="Dataloader")
 #

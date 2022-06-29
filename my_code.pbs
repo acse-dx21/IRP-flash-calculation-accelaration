@@ -10,10 +10,10 @@ cd $home
 
 pwd
 
-cd IRP_flash
+cd IRP_flash_calculation_accelaration
 
-cd XGB_experience
+cd Simple_ANN_experience
 
 pwd
 
-mpiexec -n 48 python XGB.py --BO 50
+mpiexec -n 48 python Simple_ANN.py
