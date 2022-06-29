@@ -38,7 +38,7 @@ mini_data_path=".."+os.sep+"data"+os.sep+"mini_cleaned_data"+os.sep
 All_ID = ['Methane', 'Ethane', 'Propane', 'N-Butane', 'N-Pentane', 'N-Hexane', 'Heptane']
 relate_data=generate_data.multicsv_data_generater(mini_data_path)
 relate_data.set_return_type("Dataloader")
-
+relate_data.set_batch_size(128)
 train_loader=0
 test_loader=0
 Material_ID = 0

@@ -447,6 +447,10 @@ class multicsv_data_generater:
     def set_return_type(self,return_type):
         assert return_type in ["Dataloader","NParray"]
         self.return_type=return_type
+
+    def set_batch_size(self,batch_size):
+        assert batch_size>0
+        self.batch_size=batch_size
     @property
     def get_return_type(self):
         return self.return_type
