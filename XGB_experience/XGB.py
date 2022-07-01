@@ -132,7 +132,7 @@ def run_bayes_optimize(num_of_iteration=10,data_index=10):
         )
 
     rf_bo.maximize(n_iter=num_of_iteration)
-    pd.DataFrame(rf_bo.max).to_csv(BO_root+get_related_path(material_ID))
+    pd.DataFrame(rf_bo.res).to_csv(BO_root+get_related_path(material_ID))
 
 def run_Grid_search(num_of_iteration):
     print(num_of_iteration)
@@ -151,7 +151,7 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     if args.BO is not None or stratigy=="BO":
-        for i in range(rank,128,size):
+        for i in range(rank+80,128,size):
             run_bayes_optimize(args.BO,i)
     elif args.GS is not None or stratigy=="GS":
         run_Grid_search(args.GS)

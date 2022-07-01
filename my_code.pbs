@@ -12,8 +12,8 @@ pwd
 
 cd IRP_flash_calculation_accelaration
 
-cd Simple_ANN_experience
+cd XGB_experience
 
 pwd
 
-mpiexec -n 48 python Simple_ANN.py
+mpiexec -n 48 python XGB.py --BO 100
