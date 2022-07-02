@@ -59,14 +59,18 @@ class Neural_Model_Sklearn_style:
             optimizer=torch.optim.Adam(self.model.parameters())
         train_loss_record = []
         start = time.time()
+
+
         for i in range(epoch):
             for x, y in Data_loader:
                 loss_to_mean=[]
                 x, y = x.to(self.device), y.to(self.device)
                 y_pred = self.model(x)
                 optimizer.zero_grad()
-                # loss = self.criterion(y_pred, y,x[:,-self.material_num:])
-                loss = criterion(y_pred, y)
+                if criterion != nn.MSELoss():
+                    loss = criterion(y_pred, y, x[:, -self.model.material_num:])
+                else:
+                    loss = criterion(y_pred, y)
                 loss.backward()
                 loss_to_mean.append(loss.item())
                 optimizer.step()

@@ -106,7 +106,7 @@ def grid_i(X_train, y_train):
                                scoring='neg_mean_squared_error',
                                return_train_score=True,
                                verbose=1,
-                               n_jobs=1)
+                               n_jobs=2)
 
     start = time.time()
     grid_search.fit(X_train, y_train)
