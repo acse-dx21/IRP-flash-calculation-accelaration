@@ -1,0 +1,20 @@
+/rds/general/user/dx21/home
+/rds/general/user/dx21/home/IRP_flash_calculation_accelaration/LightGBM_experience
+
+# mpiexec: MPI Program startup
+
+
+# mpiexec: Running in job 5786981.pbs at Fri  1 Jul 16:23:30 BST 2022
+# mpiexec: Fabric configuration:
+# mpiexec: node class CX3
+# mpiexec: libfabric provider verbs
+# mpiexec: libfabric inferface eth0
+# mpiexec: MPI-IO configuration on / gpfs
+# mpiexec: full path to program is /rds/general/user/dx21/home/anaconda3/bin/python
+# mpiexec: program arguments are: LightGBM.py --BO 100
+# mpiexec: 48 ranks allocated via PBS select
+# mpiexec: 1 OpenMP threads / rank allocated by PBS select
+# mpiexec: 48 ranks per node
+# mpiexec: There are 256 cores/node. 48 will be used for this job
+# mpiexec: Job has shared use of the allocated nodes. Disabling process-pinning
+# mpiexec: Node is shared. Disabling process pinning

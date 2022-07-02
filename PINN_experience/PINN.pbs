@@ -1,0 +1,19 @@
+#PBS -N process_PINN_BO_128
+#PBS -l walltime=72:00:00
+#PBS -l select=1:ncpus=128:mpiprocs=128:mem=480GB
+
+module load intel-suite
+module load mpi
+module load anaconda3/personal
+
+cd $home
+
+pwd
+
+cd IRP_flash_calculation_accelaration
+
+cd PINN_experience
+
+pwd
+
+mpiexec -n 128 python PINN.py --BO 100

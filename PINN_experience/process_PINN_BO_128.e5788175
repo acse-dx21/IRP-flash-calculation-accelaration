@@ -1,0 +1,8 @@
+Traceback (most recent call last):
+  File "/rds/general/user/dx21/home/IRP_flash_calculation_accelaration/PINN_experience/PINN.py", line 111, in <module>
+    run_bayes_optimize(100,i)
+  File "/rds/general/user/dx21/home/IRP_flash_calculation_accelaration/PINN_experience/PINN.py", line 94, in run_bayes_optimize
+    train_loader, test_loader, Material_ID = relate_data[data_index]
+  File "/rds/general/user/dx21/home/IRP_flash_calculation_accelaration/PINN_experience/../data/generate_data.py", line 430, in __getitem__
+    target_data = Generate_data_from_csv(self.csv_train[self.materials[idx]],
+IndexError: tuple index out of range
