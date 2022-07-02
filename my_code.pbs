@@ -1,6 +1,6 @@
 #PBS -N process_XGB_BO_48
-#PBS -l walltime=23:00:00
-#PBS -l select=1:ncpus=48:mpiprocs=48:mem=120GB
+#PBS -l walltime=48:00:00
+#PBS -l select=1:ncpus=96:mpiprocs=96:mem=240GB
 
 module load intel-suite
 module load mpi

@@ -1,0 +1,19 @@
+#PBS -N process_LGBM_BO_24_2
+#PBS -l walltime=48:00:00
+#PBS -l select=1:ncpus=80:mpiprocs=80:mem=480GB
+
+module load intel-suite
+module load mpi
+module load anaconda3/personal
+
+cd $home
+
+pwd
+
+cd IRP_flash_calculation_accelaration
+
+cd LightGBM_experience
+
+pwd
+
+mpiexec -n 40 python LightGBM.py --BO 100
