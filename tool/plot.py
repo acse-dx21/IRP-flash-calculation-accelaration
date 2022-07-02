@@ -2,10 +2,12 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 import numpy as np
 import os
+import pandas as pd
 path1="E:\Ic document\IRP-Accelerating-flash-calculation-through-deep-learn\Simple_ANN_experience\My_Mass_Balance_loss_data"
 path2="E:\Ic document\IRP-Accelerating-flash-calculation-through-deep-learn\Simple_ANN_experience\MSELoss_data"
 import matplotlib.pyplot as plt
 import pandas as pd
+import seaborn as sns
 def cross_plot(path1,path2):
     files1 = os.listdir(path1)
     files2 = os.listdir(path2)
@@ -31,4 +33,67 @@ def cross_plot(path1,path2):
     plt.show()
 
 
-cross_plot(path1,path2)
+class line_bar_plot_from_csv:
+    def __init__(self,name):
+        self.name=name
+
+
+    def collect_file(self,root):
+        collected_file=[]
+        for root, _ , files in os.walk(root):
+            for file in files:
+                collected_file.append(os.path.join(root,file))
+
+        return collected_file
+
+    def _collect_data(self,path):
+        return pd.read_csv(path,index_col=0)["target"]
+
+
+    def structed_plot_files(self,root):
+        cnt=0
+        collected_data={}
+
+        for roots, dir,files in os.walk(root):
+            sigle_material_data = []
+            print(files)
+            for file in files:
+                # print(file)
+                sigle_material_data.append(self._collect_data(os.path.join(roots,file)))
+                # print(len(sigle_material_data))
+            try:
+                df=pd.concat(sigle_material_data,axis=0,ignore_index=True)
+                collected_data[cnt]=df
+                print(cnt)
+            except:
+                pass
+            cnt+=1
+            # print(root)
+
+
+        return pd.DataFrame(collected_data)
+
+    def plot_files(self,root):
+        files=self.collect_file(root)
+        cnt=0
+        collect={}
+        for file in files:
+
+            data=self._collect_data(file)
+            cnt+=1;
+            collect[cnt]=data
+        return pd.DataFrame(collect)
+
+
+
+
+
+
+
+
+
+a= line_bar_plot_from_csv("test")
+file="..\\XGB_experience\\BO_result_data\\mix_3\\('Ethane', 'N-Butane', 'N-Pentane').csv"
+root="..\\XGB_experience\\BO_result_data\\"
+a.structed_plot_files(root).plot.box()
+plt.show()

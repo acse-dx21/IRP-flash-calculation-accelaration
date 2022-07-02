@@ -9,7 +9,8 @@ class simple_ANN(nn.Module):
         self.material=material
         self.material_num=len(material)
         self.input = nn.Linear(self.material_num * 4 + 2, Nodes_per_layer)
-
+        self.drop = nn.Dropout(0.25)
+        self.BN=nn.BatchNorm1d(Nodes_per_layer)
         self.layers=nn.ModuleList()
         for i in range(1,deepth):
             self.layers.append(nn.Linear(Nodes_per_layer, Nodes_per_layer))
@@ -20,7 +21,7 @@ class simple_ANN(nn.Module):
     def forward(self,x):
         x = self.act(self.input(x))
         for layer in self.layers:
-            x=self.act(layer(x))
+            x= self.drop(self.BN(self.act(layer(x))))
         x = self.act(self.output(x))
         return x
 
@@ -59,14 +60,18 @@ class Neural_Model_Sklearn_style:
             optimizer=torch.optim.Adam(self.model.parameters())
         train_loss_record = []
         start = time.time()
+
+
         for i in range(epoch):
             for x, y in Data_loader:
                 loss_to_mean=[]
                 x, y = x.to(self.device), y.to(self.device)
                 y_pred = self.model(x)
                 optimizer.zero_grad()
-                # loss = self.criterion(y_pred, y,x[:,-self.material_num:])
-                loss = criterion(y_pred, y)
+                if criterion != nn.MSELoss():
+                    loss = criterion(y_pred, y, x[:, -self.model.material_num:])
+                else:
+                    loss = criterion(y_pred, y)
                 loss.backward()
                 loss_to_mean.append(loss.item())
                 optimizer.step()
