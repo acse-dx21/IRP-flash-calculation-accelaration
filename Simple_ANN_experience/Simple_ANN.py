@@ -85,8 +85,7 @@ def model_cv(**kwargs):
     kwargs["Nodes_per_layer"] = int(kwargs["Nodes_per_layer"])
     kwargs["deepth"] = int(kwargs["deepth"])
     kwargs["material"]=Material_ID
-    model_instance = ArtificialNN.Neural_Model_Sklearn_style(ArtificialNN.simple_ANN,kwargs
-        )
+    model_instance = ArtificialNN.Neural_Model_Sklearn_style(ArtificialNN.simple_ANN,kwargs)
 
     model_instance.fit(train_loader,epoch=30)
     score=model_instance.score(test_loader)
@@ -105,6 +104,7 @@ def run_bayes_optimize(num_of_iteration=1,data_index=10):
     BO_root="."+os.sep+"BO_result_data"+os.sep
     global train_loader, test_loader, Material_ID
     train_loader, test_loader, Material_ID = relate_data[data_index]
+    print(Material_ID)
     rf_bo = BayesianOptimization(
             model_cv,
         {'Nodes_per_layer': [100, 1000],
@@ -121,7 +121,8 @@ if __name__ == "__main__":
     rank = comm.Get_rank()
     size = comm.Get_size()
 
-    for i in range(80+rank, 128, size):
+    for i in range(125+rank, 127, size):
+        print(i)
         run_bayes_optimize(100,i)
 #
 #     all_data = generate_data.multicsv_data_generater(data_path, return_type="Dataloader")

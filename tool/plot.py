@@ -36,7 +36,7 @@ def cross_plot(path1,path2):
 class line_bar_plot_from_csv:
     def __init__(self,name):
         self.name=name
-
+        self.data=[]
 
     def collect_file(self,root):
         collected_file=[]
@@ -50,28 +50,43 @@ class line_bar_plot_from_csv:
         return pd.read_csv(path,index_col=0)["target"]
 
 
-    def structed_plot_files(self,root):
+    def structed_add_files(self,root):
         cnt=0
         collected_data={}
 
         for roots, dir,files in os.walk(root):
             sigle_material_data = []
-            print(files)
+
             for file in files:
                 # print(file)
                 sigle_material_data.append(self._collect_data(os.path.join(roots,file)))
                 # print(len(sigle_material_data))
             try:
                 df=pd.concat(sigle_material_data,axis=0,ignore_index=True)
-                collected_data[cnt]=df
-                print(cnt)
+                collected_data["C_"+str(cnt)]=df
+
             except:
                 pass
             cnt+=1
             # print(root)
 
+        self.data.append(pd.DataFrame(collected_data))
 
-        return pd.DataFrame(collected_data)
+    def plot(self):
+        data_rearrange=[]
+        position=[]
+        fig, ax = plt.subplots()  # 子图
+        # print(self.data[0]["mix_"+str(1)])
+        for i in range(7):
+            for j in range(len(self.data)):
+                try:
+                    data_rearrange.append(self.data[j]["C_"+str(i)].dropna(axis=0,how="any").to_numpy()*-1)
+                    position.append(j*0.1+i)
+                except:
+                    pass
+        print(position)
+        print(len(data_rearrange[0]))
+        ax.boxplot(data_rearrange,positions=position,patch_artist=True)
 
     def plot_files(self,root):
         files=self.collect_file(root)
@@ -80,7 +95,7 @@ class line_bar_plot_from_csv:
         for file in files:
 
             data=self._collect_data(file)
-            cnt+=1;
+            cnt+=1
             collect[cnt]=data
         return pd.DataFrame(collect)
 
@@ -94,6 +109,9 @@ class line_bar_plot_from_csv:
 
 a= line_bar_plot_from_csv("test")
 file="..\\XGB_experience\\BO_result_data\\mix_3\\('Ethane', 'N-Butane', 'N-Pentane').csv"
-root="..\\XGB_experience\\BO_result_data\\"
-a.structed_plot_files(root).plot.box()
+root1="..\\Simple_ANN_experience\\BO_result_data\\"
+root2="..\\XGB_experience\\BO_result_data\\"
+a.structed_add_files(root1)
+a.structed_add_files(root2)
+a.plot()
 plt.show()

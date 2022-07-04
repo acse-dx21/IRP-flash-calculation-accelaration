@@ -427,6 +427,7 @@ class multicsv_data_generater:
             material_ID = idx
 
         if isinstance(idx, int):
+            print(self.materials)
             target_data = Generate_data_from_csv(self.csv_train[self.materials[idx]],
                                                  self.csv_test[self.materials[idx]])
             material_ID = self.materials[idx]
