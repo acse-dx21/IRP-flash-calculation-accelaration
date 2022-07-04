@@ -77,6 +77,7 @@ def model_cv(**kwargs):
     model_instance.fit(train_loader,epoch=30,criterion=PINN_loss)
 
     score=model_instance.score(test_loader)
+
     data_root="."+os.sep+"BO_training_routing"+os.sep
     pd.DataFrame(model_instance.data_record).to_csv(data_root + get_related_path(Material_ID))
 

@@ -36,7 +36,7 @@ import time
 mini_data_path=".."+os.sep+"data"+os.sep+"mini_cleaned_data"+os.sep
 
 All_ID = ['Methane', 'Ethane', 'Propane', 'N-Butane', 'N-Pentane', 'N-Hexane', 'Heptane']
-relate_data=generate_data.multicsv_data_generater(mini_data_path)
+relate_data=generate_data.multicsv_data_generater()
 relate_data.set_return_type("Dataloader")
 relate_data.set_batch_size(128)
 train_loader=0
@@ -105,6 +105,7 @@ def run_bayes_optimize(num_of_iteration=1,data_index=10):
     BO_root="."+os.sep+"BO_result_data"+os.sep
     global train_loader, test_loader, Material_ID
     train_loader, test_loader, Material_ID = relate_data[data_index]
+    print(Material_ID)
     rf_bo = BayesianOptimization(
             model_cv,
         {'Nodes_per_layer': [100, 1000],
@@ -120,9 +121,15 @@ if __name__ == "__main__":
     comm = MPI.COMM_WORLD
     rank = comm.Get_rank()
     size = comm.Get_size()
+    if rank==0:
+        run_bayes_optimize(100, 119)
+    if rank == 1:
+        run_bayes_optimize(100, 121)
+    if rank == 2:
+        run_bayes_optimize(100, 126)
 
-    for i in range(80+rank, 128, size):
-        run_bayes_optimize(100,i)
+    # for i in range(119, 127, size):
+    #     run_bayes_optimize(100,i)
 #
 #     all_data = generate_data.multicsv_data_generater(data_path, return_type="Dataloader")
 #

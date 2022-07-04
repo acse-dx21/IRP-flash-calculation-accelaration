@@ -5,4 +5,6 @@ def test(a,b,c):
 
 a=1;
 aw={"b":0,"c":2}
-test(a,**aw)
+import pandas
+
+print(pandas.DataFrame.from_dict(aw,orient='index'))
