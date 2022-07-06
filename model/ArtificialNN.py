@@ -152,12 +152,13 @@ class Neural_Model_Sklearn_style:
         self.data_record={}
         self.device = "cuda" if torch.cuda.is_available() else "cpu"
 
-    def fit(self, train,target, epoch=205, batch_size=128,criterion=nn.MSELoss(),optimizer = None):
+    def fit(self, train,target, epoch=15, batch_size=128,criterion=nn.MSELoss(),optimizer = None):
         self.model.train()
         Data_loader=DataLoader(TensorDataset(torch.from_numpy(train.astype(np.float32)),torch.from_numpy(target.astype(np.float32))),batch_size=batch_size, shuffle=True)
         if optimizer==None:
             optimizer=torch.optim.Adam(self.model.parameters())
         train_loss_record = []
+        train_time_record  =[]
         start = time.time()
 
 
@@ -175,8 +176,8 @@ class Neural_Model_Sklearn_style:
                 loss_to_mean.append(loss.item())
                 optimizer.step()
             train_loss_record.append(np.mean(loss_to_mean))
-
-        self.data_record["trainning_time_consume(s)"] = time.time() - start
+            train_time_record.append(time.time() - start)
+        self.data_record["trainning_time_consume(s)"] = train_time_record
         self.data_record["train_loss_record"] = train_loss_record
         return self.data_record
 
@@ -189,7 +190,6 @@ class Neural_Model_Sklearn_style:
         start = time.time()
         test_loss_record = []
         for x, y in Test_loader:
-            print(x.shape)
             x, y = x.to(self.device), y.to(self.device)
             y_pred = self.model(x)
             # loss = self.criterion(y_pred, y,x[:,-self.material_num:])

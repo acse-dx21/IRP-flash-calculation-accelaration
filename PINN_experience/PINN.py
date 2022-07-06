@@ -69,7 +69,7 @@ def model_cv(**kwargs):
     model_instance = ArtificialNN.Neural_Model_Sklearn_style(ArtificialNN.simple_ANN, model_kwargs
                                                              )
 
-    PINN_loss = My_Mass_Balance_loss(1, kwargs["My_Mass_Balance_loss"])
+    PINN_loss = My_Mass_Balance_loss(kwargs["My_Mass_Balance_loss"],1 )
     model_instance.fit(X_train, y_train, epoch=30, criterion=PINN_loss)
 
     score = model_instance.score(X_test, y_test)

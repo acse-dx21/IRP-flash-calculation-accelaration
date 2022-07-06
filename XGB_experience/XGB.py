@@ -12,11 +12,9 @@ import time
 import os
 from xgboost import XGBRegressor
 mini_data_path=".."+os.sep+"data"+os.sep+"mini_cleaned_data"+os.sep
-<<<<<<< HEAD
 relate_data = generate_data.multicsv_data_generater(mini_data_path)
-=======
-relate_data = generate_data.multicsv_data_generater()
->>>>>>> d46581c492e5617ca50ca6a2a9f891c69bb77c0d
+# relate_data = generate_data.multicsv_data_generater()
+
 
 X_train = 0
 y_train = 0
@@ -70,7 +68,7 @@ from sklearn.metrics import mean_squared_error
 
 #
 
-data_record = {"train_time": [], "test_time": []}
+data_record = {"trainning_time_consume(s)": [], "test_time_consume(s)": []}
 def model_cv(**kwargs):
     subsample = kwargs["subsample"] if "subsample" in kwargs.keys() else 0.5
     learning_rate = kwargs["learning_rate"] if "learning_rate" in kwargs.keys() else 0.05
@@ -86,11 +84,9 @@ def model_cv(**kwargs):
         max_depth=int(max_depth),
         colsample_bytree=colsample_bytree,
         reg_lambda=reg_lambda,
-<<<<<<< HEAD
-        n_jobs=8
-=======
-        n_jobs=2
->>>>>>> d46581c492e5617ca50ca6a2a9f891c69bb77c0d
+
+        n_jobs=1
+
     ).fit(X_train, y_train)
     train_time = time.time()-start_train
 
@@ -98,8 +94,8 @@ def model_cv(**kwargs):
     pred = model_instance.predict(X_test)
     test_time = time.time()-start_pred
 
-    data_record["train_time"].append(train_time)
-    data_record["test_time"].append(test_time)
+    data_record["trainning_time_consume(s)"].append(train_time)
+    data_record["test_time_consume(s)"].append(test_time)
 
     return -mean_squared_error(pred, y_test)
 
@@ -145,8 +141,12 @@ def run_bayes_optimize(num_of_iteration=10, data_index=10):
     rf_bo.maximize(n_iter=num_of_iteration)
     result_data_root = "." + os.sep + "BO_result_data" + os.sep
     routing_data_root = "." + os.sep + "BO_training_routing" + os.sep
-
-    pd.DataFrame(data_record).to_csv(routing_data_root + get_related_path(Material_ID))
+    print(pd.DataFrame(data_record))
+    print(os.getcwd())
+    print(routing_data_root + get_related_path(Material_ID))
+    print(pd.DataFrame(data_record).to_csv(routing_data_root + get_related_path(Material_ID)))
+    data_record["trainning_time_consume(s)"].clear()
+    data_record["test_time_consume(s)"].clear()
     # pd.DataFrame(rf_bo.res).to_csv(result_data_root+get_related_path(Material_ID))
 
 
@@ -167,11 +167,8 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     if args.BO is not None or stratigy == "BO":
-<<<<<<< HEAD
-        for i in range(rank + 80, 128, size):
-=======
-        for i in range(64, 127, size):
->>>>>>> d46581c492e5617ca50ca6a2a9f891c69bb77c0d
+
+        for i in range(rank, 128, size):
             run_bayes_optimize(5, i)
     elif args.GS is not None or stratigy == "GS":
         run_Grid_search(args.GS)

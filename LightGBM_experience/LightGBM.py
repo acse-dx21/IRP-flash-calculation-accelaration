@@ -96,8 +96,8 @@ def model_cv(**kwargs):
     pred = model_instance.predict(X_test)
     test_time = time.time() - start_pred
 
-    data_record["train_time"].append(train_time)
-    data_record["test_time"].append(test_time)
+    data_record["trainning_time_consume(s)"].append(train_time)
+    data_record["test_time_consume(s)"].append(test_time)
 
     return -mean_squared_error(pred, y_test)
 
@@ -145,6 +145,8 @@ def run_bayes_optimize(num_of_iteration=10,data_index=10):
     routing_data_root = "." + os.sep + "BO_training_routing" + os.sep
 
     pd.DataFrame(data_record).to_csv(routing_data_root + get_related_path(material_ID))
+    data_record["trainning_time_consume(s)"].clear()
+    data_record["test_time_consume(s)"].clear()
     # pd.DataFrame(rf_bo.res).to_csv(BO_root+get_related_path(material_ID))
 
 def run_Grid_search(num_of_iteration):

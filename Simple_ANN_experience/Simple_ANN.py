@@ -82,17 +82,28 @@ def get_related_path(Material_ID):
 
 
 from bayes_opt import BayesianOptimization
-
+data_record = {"trainning_time_consume(s)": [], "test_time_consume(s)": []}
 def model_cv(**kwargs):
     kwargs["Nodes_per_layer"] = int(kwargs["Nodes_per_layer"])
     kwargs["deepth"] = int(kwargs["deepth"])
     kwargs["material"]=Material_ID
     model_instance = ArtificialNN.Neural_Model_Sklearn_style(ArtificialNN.simple_ANN,kwargs)
 
+    # record_data
+    start_train = time.time()
     model_instance.fit(X_train,y_train,epoch=30)
     score=model_instance.score(X_test,y_test)
-    data_root="."+os.sep+"BO_training_routing"+os.sep
-    pd.DataFrame(model_instance.data_record).to_csv(data_root + get_related_path(Material_ID))
+
+    train_time = time.time() - start_train
+    start_pred = time.time()
+    pred = model_instance.predict(X_test)
+    test_time = time.time() - start_pred
+
+    data_record["trainning_time_consume(s)"].append(train_time)
+    data_record["test_time_consume(s)"].append(test_time)
+
+    epoch_root="."+os.sep+"BO_epoch_routing"+os.sep
+    pd.DataFrame(model_instance.data_record).to_csv(epoch_root + get_related_path(Material_ID))
 
     return -score
 
@@ -104,6 +115,7 @@ from mpi4py import MPI
 
 def run_bayes_optimize(num_of_iteration=1,data_index=10):
     BO_root="."+os.sep+"BO_result_data"+os.sep
+    BO_routing = "." + os.sep + "BO_training_routing" + os.sep
     global X_train, y_train, X_test, y_test, Material_ID
 
     X_train, y_train, X_test, y_test, Material_ID = relate_data[data_index]
@@ -115,8 +127,10 @@ def run_bayes_optimize(num_of_iteration=1,data_index=10):
         )
 
     rf_bo.maximize(n_iter=num_of_iteration)
-    pd.DataFrame(rf_bo.res).to_csv(BO_root+get_related_path(Material_ID))
-
+    # pd.DataFrame(rf_bo.res).to_csv(BO_root+get_related_path(Material_ID))
+    pd.DataFrame(data_record).to_csv(BO_routing + get_related_path(Material_ID))
+    data_record["trainning_time_consume(s)"].clear()
+    data_record["test_time_consume(s)"].clear()
 
 
 if __name__ == "__main__":
@@ -125,16 +139,11 @@ if __name__ == "__main__":
     size = comm.Get_size()
 
 
-    for i in range(125+rank, 127, size):
-        print(i)
-        run_bayes_optimize(100,i)
+    # for i in range(rank, 127, size):
+    #     print(i)
+    run_bayes_optimize(10,126)
 
-    if rank==0:
-        run_bayes_optimize(100, 119)
-    if rank == 1:
-        run_bayes_optimize(100, 121)
-    if rank == 2:
-        run_bayes_optimize(100, 126)
+
 
     # for i in range(119, 127, size):
     #     run_bayes_optimize(100,i)

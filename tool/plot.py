@@ -47,9 +47,8 @@ class line_bar_plot_from_csv:
 
         return collected_file
 
-    def _collect_data(self,path,name):
-        print(pd.read_csv(path,index_col=0))
-        return pd.read_csv(path,index_col=0)[name]
+    def _collect_data(self,path,target):
+        return pd.read_csv(path,index_col=0)[target]
 
 
     def structed_add_files(self,root,target):
@@ -65,7 +64,14 @@ class line_bar_plot_from_csv:
             sigle_material_data = []
 
             for file in files:
-                # print(file)
+                print(file)
+                corrct=pd.read_csv(os.path.join(roots, file),index_col=0)
+                if "train_time" in corrct.columns:
+                    print(corrct)
+                    corrct.columns=['trainning_time_consume(s)','test_time_consume(s)']
+                    print(corrct)
+                    corrct.to_csv(os.path.join(roots, file))
+                self._collect_data(os.path.join(roots, file), target)
                 sigle_material_data.append(self._collect_data(os.path.join(roots,file),target))
                 # print(len(sigle_material_data))
             try:
@@ -124,7 +130,7 @@ class line_bar_plot_from_csv:
             X = []
             for col in self.data[key].columns:
                 cnt_col+=1
-                data.append(self.data[key][col].dropna(axis=0,how="any").mean()*-1)
+                data.append(self.data[key][col].dropna(axis=0,how="any").mean())
                 X.append(cnt_col)
 
 
@@ -158,19 +164,21 @@ class line_bar_plot_from_csv:
 
 
 a= line_bar_plot_from_csv("test")
-file="..\\XGB_experience\\BO_result_data\\mix_3\\('Ethane', 'N-Butane', 'N-Pentane').csv"
+# file="..\\XGB_experience\\BO_result_data\\mix_3\\('Ethane', 'N-Butane', 'N-Pentane').csv"
+# root1="..\\Simple_ANN_experience\\BO_result_data\\"
+# root2="..\\XGB_experience\\BO_result_data\\"
+# root3="..\\LightGBM_experience\\BO_result_data\\"
+
 root1="..\\Simple_ANN_experience\\BO_result_data\\"
-root2="..\\XGB_experience\\BO_result_data\\"
-root3="..\\LightGBM_experience\\BO_result_data\\"
-
-root1="..\\Simple_ANN_experience\\BO_training_routing\\"
-root2="..\\XGB_experience\\BO_training_routing\\"
-root3="..\\LightGBM_experience\\BO_training_routing\\"
-
-a.structed_add_files(root1,"trainning_time_consume(s)")
+# root2="..\\XGB_experience\\BO_training_routing\\"
+# root3="..\\LightGBM_experience\\BO_training_routing\\"
+root4="..\\PINN_experience\\BO_result_data\\"
+target="target"
+a.structed_add_files(root1,target)
 print(a.data)
 
-a.structed_add_files(root2,"trainning_time_consume(s)")
-a.structed_add_files(root3,"test_time")
-a.plot_box()
+a.structed_add_files(root4,target)
+# a.structed_add_files(root3,target)
+ax=a.plot_box()
+plt.ylabel(target)
 plt.show()
