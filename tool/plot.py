@@ -36,9 +36,10 @@ def cross_plot(path1,path2):
 class line_bar_plot_from_csv:
     def __init__(self,name):
         self.name=name
-        self.data=[]
-
-    def collect_file(self,root):
+        self.data={}
+        self.fig, self.ax = plt.subplots()
+        self.colors=['pink', 'lightblue', 'lightgreen']
+    def collect_file_path(self,root):
         collected_file=[]
         for root, _ , files in os.walk(root):
             for file in files:
@@ -46,11 +47,17 @@ class line_bar_plot_from_csv:
 
         return collected_file
 
-    def _collect_data(self,path):
-        return pd.read_csv(path,index_col=0)["target"]
+    def _collect_data(self,path,name):
+        print(pd.read_csv(path,index_col=0))
+        return pd.read_csv(path,index_col=0)[name]
 
 
-    def structed_add_files(self,root):
+    def structed_add_files(self,root,target):
+        """
+        add Dataframe files,with key = mix_i and values= dataframe(comb(materials datas))
+        :param root:
+        :return:
+        """
         cnt=0
         collected_data={}
 
@@ -59,7 +66,7 @@ class line_bar_plot_from_csv:
 
             for file in files:
                 # print(file)
-                sigle_material_data.append(self._collect_data(os.path.join(roots,file)))
+                sigle_material_data.append(self._collect_data(os.path.join(roots,file),target))
                 # print(len(sigle_material_data))
             try:
                 df=pd.concat(sigle_material_data,axis=0,ignore_index=True)
@@ -69,9 +76,10 @@ class line_bar_plot_from_csv:
                 pass
             cnt+=1
             # print(root)
+        target=root.split("\\")[1]
 
-        self.data.append(pd.DataFrame(collected_data))
-
+        self.data[target]=pd.DataFrame(collected_data)
+        return self.data
     def plot(self):
         data_rearrange=[]
         position=[]
@@ -86,7 +94,49 @@ class line_bar_plot_from_csv:
                     pass
         print(position)
         print(len(data_rearrange[0]))
-        ax.boxplot(data_rearrange,positions=position,patch_artist=True)
+        ax.boxplot(data_rearrange,positions=position,patch_artist=True,label="")
+
+    def plot_box(self):
+        cnt=0
+        for key in self.data.keys():
+
+            data=[]
+            for col in self.data[key].columns:
+
+                data.append(self.data[key][col].dropna(axis=0,how="any").to_numpy()*-1)
+            boxprops = {'facecolor': self.colors[cnt]}
+
+            self.ax.boxplot(data,patch_artist=True,boxprops=boxprops)
+            cnt += 1
+
+        self.ax.legend(self.data.keys())
+        return self.ax
+
+    def plot_line(self,add=False):
+        if(add):
+            self.ax=self.ax.twinx()
+
+        cnt=0;
+
+        for key in self.data.keys():
+            data=[]
+            cnt_col=0
+            X = []
+            for col in self.data[key].columns:
+                cnt_col+=1
+                data.append(self.data[key][col].dropna(axis=0,how="any").mean()*-1)
+                X.append(cnt_col)
+
+
+            print(cnt)
+            self.ax.plot(X,data,color=self.colors[cnt])
+            cnt += 1
+
+
+        self.ax.legend(self.data.keys())
+        return self.ax
+
+
 
     def plot_files(self,root):
         files=self.collect_file(root)
@@ -111,7 +161,16 @@ a= line_bar_plot_from_csv("test")
 file="..\\XGB_experience\\BO_result_data\\mix_3\\('Ethane', 'N-Butane', 'N-Pentane').csv"
 root1="..\\Simple_ANN_experience\\BO_result_data\\"
 root2="..\\XGB_experience\\BO_result_data\\"
-a.structed_add_files(root1)
-a.structed_add_files(root2)
-a.plot()
+root3="..\\LightGBM_experience\\BO_result_data\\"
+
+root1="..\\Simple_ANN_experience\\BO_training_routing\\"
+root2="..\\XGB_experience\\BO_training_routing\\"
+root3="..\\LightGBM_experience\\BO_training_routing\\"
+
+a.structed_add_files(root1,"trainning_time_consume(s)")
+print(a.data)
+
+a.structed_add_files(root2,"trainning_time_consume(s)")
+a.structed_add_files(root3,"test_time")
+a.plot_box()
 plt.show()

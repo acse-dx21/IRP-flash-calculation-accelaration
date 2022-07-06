@@ -12,7 +12,11 @@ import time
 import os
 from xgboost import XGBRegressor
 mini_data_path=".."+os.sep+"data"+os.sep+"mini_cleaned_data"+os.sep
+<<<<<<< HEAD
 relate_data = generate_data.multicsv_data_generater(mini_data_path)
+=======
+relate_data = generate_data.multicsv_data_generater()
+>>>>>>> d46581c492e5617ca50ca6a2a9f891c69bb77c0d
 
 X_train = 0
 y_train = 0
@@ -82,7 +86,11 @@ def model_cv(**kwargs):
         max_depth=int(max_depth),
         colsample_bytree=colsample_bytree,
         reg_lambda=reg_lambda,
+<<<<<<< HEAD
         n_jobs=8
+=======
+        n_jobs=2
+>>>>>>> d46581c492e5617ca50ca6a2a9f891c69bb77c0d
     ).fit(X_train, y_train)
     train_time = time.time()-start_train
 
@@ -159,7 +167,11 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     if args.BO is not None or stratigy == "BO":
+<<<<<<< HEAD
         for i in range(rank + 80, 128, size):
+=======
+        for i in range(64, 127, size):
+>>>>>>> d46581c492e5617ca50ca6a2a9f891c69bb77c0d
             run_bayes_optimize(5, i)
     elif args.GS is not None or stratigy == "GS":
         run_Grid_search(args.GS)

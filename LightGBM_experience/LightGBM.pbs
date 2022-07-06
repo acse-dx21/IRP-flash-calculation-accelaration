@@ -16,4 +16,4 @@ cd LightGBM_experience
 
 pwd
 
-mpiexec -n 40 python LightGBM.py --BO 100
+mpiexec -n 40 python LightGBM.py --BO 5

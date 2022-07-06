@@ -20,6 +20,7 @@ y_train=0
 X_test=0
 y_test=0
 material_ID=0
+data_record = {"train_time": [], "test_time": []}
 
 
 param_grid = [
@@ -78,7 +79,7 @@ def model_cv(**kwargs):
     max_depth=kwargs["min_samples_split"] if "min_samples_split" in kwargs.keys() else 12
     colsample_bytree = kwargs["colsample_bytree"] if "colsample_bytree" in kwargs.keys() else 0.8
     reg_lambda = kwargs["reg_lambda"] if "reg_lambda" in kwargs.keys() else 15
-
+    start_train = time.time()
     model_instance = MultiOutputRegressor(model(
             subsample=subsample,
             learning_rate=learning_rate, # float
@@ -86,11 +87,19 @@ def model_cv(**kwargs):
             max_depth=int(max_depth),
         colsample_bytree=colsample_bytree,
         reg_lambda=reg_lambda,
-            n_jobs=1)
+            n_jobs=2)
         ).fit(X_train, y_train)
 
+    train_time = time.time() - start_train
 
-    return -mean_squared_error(model_instance.predict(X_test), y_test)
+    start_pred = time.time()
+    pred = model_instance.predict(X_test)
+    test_time = time.time() - start_pred
+
+    data_record["train_time"].append(train_time)
+    data_record["test_time"].append(test_time)
+
+    return -mean_squared_error(pred, y_test)
 
 
 import argparse
@@ -133,7 +142,10 @@ def run_bayes_optimize(num_of_iteration=10,data_index=10):
         )
 
     rf_bo.maximize(n_iter=num_of_iteration)
-    pd.DataFrame(rf_bo.res).to_csv(BO_root+get_related_path(material_ID))
+    routing_data_root = "." + os.sep + "BO_training_routing" + os.sep
+
+    pd.DataFrame(data_record).to_csv(routing_data_root + get_related_path(material_ID))
+    # pd.DataFrame(rf_bo.res).to_csv(BO_root+get_related_path(material_ID))
 
 def run_Grid_search(num_of_iteration):
     print(num_of_iteration)
@@ -152,8 +164,8 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     if args.BO is not None or stratigy=="BO":
-        for i in range(rank+48,128,size):
-            run_bayes_optimize(args.BO,i)
+        for i in range(rank,128,size):
+            run_bayes_optimize(5,i)
     elif args.GS is not None or stratigy=="GS":
         run_Grid_search(args.GS)
 

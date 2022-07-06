@@ -37,10 +37,12 @@ mini_data_path=".."+os.sep+"data"+os.sep+"mini_cleaned_data"+os.sep
 
 All_ID = ['Methane', 'Ethane', 'Propane', 'N-Butane', 'N-Pentane', 'N-Hexane', 'Heptane']
 relate_data=generate_data.multicsv_data_generater(mini_data_path)
-relate_data.set_return_type("Dataloader")
+
 relate_data.set_batch_size(128)
-train_loader=0
-test_loader=0
+X_train=0
+y_train=0
+X_test=0
+y_test=0
 Material_ID = 0
 
 param_grid = [
@@ -87,8 +89,8 @@ def model_cv(**kwargs):
     kwargs["material"]=Material_ID
     model_instance = ArtificialNN.Neural_Model_Sklearn_style(ArtificialNN.simple_ANN,kwargs)
 
-    model_instance.fit(train_loader,epoch=30)
-    score=model_instance.score(test_loader)
+    model_instance.fit(X_train,y_train,epoch=30)
+    score=model_instance.score(X_test,y_test)
     data_root="."+os.sep+"BO_training_routing"+os.sep
     pd.DataFrame(model_instance.data_record).to_csv(data_root + get_related_path(Material_ID))
 
@@ -102,9 +104,10 @@ from mpi4py import MPI
 
 def run_bayes_optimize(num_of_iteration=1,data_index=10):
     BO_root="."+os.sep+"BO_result_data"+os.sep
-    global train_loader, test_loader, Material_ID
-    train_loader, test_loader, Material_ID = relate_data[data_index]
-    print(Material_ID)
+    global X_train, y_train, X_test, y_test, Material_ID
+
+    X_train, y_train, X_test, y_test, Material_ID = relate_data[data_index]
+
     rf_bo = BayesianOptimization(
             model_cv,
         {'Nodes_per_layer': [100, 1000],
@@ -121,10 +124,21 @@ if __name__ == "__main__":
     rank = comm.Get_rank()
     size = comm.Get_size()
 
+
     for i in range(125+rank, 127, size):
         print(i)
         run_bayes_optimize(100,i)
-#
+
+    if rank==0:
+        run_bayes_optimize(100, 119)
+    if rank == 1:
+        run_bayes_optimize(100, 121)
+    if rank == 2:
+        run_bayes_optimize(100, 126)
+
+    # for i in range(119, 127, size):
+    #     run_bayes_optimize(100,i)
+
 #     all_data = generate_data.multicsv_data_generater(data_path, return_type="Dataloader")
 #
 #     for i in range(len(all_data) - rank - 1, -1, -size):

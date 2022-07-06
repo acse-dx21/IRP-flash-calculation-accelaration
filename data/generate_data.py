@@ -421,13 +421,11 @@ class multicsv_data_generater:
         :param Datatype: one of "Dataloader" and "NParray"
         :return:
         """
-        print()
         if isinstance(idx, tuple):
             target_data = Generate_data_from_csv(self.csv_train[idx], self.csv_test[idx])
             material_ID = idx
 
         if isinstance(idx, int):
-            print(self.materials)
             target_data = Generate_data_from_csv(self.csv_train[self.materials[idx]],
                                                  self.csv_test[self.materials[idx]])
             material_ID = self.materials[idx]
