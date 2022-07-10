@@ -1,6 +1,6 @@
-#PBS -N process_XGB_BO_80_128_96_2
+#PBS -N process_XGB_BO_mini
 #PBS -l walltime=48:00:00
-#PBS -l select=1:ncpus=96:mpiprocs=96:mem=240GB
+#PBS -l select=1:ncpus=48:mpiprocs=48:mem=240GB
 
 module load intel-suite
 module load mpi
@@ -16,4 +16,4 @@ cd XGB_experience
 
 pwd
 
-mpiexec -n 48 python XGB.py --BO 100
+mpiexec -n 48 python XGB.py --BO 5

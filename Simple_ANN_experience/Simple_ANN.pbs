@@ -1,0 +1,19 @@
+#PBS -N process_Simple_ANN_BO_three_miss_epoch30
+#PBS -l walltime=72:00:00
+#PBS -l select=1:ncpus=3:mpiprocs=3:mem=10GB
+
+module load intel-suite
+module load mpi
+module load anaconda3/personal
+
+cd $home
+
+pwd
+
+cd IRP_flash_calculation_accelaration
+
+cd Simple_ANN_experience
+
+pwd
+
+mpiexec -n 3 python Simple_ANN.py --BO 100

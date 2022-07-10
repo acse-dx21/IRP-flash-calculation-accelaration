@@ -6,3 +6,4 @@ Traceback (most recent call last):
   File "/rds/general/user/dx21/home/IRP_flash_calculation_accelaration/PINN_experience/../data/generate_data.py", line 430, in __getitem__
     target_data = Generate_data_from_csv(self.csv_train[self.materials[idx]],
 IndexError: tuple index out of range
+=>> PBS: job killed: walltime 259205 exceeded limit 259200

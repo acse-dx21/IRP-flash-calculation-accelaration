@@ -16,4 +16,4 @@ cd PINN_experience
 
 pwd
 
-mpiexec -n 128 python PINN.py --BO 100
+mpiexec -n 64 python PINN.py --BO 100
