@@ -1,6 +1,6 @@
-#PBS -N process_PINN_BO_128
+#PBS -N process_PINN_mini_1
 #PBS -l walltime=72:00:00
-#PBS -l select=1:ncpus=128:mpiprocs=128:mem=480GB
+#PBS -l select=1:ncpus=96:mpiprocs=96:mem=280GB
 
 module load intel-suite
 module load mpi
@@ -16,4 +16,4 @@ cd PINN_experience
 
 pwd
 
-mpiexec -n 64 python PINN.py --BO 100
+mpiexec -n 24 python PINN.py 

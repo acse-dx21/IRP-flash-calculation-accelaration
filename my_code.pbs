@@ -1,6 +1,6 @@
-#PBS -N process_XGB_BO_48
-#PBS -l walltime=48:00:00
-#PBS -l select=1:ncpus=96:mpiprocs=96:mem=240GB
+#PBS -N process_split
+#PBS -l walltime=10:00:00
+#PBS -l select=1:ncpus=4:mpiprocs=4:mem=20GB
 
 module load intel-suite
 module load mpi
@@ -12,8 +12,7 @@ pwd
 
 cd IRP_flash_calculation_accelaration
 
-cd XGB_experience
 
 pwd
 
-mpiexec -n 48 python XGB.py --BO 100
+mpiexec -n 4 python split.py

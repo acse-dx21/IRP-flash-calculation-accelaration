@@ -319,7 +319,6 @@ class Generate_data_from_csv:
         path_train_ID = eval(open(path_train).readlines()[-1].replace("#", "").replace("\\n", "").replace("/n", "").replace("  ", ","))
         path_test_ID = eval(open(path_test).readlines()[-1].replace("#", "").replace("\\n", "").replace("/n", "").replace("  ", ","))
 
-
         # self.T_set_train_all, self.P_set_train_all, self.Zs_set_train_all=np.array(self.T_set_train_all),np.array(self.P_set_train_all),np.array(self.Zs_set_train_all)
         # self.T_set_test_all, self.P_set_test_all, self.Zs_set_test_all=np.array(self.T_set_test_all),np.array(self.P_set_test_all),np.array(self.Zs_set_test_all)
         assert path_test_ID == path_train_ID
@@ -421,7 +420,6 @@ class multicsv_data_generater:
         :param Datatype: one of "Dataloader" and "NParray"
         :return:
         """
-        print()
         if isinstance(idx, tuple):
             target_data = Generate_data_from_csv(self.csv_train[idx], self.csv_test[idx])
             material_ID = idx

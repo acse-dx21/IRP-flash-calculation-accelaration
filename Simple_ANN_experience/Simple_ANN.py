@@ -27,22 +27,21 @@ import random
 
 from sklearn.model_selection import GridSearchCV
 
-
 from itertools import combinations
 
 from sklearn.model_selection import GridSearchCV
 import time
 
-mini_data_path=".."+os.sep+"data"+os.sep+"mini_cleaned_data"+os.sep
-
+mini_data_path = ".." + os.sep + "data" + os.sep + "mini_cleaned_data" + os.sep
+root = "." + os.sep + "mini_data_1" + os.sep
 All_ID = ['Methane', 'Ethane', 'Propane', 'N-Butane', 'N-Pentane', 'N-Hexane', 'Heptane']
-relate_data=generate_data.multicsv_data_generater(mini_data_path)
+relate_data = generate_data.multicsv_data_generater(mini_data_path)
 
 relate_data.set_batch_size(128)
-X_train=0
-y_train=0
-X_test=0
-y_test=0
+X_train = 0
+y_train = 0
+X_test = 0
+y_test = 0
 Material_ID = 0
 
 param_grid = [
@@ -54,20 +53,15 @@ param_grid = [
      'reg_lambda': [10]}
 ]
 
-
-
-
 from model.train import check_IDexist
 from tool.log import log
 
 import os
 
-data_path = ".." + os.sep +"data"+os.sep+"mini_cleaned_data" + os.sep
+data_path = ".." + os.sep + "data" + os.sep + "mini_cleaned_data" + os.sep
 result_path = "." + os.sep + "MSELoss_data" + os.sep
 
-
 from mpi4py import MPI
-
 
 
 # model=ArtificialNN.Neural_Model_Sklearn_style(ArtificialNN.simple_ANN,{"material":Material_ID})
@@ -77,46 +71,65 @@ from mpi4py import MPI
 # print(model.get_data)
 
 def get_related_path(Material_ID):
-    return "mix_"+str(len(Material_ID))+os.sep+str(Material_ID)+".csv"
-
+    return "mix_" + str(len(Material_ID)) + os.sep + str(Material_ID) + ".csv"
 
 
 from bayes_opt import BayesianOptimization
 
+data_record = {"trainning_time_consume(s)": [], "test_time_consume(s)": []}
+
+
 def model_cv(**kwargs):
     kwargs["Nodes_per_layer"] = int(kwargs["Nodes_per_layer"])
     kwargs["deepth"] = int(kwargs["deepth"])
-    kwargs["material"]=Material_ID
-    model_instance = ArtificialNN.Neural_Model_Sklearn_style(ArtificialNN.simple_ANN,kwargs)
+    kwargs["material"] = Material_ID
+    model_instance = ArtificialNN.Neural_Model_Sklearn_style(ArtificialNN.simple_ANN, kwargs)
 
-    model_instance.fit(X_train,y_train,epoch=30)
-    score=model_instance.score(X_test,y_test)
-    data_root="."+os.sep+"BO_training_routing"+os.sep
-    pd.DataFrame(model_instance.data_record).to_csv(data_root + get_related_path(Material_ID))
+    # record_data
+    start_train = time.time()
+    model_instance.fit(X_train, y_train, epoch=30)
+    train_time = time.time() - start_train
+
+    score = model_instance.score(X_test, y_test)
+
+    start_pred = time.time()
+    pred = model_instance.predict(X_test)
+    test_time = time.time() - start_pred
+
+    data_record["trainning_time_consume(s)"].append(train_time)
+    data_record["test_time_consume(s)"].append(test_time)
+
+    epoch_root = root + "." + os.sep + "BO_epoch_routing" + os.sep
+    pd.DataFrame(model_instance.data_record).to_csv(epoch_root + get_related_path(Material_ID))
 
     return -score
+
 
 import argparse
 # print(a)
 from mpi4py import MPI
 
 
+def run_bayes_optimize(num_of_iteration=1, data_index=10):
+    BO_root = root + "." + os.sep + "BO_result_data" + os.sep
+    BO_routing = root + "." + os.sep + "BO_training_routing" + os.sep
 
-def run_bayes_optimize(num_of_iteration=1,data_index=10):
-    BO_root="."+os.sep+"BO_result_data"+os.sep
     global X_train, y_train, X_test, y_test, Material_ID
 
     X_train, y_train, X_test, y_test, Material_ID = relate_data[data_index]
 
     rf_bo = BayesianOptimization(
-            model_cv,
+        model_cv,
         {'Nodes_per_layer': [100, 1000],
-         "deepth": [2,  5]}
-        )
+         "deepth": [2, 5]}
+    )
 
     rf_bo.maximize(n_iter=num_of_iteration)
-    pd.DataFrame(rf_bo.res).to_csv(BO_root+get_related_path(Material_ID))
+    pd.DataFrame(rf_bo.res).to_csv(BO_root + get_related_path(Material_ID))
 
+    pd.DataFrame(data_record).to_csv(BO_routing + get_related_path(Material_ID))
+    data_record["trainning_time_consume(s)"].clear()
+    data_record["test_time_consume(s)"].clear()
 
 
 if __name__ == "__main__":
@@ -124,17 +137,9 @@ if __name__ == "__main__":
     rank = comm.Get_rank()
     size = comm.Get_size()
 
+    for i in range(rank, 127, size):
 
-    # for i in range(125+rank, 127, size):
-    #     print(i)
-    #     run_bayes_optimize(100,i)
-
-    if rank==0:
-        run_bayes_optimize(100, 119)
-    if rank == 1:
-        run_bayes_optimize(100, 121)
-    if rank == 2:
-        run_bayes_optimize(100, 126)
+        run_bayes_optimize(40, i)
 
     # for i in range(119, 127, size):
     #     run_bayes_optimize(100,i)

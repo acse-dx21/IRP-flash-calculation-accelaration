@@ -25,12 +25,11 @@ import os
 import csv
 
 All_ID = ['Methane','Ethane', 'Propane', 'N-Butane','N-Pentane', 'N-Hexane', 'Heptane']
-# ID=['Methane']
-# constants, properties = ChemicalConstantsPackage.from_IDs(ID)
-
+ID=['Ethane']
+constants, properties = ChemicalConstantsPackage.from_IDs(ID)
 
 #
-# row_data=generate_data.generate_good_TPZ(1000,constants, properties,"good_TPZ_test_sigle_material",comment=str(ID))
+row_data=generate_data.generate_good_TPZ(20000,constants, properties,"replace",comment=str(tuple(ID)))
 #
 #
 # test = flashdata(constants, properties, {"T": row_data[0], "P": row_data[1]}, row_data[2], "pure")
@@ -56,41 +55,41 @@ All_ID = ['Methane','Ethane', 'Propane', 'N-Butane','N-Pentane', 'N-Hexane', 'He
 #
 
 
-from sklearn.ensemble import RandomForestRegressor
-from sklearn.model_selection import cross_val_score
-from bayes_opt import BayesianOptimization
-# print(check_IDexist("('Ethane', 'Propane', 'N-Butane', 'N-Pentane', 'Heptane')",".\\result_of_cleaned_data\\XGBregressor\\"))
+# from sklearn.ensemble import RandomForestRegressor
+# from sklearn.model_selection import cross_val_score
+# from bayes_opt import BayesianOptimization
+# # print(check_IDexist("('Ethane', 'Propane', 'N-Butane', 'N-Pentane', 'Heptane')",".\\result_of_cleaned_data\\XGBregressor\\"))
+#
+# a=generate_data.multicsv_data_generater()
+# X_train, y_train, X_test, y_test, material_ID=a[10]
+# from sklearn.metrics import mean_squared_error
+# def rf_cv(**kwargs):
+#     n_estimators=kwargs["n_estimators"] if "n_estimators" in kwargs.keys() else 150
+#     min_samples_split=kwargs["min_samples_split"] if "min_samples_split" in kwargs.keys() else 150
+#     max_features=kwargs["min_samples_split"] if "min_samples_split" in kwargs.keys() else 0.999
+#     max_depth=kwargs["min_samples_split"] if "min_samples_split" in kwargs.keys() else 12
+#     rf = RandomForestRegressor(n_estimators=int(n_estimators),
+#             min_samples_split=int(min_samples_split),
+#             max_features=min(max_features, 0.999), # float
+#             max_depth=int(max_depth),
+#             random_state=2,
+#             n_jobs=8
+#         ).fit(X_train, y_train)
 
-a=generate_data.multicsv_data_generater()
-X_train, y_train, X_test, y_test, material_ID=a[10]
-from sklearn.metrics import mean_squared_error
-def rf_cv(**kwargs):
-    n_estimators=kwargs["n_estimators"] if "n_estimators" in kwargs.keys() else 150
-    min_samples_split=kwargs["min_samples_split"] if "min_samples_split" in kwargs.keys() else 150
-    max_features=kwargs["min_samples_split"] if "min_samples_split" in kwargs.keys() else 0.999
-    max_depth=kwargs["min_samples_split"] if "min_samples_split" in kwargs.keys() else 12
-    rf = RandomForestRegressor(n_estimators=int(n_estimators),
-            min_samples_split=int(min_samples_split),
-            max_features=min(max_features, 0.999), # float
-            max_depth=int(max_depth),
-            random_state=2,
-            n_jobs=8
-        ).fit(X_train, y_train)
 
-
-    return -mean_squared_error(rf.predict(X_test), y_test)
-
-rf_bo = BayesianOptimization(
-        rf_cv,
-        {'n_estimators': (10, 250),
-        'min_samples_split': (2, 25),
-        'max_features': (0.1, 0.999),
-        'max_depth': (5, 15)}
-    )
-
-a=rf_bo.maximize(n_iter=10)
-
-print(a)
+    # return -mean_squared_error(rf.predict(X_test), y_test)
+#
+# rf_bo = BayesianOptimization(
+#         rf_cv,
+#         {'n_estimators': (10, 250),
+#         'min_samples_split': (2, 25),
+#         'max_features': (0.1, 0.999),
+#         'max_depth': (5, 15)}
+#     )
+#
+# a=rf_bo.maximize(n_iter=10)
+#
+# print(a)
 
 # print(rf_bo.maximize())
 #
