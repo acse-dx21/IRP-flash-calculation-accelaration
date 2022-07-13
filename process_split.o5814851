@@ -1,0 +1,1064 @@
+/rds/general/user/dx21/home
+/rds/general/user/dx21/home/IRP_flash_calculation_accelaration
+
+# mpiexec: MPI Program startup
+
+
+# mpiexec: Running in job 5814851.pbs at Sun 10 Jul 14:06:11 BST 2022
+# mpiexec: Fabric configuration:
+# mpiexec: node class CX3
+# mpiexec: libfabric provider verbs
+# mpiexec: libfabric inferface eth0
+# mpiexec: MPI-IO configuration on / gpfs
+# mpiexec: full path to program is /rds/general/user/dx21/home/anaconda3/bin/python
+# mpiexec: program arguments are: split.py
+# mpiexec: 4 ranks allocated via PBS select
+# mpiexec: 1 OpenMP threads / rank allocated by PBS select
+# mpiexec: 4 ranks per node
+# mpiexec: There are 256 cores/node. 4 will be used for this job
+# mpiexec: Job has shared use of the allocated nodes. Disabling process-pinning
+# mpiexec: Node is shared. Disabling process pinning
+# mpiexec: machinefile configured as:
+cx3-12-16.cx3.hpc.ic.ac.uk:4
+#
+# mpiexec: Checking all nodes are ONLINE using ping:
+# mpiexec: All nodes appear ONLINE
+# mpiexec: Checking all nodes are ONLINE using ssh:
+# cx3-12-16.cx3.hpc.ic.ac.uk : # mpiexec: Dynamic linking for /rds/general/user/dx21/home/anaconda3/bin/python:
+	linux-vdso.so.1 (0x00007ffc5fab0000)
+	/apps/rcs-tmpfile-replacement/rcs-tmpfile-replacement/libc-replaced-tmpnam.so (0x000014ac0c684000)
+	/apps/rcs-tmpfile-replacement/rcs-tmpfile-replacement/libc-replaced-tmpfile.so (0x000014ac0c482000)
+	/apps/rcs-setxattr-replacement/rcs-setxattr-replacement/libc-setxattr-shim.so (0x000014ac0ce6d000)
+	libdl.so.2 => /lib64/libdl.so.2 (0x000014ac0c27e000)
+	libutil.so.1 => /lib64/libutil.so.1 (0x000014ac0c07a000)
+	libm.so.6 => /lib64/libm.so.6 (0x000014ac0bcf8000)
+	libpthread.so.0 => /lib64/libpthread.so.0 (0x000014ac0bad8000)
+	libc.so.6 => /lib64/libc.so.6 (0x000014ac0b713000)
+	/lib64/ld-linux-x86-64.so.2 (0x000014ac0cc4a000)
+# mpiexec: launch started at Sun 10 Jul 14:06:12 BST 2022
+# mpiexec: launching program...
+# mpiexec: /rds/general/user/dx21/home/anaconda3/bin/python split.py
+# mpiexec: PROGRAM OUTPUT FOLLOWS
+(cx3-12-16.cx3.hpc.ic.ac.uk:0,1,2,3)
+
+./data/cleaned_data
+('Ethane', 'Propane', 'N-Pentane')_train.csv
+('Ethane', 'N-Pentane', 'Heptane')_test.csv
+('N-Pentane', 'N-Hexane', 'Heptane')_test.csv
+('Ethane', 'N-Pentane', 'Heptane')_train.csv
+('Methane', 'N-Pentane', 'N-Hexane')_train.csv
+('Propane', 'N-Butane', 'N-Hexane')_train.csv
+('Methane', 'N-Pentane', 'Heptane')_train.csv
+('Propane', 'N-Butane', 'Heptane')_train.csv
+('Methane', 'Ethane', 'N-Butane')_train.csv
+('Methane', 'N-Hexane', 'Heptane')_test.csv
+('N-Butane', 'N-Pentane', 'Heptane')_train.csv
+('Methane', 'Ethane', 'N-Pentane')_test.csv
+('Propane', 'N-Pentane', 'N-Hexane')_test.csv
+('Ethane', 'Propane', 'N-Butane')_train.csv
+('N-Butane', 'N-Pentane', 'N-Hexane')_train.csv
+('Ethane', 'Propane', 'N-Hexane')_train.csv
+('Methane', 'N-Butane', 'Heptane')_test.csv
+('Ethane', 'Propane', 'N-Hexane')_test.csv
+('Methane', 'N-Pentane', 'Heptane')_test.csv
+('Methane', 'N-Pentane', 'N-Hexane')_test.csv
+('Propane', 'N-Pentane', 'Heptane')_test.csv
+('Methane', 'N-Butane', 'Heptane')_train.csv
+('Propane', 'N-Butane', 'N-Hexane')_test.csv
+('Ethane', 'Propane', 'N-Butane')_test.csv
+('N-Butane', 'N-Hexane', 'Heptane')_train.csv
+('Propane', 'N-Hexane', 'Heptane')_train.csv
+('Methane', 'Ethane', 'Heptane')_test.csv
+('Propane', 'N-Butane', 'N-Pentane')_test.csv
+('Methane', 'N-Butane', 'N-Pentane')_train.csv
+('Ethane', 'N-Hexane', 'Heptane')_train.csv
+('Methane', 'Propane', 'N-Butane')_train.csv
+('Propane', 'N-Hexane', 'Heptane')_test.csv
+('Methane', 'Ethane', 'N-Hexane')_test.csv
+('Propane', 'N-Butane', 'N-Pentane')_train.csv
+('Ethane', 'N-Hexane', 'Heptane')_test.csv
+('Propane', 'N-Pentane', 'Heptane')_train.csv
+('Ethane', 'N-Butane', 'N-Hexane')_train.csv
+('Ethane', 'N-Pentane', 'N-Hexane')_train.csv
+('Ethane', 'Propane', 'N-Pentane')_test.csv
+('Methane', 'N-Butane', 'N-Pentane')_test.csv
+('Methane', 'Propane', 'N-Hexane')_test.csv
+('Methane', 'Ethane', 'Propane')_test.csv
+('N-Butane', 'N-Pentane', 'N-Hexane')_test.csv
+('Ethane', 'N-Butane', 'Heptane')_train.csv
+('Propane', 'N-Pentane', 'N-Hexane')_train.csv
+('Methane', 'Ethane', 'Propane')_train.csv
+('Ethane', 'N-Butane', 'N-Pentane')_train.csv
+('Methane', 'Propane', 'Heptane')_test.csv
+('Ethane', 'Propane', 'Heptane')_test.csv
+('Ethane', 'N-Butane', 'Heptane')_test.csv
+('Methane', 'N-Hexane', 'Heptane')_train.csv
+('Methane', 'Propane', 'N-Pentane')_train.csv
+('N-Butane', 'N-Hexane', 'Heptane')_test.csv
+('Methane', 'Ethane', 'N-Pentane')_train.csv
+('Ethane', 'Propane', 'Heptane')_train.csv
+('Methane', 'Propane', 'N-Hexane')_train.csv
+('Ethane', 'N-Butane', 'N-Pentane')_test.csv
+('N-Butane', 'N-Pentane', 'Heptane')_test.csv
+('Methane', 'Ethane', 'N-Butane')_test.csv
+('Methane', 'Propane', 'N-Pentane')_test.csv
+('Methane', 'Ethane', 'Heptane')_train.csv
+('Propane', 'N-Butane', 'Heptane')_test.csv
+('Methane', 'Propane', 'N-Butane')_test.csv
+('Ethane', 'N-Butane', 'N-Hexane')_test.csv
+('Methane', 'N-Butane', 'N-Hexane')_test.csv
+('Methane', 'Propane', 'Heptane')_train.csv
+('N-Pentane', 'N-Hexane', 'Heptane')_train.csv
+('Ethane', 'N-Pentane', 'N-Hexane')_test.csv
+('Methane', 'N-Butane', 'N-Hexane')_train.csv
+('Methane', 'Ethane', 'N-Hexane')_train.csv
+('Methane', 'Propane', 'N-Butane', 'N-Hexane')_test.csv
+('Methane', 'Ethane', 'N-Pentane', 'N-Hexane')_test.csv
+('Ethane', 'N-Butane', 'N-Hexane', 'Heptane')_train.csv
+('Methane', 'Ethane', 'N-Butane', 'N-Hexane')_train.csv
+('Methane', 'Propane', 'N-Butane', 'Heptane')_test.csv
+('Propane', 'N-Pentane', 'N-Hexane', 'Heptane')_train.csv
+('Ethane', 'N-Pentane', 'N-Hexane', 'Heptane')_train.csv
+('Methane', 'N-Pentane', 'N-Hexane', 'Heptane')_train.csv
+('Methane', 'Propane', 'N-Butane', 'Heptane')_train.csv
+('Ethane', 'Propane', 'N-Butane', 'N-Pentane')_test.csv
+('Methane', 'Propane', 'N-Pentane', 'N-Hexane')_train.csv
+('Ethane', 'Propane', 'N-Hexane', 'Heptane')_test.csv
+('Methane', 'N-Pentane', 'N-Hexane', 'Heptane')_test.csv
+('Methane', 'Ethane', 'N-Butane', 'Heptane')_test.csv
+('Ethane', 'Propane', 'N-Hexane', 'Heptane')_train.csv
+('Methane', 'Ethane', 'Propane', 'Heptane')_test.csv
+('N-Butane', 'N-Pentane', 'N-Hexane', 'Heptane')_train.csv
+('Methane', 'Ethane', 'N-Butane', 'Heptane')_train.csv
+('Methane', 'Propane', 'N-Butane', 'N-Hexane')_train.csv
+('Ethane', 'Propane', 'N-Pentane', 'Heptane')_train.csv
+('Methane', 'Ethane', 'Propane', 'Heptane')_train.csv
+('Propane', 'N-Pentane', 'N-Hexane', 'Heptane')_test.csv
+('Methane', 'Propane', 'N-Butane', 'N-Pentane')_test.csv
+('Ethane', 'Propane', 'N-Pentane', 'N-Hexane')_train.csv
+('Methane', 'N-Butane', 'N-Pentane', 'Heptane')_test.csv
+('Methane', 'N-Butane', 'N-Hexane', 'Heptane')_train.csv
+('Methane', 'Ethane', 'Propane', 'N-Pentane')_train.csv
+('Methane', 'Ethane', 'N-Butane', 'N-Pentane')_test.csv
+('Ethane', 'N-Pentane', 'N-Hexane', 'Heptane')_test.csv
+('Methane', 'Ethane', 'N-Hexane', 'Heptane')_train.csv
+('Ethane', 'Propane', 'N-Pentane', 'N-Hexane')_test.csv
+('Methane', 'Propane', 'N-Butane', 'N-Pentane')_train.csv
+('Ethane', 'Propane', 'N-Butane', 'Heptane')_train.csv
+('Methane', 'Ethane', 'Propane', 'N-Butane')_train.csv
+('Ethane', 'Propane', 'N-Butane', 'N-Hexane')_test.csv
+('Methane', 'Ethane', 'N-Pentane', 'N-Hexane')_train.csv
+('Ethane', 'Propane', 'N-Butane', 'N-Pentane')_train.csv
+('Methane', 'Propane', 'N-Pentane', 'Heptane')_test.csv
+('Methane', 'Ethane', 'Propane', 'N-Pentane')_test.csv
+('Ethane', 'N-Butane', 'N-Pentane', 'N-Hexane')_test.csv
+('Propane', 'N-Butane', 'N-Hexane', 'Heptane')_test.csv
+('Ethane', 'Propane', 'N-Butane', 'Heptane')_test.csv
+('Methane', 'N-Butane', 'N-Pentane', 'N-Hexane')_train.csv
+('Methane', 'Ethane', 'N-Pentane', 'Heptane')_train.csv
+('Ethane', 'N-Butane', 'N-Hexane', 'Heptane')_test.csv
+('Methane', 'Ethane', 'N-Hexane', 'Heptane')_test.csv
+('Methane', 'N-Butane', 'N-Pentane', 'Heptane')_train.csv
+('Ethane', 'N-Butane', 'N-Pentane', 'N-Hexane')_train.csv
+('Propane', 'N-Butane', 'N-Pentane', 'Heptane')_train.csv
+('Methane', 'Ethane', 'N-Butane', 'N-Pentane')_train.csv
+('Ethane', 'N-Butane', 'N-Pentane', 'Heptane')_test.csv
+('Methane', 'Ethane', 'Propane', 'N-Hexane')_train.csv
+('Propane', 'N-Butane', 'N-Pentane', 'N-Hexane')_test.csv
+('Ethane', 'N-Butane', 'N-Pentane', 'Heptane')_train.csv
+('Ethane', 'Propane', 'N-Pentane', 'Heptane')_test.csv
+('Ethane', 'Propane', 'N-Butane', 'N-Hexane')_train.csv
+('Methane', 'Ethane', 'N-Pentane', 'Heptane')_test.csv
+('Methane', 'Propane', 'N-Pentane', 'N-Hexane')_test.csv
+('Methane', 'Ethane', 'N-Butane', 'N-Hexane')_test.csv
+('Methane', 'Propane', 'N-Pentane', 'Heptane')_train.csv
+('Propane', 'N-Butane', 'N-Hexane', 'Heptane')_train.csv
+('N-Butane', 'N-Pentane', 'N-Hexane', 'Heptane')_test.csv
+('Methane', 'Propane', 'N-Hexane', 'Heptane')_train.csv
+('Propane', 'N-Butane', 'N-Pentane', 'Heptane')_test.csv
+('Methane', 'N-Butane', 'N-Hexane', 'Heptane')_test.csv
+('Methane', 'N-Butane', 'N-Pentane', 'N-Hexane')_test.csv
+('Methane', 'Propane', 'N-Hexane', 'Heptane')_test.csv
+('Propane', 'N-Butane', 'N-Pentane', 'N-Hexane')_train.csv
+('Methane', 'Ethane', 'Propane', 'N-Hexane')_test.csv
+('Methane', 'Ethane', 'Propane', 'N-Butane')_test.csv
+('Methane', 'Ethane', 'N-Butane', 'N-Pentane', 'N-Hexane')_test.csv
+('Methane', 'Ethane', 'N-Butane', 'N-Pentane', 'Heptane')_test.csv
+('Methane', 'Ethane', 'Propane', 'N-Butane', 'Heptane')_train.csv
+('Methane', 'Ethane', 'Propane', 'N-Hexane', 'Heptane')_train.csv
+('Propane', 'N-Butane', 'N-Pentane', 'N-Hexane', 'Heptane')_train.csv
+('Methane', 'Ethane', 'N-Butane', 'N-Pentane', 'Heptane')_train.csv
+('Methane', 'N-Butane', 'N-Pentane', 'N-Hexane', 'Heptane')_test.csv
+('Methane', 'Ethane', 'N-Pentane', 'N-Hexane', 'Heptane')_train.csv
+('Methane', 'Ethane', 'Propane', 'N-Pentane', 'Heptane')_train.csv
+('Methane', 'Propane', 'N-Butane', 'N-Hexane', 'Heptane')_train.csv
+('Ethane', 'Propane', 'N-Pentane', 'N-Hexane', 'Heptane')_train.csv
+('Methane', 'Ethane', 'N-Butane', 'N-Hexane', 'Heptane')_test.csv
+('Methane', 'Propane', 'N-Butane', 'N-Hexane', 'Heptane')_test.csv
+('Ethane', 'Propane', 'N-Butane', 'N-Pentane', 'Heptane')_test.csv
+('Methane', 'Ethane', 'Propane', 'N-Butane', 'Heptane')_test.csv
+('Ethane', 'Propane', 'N-Butane', 'N-Hexane', 'Heptane')_test.csv
+./data/cleaned_data
+('Ethane', 'Propane', 'N-Pentane')_train.csv
+('Ethane', 'N-Pentane', 'Heptane')_test.csv
+('N-Pentane', 'N-Hexane', 'Heptane')_test.csv
+('Ethane', 'N-Pentane', 'Heptane')_train.csv
+('Methane', 'N-Pentane', 'N-Hexane')_train.csv
+('Propane', 'N-Butane', 'N-Hexane')_train.csv
+('Methane', 'N-Pentane', 'Heptane')_train.csv
+('Propane', 'N-Butane', 'Heptane')_train.csv
+('Methane', 'Ethane', 'N-Butane')_train.csv
+('Methane', 'N-Hexane', 'Heptane')_test.csv
+('N-Butane', 'N-Pentane', 'Heptane')_train.csv
+('Methane', 'Ethane', 'N-Pentane')_test.csv
+('Propane', 'N-Pentane', 'N-Hexane')_test.csv
+('Ethane', 'Propane', 'N-Butane')_train.csv
+('N-Butane', 'N-Pentane', 'N-Hexane')_train.csv
+('Ethane', 'Propane', 'N-Hexane')_train.csv
+('Methane', 'N-Butane', 'Heptane')_test.csv
+('Ethane', 'Propane', 'N-Hexane')_test.csv
+('Methane', 'N-Pentane', 'Heptane')_test.csv
+('Methane', 'N-Pentane', 'N-Hexane')_test.csv
+('Propane', 'N-Pentane', 'Heptane')_test.csv
+('Methane', 'N-Butane', 'Heptane')_train.csv
+('Propane', 'N-Butane', 'N-Hexane')_test.csv
+('Ethane', 'Propane', 'N-Butane')_test.csv
+('N-Butane', 'N-Hexane', 'Heptane')_train.csv
+('Propane', 'N-Hexane', 'Heptane')_train.csv
+('Methane', 'Ethane', 'Heptane')_test.csv
+('Propane', 'N-Butane', 'N-Pentane')_test.csv
+('Methane', 'N-Butane', 'N-Pentane')_train.csv
+('Ethane', 'N-Hexane', 'Heptane')_train.csv
+('Methane', 'Propane', 'N-Butane')_train.csv
+('Propane', 'N-Hexane', 'Heptane')_test.csv
+('Methane', 'Ethane', 'N-Hexane')_test.csv
+('Propane', 'N-Butane', 'N-Pentane')_train.csv
+('Ethane', 'N-Hexane', 'Heptane')_test.csv
+('Propane', 'N-Pentane', 'Heptane')_train.csv
+('Ethane', 'N-Butane', 'N-Hexane')_train.csv
+('Ethane', 'N-Pentane', 'N-Hexane')_train.csv
+('Ethane', 'Propane', 'N-Pentane')_test.csv
+('Methane', 'N-Butane', 'N-Pentane')_test.csv
+('Methane', 'Propane', 'N-Hexane')_test.csv
+('Methane', 'Ethane', 'Propane')_test.csv
+('N-Butane', 'N-Pentane', 'N-Hexane')_test.csv
+('Ethane', 'N-Butane', 'Heptane')_train.csv
+('Propane', 'N-Pentane', 'N-Hexane')_train.csv
+('Methane', 'Ethane', 'Propane')_train.csv
+('Ethane', 'N-Butane', 'N-Pentane')_train.csv
+('Methane', 'Propane', 'Heptane')_test.csv
+('Ethane', 'Propane', 'Heptane')_test.csv
+('Ethane', 'N-Butane', 'Heptane')_test.csv
+('Methane', 'N-Hexane', 'Heptane')_train.csv
+('Methane', 'Propane', 'N-Pentane')_train.csv
+('N-Butane', 'N-Hexane', 'Heptane')_test.csv
+('Methane', 'Ethane', 'N-Pentane')_train.csv
+('Ethane', 'Propane', 'Heptane')_train.csv
+('Methane', 'Propane', 'N-Hexane')_train.csv
+('Ethane', 'N-Butane', 'N-Pentane')_test.csv
+('N-Butane', 'N-Pentane', 'Heptane')_test.csv
+('Methane', 'Ethane', 'N-Butane')_test.csv
+('Methane', 'Propane', 'N-Pentane')_test.csv
+('Methane', 'Ethane', 'Heptane')_train.csv
+('Propane', 'N-Butane', 'Heptane')_test.csv
+('Methane', 'Propane', 'N-Butane')_test.csv
+('Ethane', 'N-Butane', 'N-Hexane')_test.csv
+('Methane', 'N-Butane', 'N-Hexane')_test.csv
+('Methane', 'Propane', 'Heptane')_train.csv
+('N-Pentane', 'N-Hexane', 'Heptane')_train.csv
+('Ethane', 'N-Pentane', 'N-Hexane')_test.csv
+('Methane', 'N-Butane', 'N-Hexane')_train.csv
+('Methane', 'Ethane', 'N-Hexane')_train.csv
+('Methane', 'Propane', 'N-Butane', 'N-Hexane')_test.csv
+('Methane', 'Ethane', 'N-Pentane', 'N-Hexane')_test.csv
+('Ethane', 'N-Butane', 'N-Hexane', 'Heptane')_train.csv
+('Methane', 'Ethane', 'N-Butane', 'N-Hexane')_train.csv
+('Methane', 'Propane', 'N-Butane', 'Heptane')_test.csv
+('Propane', 'N-Pentane', 'N-Hexane', 'Heptane')_train.csv
+('Ethane', 'N-Pentane', 'N-Hexane', 'Heptane')_train.csv
+('Methane', 'N-Pentane', 'N-Hexane', 'Heptane')_train.csv
+('Methane', 'Propane', 'N-Butane', 'Heptane')_train.csv
+('Ethane', 'Propane', 'N-Butane', 'N-Pentane')_test.csv
+('Methane', 'Propane', 'N-Pentane', 'N-Hexane')_train.csv
+('Ethane', 'Propane', 'N-Hexane', 'Heptane')_test.csv
+('Methane', 'N-Pentane', 'N-Hexane', 'Heptane')_test.csv
+('Methane', 'Ethane', 'N-Butane', 'Heptane')_test.csv
+('Ethane', 'Propane', 'N-Hexane', 'Heptane')_train.csv
+('Methane', 'Ethane', 'Propane', 'Heptane')_test.csv
+('N-Butane', 'N-Pentane', 'N-Hexane', 'Heptane')_train.csv
+('Methane', 'Ethane', 'N-Butane', 'Heptane')_train.csv
+('Methane', 'Propane', 'N-Butane', 'N-Hexane')_train.csv
+('Ethane', 'Propane', 'N-Pentane', 'Heptane')_train.csv
+('Methane', 'Ethane', 'Propane', 'Heptane')_train.csv
+('Propane', 'N-Pentane', 'N-Hexane', 'Heptane')_test.csv
+('Methane', 'Propane', 'N-Butane', 'N-Pentane')_test.csv
+('Ethane', 'Propane', 'N-Pentane', 'N-Hexane')_train.csv
+('Methane', 'N-Butane', 'N-Pentane', 'Heptane')_test.csv
+('Methane', 'N-Butane', 'N-Hexane', 'Heptane')_train.csv
+('Methane', 'Ethane', 'Propane', 'N-Pentane')_train.csv
+('Methane', 'Ethane', 'N-Butane', 'N-Pentane')_test.csv
+('Ethane', 'N-Pentane', 'N-Hexane', 'Heptane')_test.csv
+('Methane', 'Ethane', 'N-Hexane', 'Heptane')_train.csv
+('Ethane', 'Propane', 'N-Pentane', 'N-Hexane')_test.csv
+('Methane', 'Propane', 'N-Butane', 'N-Pentane')_train.csv
+('Ethane', 'Propane', 'N-Butane', 'Heptane')_train.csv
+('Methane', 'Ethane', 'Propane', 'N-Butane')_train.csv
+('Ethane', 'Propane', 'N-Butane', 'N-Hexane')_test.csv
+('Methane', 'Ethane', 'N-Pentane', 'N-Hexane')_train.csv
+('Ethane', 'Propane', 'N-Butane', 'N-Pentane')_train.csv
+('Methane', 'Propane', 'N-Pentane', 'Heptane')_test.csv
+('Methane', 'Ethane', 'Propane', 'N-Pentane')_test.csv
+('Ethane', 'N-Butane', 'N-Pentane', 'N-Hexane')_test.csv
+('Propane', 'N-Butane', 'N-Hexane', 'Heptane')_test.csv
+('Ethane', 'Propane', 'N-Butane', 'Heptane')_test.csv
+('Methane', 'N-Butane', 'N-Pentane', 'N-Hexane')_train.csv
+('Methane', 'Ethane', 'N-Pentane', 'Heptane')_train.csv
+('Ethane', 'N-Butane', 'N-Hexane', 'Heptane')_test.csv
+('Methane', 'Ethane', 'N-Hexane', 'Heptane')_test.csv
+('Methane', 'N-Butane', 'N-Pentane', 'Heptane')_train.csv
+('Ethane', 'N-Butane', 'N-Pentane', 'N-Hexane')_train.csv
+('Propane', 'N-Butane', 'N-Pentane', 'Heptane')_train.csv
+('Methane', 'Ethane', 'N-Butane', 'N-Pentane')_train.csv
+('Ethane', 'N-Butane', 'N-Pentane', 'Heptane')_test.csv
+('Methane', 'Ethane', 'Propane', 'N-Hexane')_train.csv
+('Propane', 'N-Butane', 'N-Pentane', 'N-Hexane')_test.csv
+('Ethane', 'N-Butane', 'N-Pentane', 'Heptane')_train.csv
+('Ethane', 'Propane', 'N-Pentane', 'Heptane')_test.csv
+('Ethane', 'Propane', 'N-Butane', 'N-Hexane')_train.csv
+('Methane', 'Ethane', 'N-Pentane', 'Heptane')_test.csv
+('Methane', 'Propane', 'N-Pentane', 'N-Hexane')_test.csv
+('Methane', 'Ethane', 'N-Butane', 'N-Hexane')_test.csv
+('Methane', 'Propane', 'N-Pentane', 'Heptane')_train.csv
+('Propane', 'N-Butane', 'N-Hexane', 'Heptane')_train.csv
+('N-Butane', 'N-Pentane', 'N-Hexane', 'Heptane')_test.csv
+('Methane', 'Propane', 'N-Hexane', 'Heptane')_train.csv
+('Propane', 'N-Butane', 'N-Pentane', 'Heptane')_test.csv
+('Methane', 'N-Butane', 'N-Hexane', 'Heptane')_test.csv
+('Methane', 'N-Butane', 'N-Pentane', 'N-Hexane')_test.csv
+('Methane', 'Propane', 'N-Hexane', 'Heptane')_test.csv
+('Propane', 'N-Butane', 'N-Pentane', 'N-Hexane')_train.csv
+('Methane', 'Ethane', 'Propane', 'N-Hexane')_test.csv
+('Methane', 'Ethane', 'Propane', 'N-Butane')_test.csv
+('Methane', 'Ethane', 'N-Butane', 'N-Pentane', 'N-Hexane')_test.csv
+('Methane', 'Ethane', 'N-Butane', 'N-Pentane', 'Heptane')_test.csv
+('Methane', 'Ethane', 'Propane', 'N-Butane', 'Heptane')_train.csv
+('Methane', 'Ethane', 'Propane', 'N-Hexane', 'Heptane')_train.csv
+('Propane', 'N-Butane', 'N-Pentane', 'N-Hexane', 'Heptane')_train.csv
+('Methane', 'Ethane', 'N-Butane', 'N-Pentane', 'Heptane')_train.csv
+('Methane', 'N-Butane', 'N-Pentane', 'N-Hexane', 'Heptane')_test.csv
+('Methane', 'Ethane', 'N-Pentane', 'N-Hexane', 'Heptane')_train.csv
+('Methane', 'Ethane', 'Propane', 'N-Pentane', 'Heptane')_train.csv
+('Methane', 'Propane', 'N-Butane', 'N-Hexane', 'Heptane')_train.csv
+('Ethane', 'Propane', 'N-Pentane', 'N-Hexane', 'Heptane')_train.csv
+('Methane', 'Ethane', 'N-Butane', 'N-Hexane', 'Heptane')_test.csv
+('Methane', 'Propane', 'N-Butane', 'N-Hexane', 'Heptane')_test.csv
+('Ethane', 'Propane', 'N-Butane', 'N-Pentane', 'Heptane')_test.csv
+('Methane', 'Ethane', 'Propane', 'N-Butane', 'Heptane')_test.csv
+('Ethane', 'Propane', 'N-Butane', 'N-Hexane', 'Heptane')_test.csv
+./data/cleaned_data
+('Ethane', 'Propane', 'N-Pentane')_train.csv
+('Ethane', 'N-Pentane', 'Heptane')_test.csv
+('N-Pentane', 'N-Hexane', 'Heptane')_test.csv
+('Ethane', 'N-Pentane', 'Heptane')_train.csv
+('Methane', 'N-Pentane', 'N-Hexane')_train.csv
+('Propane', 'N-Butane', 'N-Hexane')_train.csv
+('Methane', 'N-Pentane', 'Heptane')_train.csv
+('Propane', 'N-Butane', 'Heptane')_train.csv
+('Methane', 'Ethane', 'N-Butane')_train.csv
+('Methane', 'N-Hexane', 'Heptane')_test.csv
+('N-Butane', 'N-Pentane', 'Heptane')_train.csv
+('Methane', 'Ethane', 'N-Pentane')_test.csv
+('Propane', 'N-Pentane', 'N-Hexane')_test.csv
+('Ethane', 'Propane', 'N-Butane')_train.csv
+('N-Butane', 'N-Pentane', 'N-Hexane')_train.csv
+('Ethane', 'Propane', 'N-Hexane')_train.csv
+('Methane', 'N-Butane', 'Heptane')_test.csv
+('Ethane', 'Propane', 'N-Hexane')_test.csv
+('Methane', 'N-Pentane', 'Heptane')_test.csv
+('Methane', 'N-Pentane', 'N-Hexane')_test.csv
+('Propane', 'N-Pentane', 'Heptane')_test.csv
+('Methane', 'N-Butane', 'Heptane')_train.csv
+('Propane', 'N-Butane', 'N-Hexane')_test.csv
+('Ethane', 'Propane', 'N-Butane')_test.csv
+('N-Butane', 'N-Hexane', 'Heptane')_train.csv
+('Propane', 'N-Hexane', 'Heptane')_train.csv
+('Methane', 'Ethane', 'Heptane')_test.csv
+('Propane', 'N-Butane', 'N-Pentane')_test.csv
+('Methane', 'N-Butane', 'N-Pentane')_train.csv
+('Ethane', 'N-Hexane', 'Heptane')_train.csv
+('Methane', 'Propane', 'N-Butane')_train.csv
+('Propane', 'N-Hexane', 'Heptane')_test.csv
+('Methane', 'Ethane', 'N-Hexane')_test.csv
+('Propane', 'N-Butane', 'N-Pentane')_train.csv
+('Ethane', 'N-Hexane', 'Heptane')_test.csv
+('Propane', 'N-Pentane', 'Heptane')_train.csv
+('Ethane', 'N-Butane', 'N-Hexane')_train.csv
+('Ethane', 'N-Pentane', 'N-Hexane')_train.csv
+('Ethane', 'Propane', 'N-Pentane')_test.csv
+('Methane', 'N-Butane', 'N-Pentane')_test.csv
+('Methane', 'Propane', 'N-Hexane')_test.csv
+('Methane', 'Ethane', 'Propane')_test.csv
+('N-Butane', 'N-Pentane', 'N-Hexane')_test.csv
+('Ethane', 'N-Butane', 'Heptane')_train.csv
+('Propane', 'N-Pentane', 'N-Hexane')_train.csv
+('Methane', 'Ethane', 'Propane')_train.csv
+('Ethane', 'N-Butane', 'N-Pentane')_train.csv
+('Methane', 'Propane', 'Heptane')_test.csv
+('Ethane', 'Propane', 'Heptane')_test.csv
+('Ethane', 'N-Butane', 'Heptane')_test.csv
+('Methane', 'N-Hexane', 'Heptane')_train.csv
+('Methane', 'Propane', 'N-Pentane')_train.csv
+('N-Butane', 'N-Hexane', 'Heptane')_test.csv
+('Methane', 'Ethane', 'N-Pentane')_train.csv
+('Ethane', 'Propane', 'Heptane')_train.csv
+('Methane', 'Propane', 'N-Hexane')_train.csv
+('Ethane', 'N-Butane', 'N-Pentane')_test.csv
+('N-Butane', 'N-Pentane', 'Heptane')_test.csv
+('Methane', 'Ethane', 'N-Butane')_test.csv
+('Methane', 'Propane', 'N-Pentane')_test.csv
+('Methane', 'Ethane', 'Heptane')_train.csv
+('Propane', 'N-Butane', 'Heptane')_test.csv
+('Methane', 'Propane', 'N-Butane')_test.csv
+('Ethane', 'N-Butane', 'N-Hexane')_test.csv
+('Methane', 'N-Butane', 'N-Hexane')_test.csv
+('Methane', 'Propane', 'Heptane')_train.csv
+('N-Pentane', 'N-Hexane', 'Heptane')_train.csv
+('Ethane', 'N-Pentane', 'N-Hexane')_test.csv
+('Methane', 'N-Butane', 'N-Hexane')_train.csv
+('Methane', 'Ethane', 'N-Hexane')_train.csv
+('Methane', 'Propane', 'N-Butane', 'N-Hexane')_test.csv
+('Methane', 'Ethane', 'N-Pentane', 'N-Hexane')_test.csv
+('Ethane', 'N-Butane', 'N-Hexane', 'Heptane')_train.csv
+('Methane', 'Ethane', 'N-Butane', 'N-Hexane')_train.csv
+('Methane', 'Propane', 'N-Butane', 'Heptane')_test.csv
+('Propane', 'N-Pentane', 'N-Hexane', 'Heptane')_train.csv
+('Ethane', 'N-Pentane', 'N-Hexane', 'Heptane')_train.csv
+('Methane', 'N-Pentane', 'N-Hexane', 'Heptane')_train.csv
+('Methane', 'Propane', 'N-Butane', 'Heptane')_train.csv
+('Ethane', 'Propane', 'N-Butane', 'N-Pentane')_test.csv
+('Methane', 'Propane', 'N-Pentane', 'N-Hexane')_train.csv
+('Ethane', 'Propane', 'N-Hexane', 'Heptane')_test.csv
+('Methane', 'N-Pentane', 'N-Hexane', 'Heptane')_test.csv
+('Methane', 'Ethane', 'N-Butane', 'Heptane')_test.csv
+('Ethane', 'Propane', 'N-Hexane', 'Heptane')_train.csv
+('Methane', 'Ethane', 'Propane', 'Heptane')_test.csv
+('N-Butane', 'N-Pentane', 'N-Hexane', 'Heptane')_train.csv
+('Methane', 'Ethane', 'N-Butane', 'Heptane')_train.csv
+('Methane', 'Propane', 'N-Butane', 'N-Hexane')_train.csv
+('Ethane', 'Propane', 'N-Pentane', 'Heptane')_train.csv
+('Methane', 'Ethane', 'Propane', 'Heptane')_train.csv
+('Propane', 'N-Pentane', 'N-Hexane', 'Heptane')_test.csv
+('Methane', 'Propane', 'N-Butane', 'N-Pentane')_test.csv
+('Ethane', 'Propane', 'N-Pentane', 'N-Hexane')_train.csv
+('Methane', 'N-Butane', 'N-Pentane', 'Heptane')_test.csv
+('Methane', 'N-Butane', 'N-Hexane', 'Heptane')_train.csv
+('Methane', 'Ethane', 'Propane', 'N-Pentane')_train.csv
+('Methane', 'Ethane', 'N-Butane', 'N-Pentane')_test.csv
+('Ethane', 'N-Pentane', 'N-Hexane', 'Heptane')_test.csv
+('Methane', 'Ethane', 'N-Hexane', 'Heptane')_train.csv
+('Ethane', 'Propane', 'N-Pentane', 'N-Hexane')_test.csv
+('Methane', 'Propane', 'N-Butane', 'N-Pentane')_train.csv
+('Ethane', 'Propane', 'N-Butane', 'Heptane')_train.csv
+('Methane', 'Ethane', 'Propane', 'N-Butane')_train.csv
+('Ethane', 'Propane', 'N-Butane', 'N-Hexane')_test.csv
+('Methane', 'Ethane', 'N-Pentane', 'N-Hexane')_train.csv
+('Ethane', 'Propane', 'N-Butane', 'N-Pentane')_train.csv
+('Methane', 'Propane', 'N-Pentane', 'Heptane')_test.csv
+('Methane', 'Ethane', 'Propane', 'N-Pentane')_test.csv
+('Ethane', 'N-Butane', 'N-Pentane', 'N-Hexane')_test.csv
+('Propane', 'N-Butane', 'N-Hexane', 'Heptane')_test.csv
+('Ethane', 'Propane', 'N-Butane', 'Heptane')_test.csv
+('Methane', 'N-Butane', 'N-Pentane', 'N-Hexane')_train.csv
+('Methane', 'Ethane', 'N-Pentane', 'Heptane')_train.csv
+('Ethane', 'N-Butane', 'N-Hexane', 'Heptane')_test.csv
+('Methane', 'Ethane', 'N-Hexane', 'Heptane')_test.csv
+('Methane', 'N-Butane', 'N-Pentane', 'Heptane')_train.csv
+('Ethane', 'N-Butane', 'N-Pentane', 'N-Hexane')_train.csv
+('Propane', 'N-Butane', 'N-Pentane', 'Heptane')_train.csv
+('Methane', 'Ethane', 'N-Butane', 'N-Pentane')_train.csv
+('Ethane', 'N-Butane', 'N-Pentane', 'Heptane')_test.csv
+('Methane', 'Ethane', 'Propane', 'N-Hexane')_train.csv
+('Propane', 'N-Butane', 'N-Pentane', 'N-Hexane')_test.csv
+('Ethane', 'N-Butane', 'N-Pentane', 'Heptane')_train.csv
+('Ethane', 'Propane', 'N-Pentane', 'Heptane')_test.csv
+('Ethane', 'Propane', 'N-Butane', 'N-Hexane')_train.csv
+('Methane', 'Ethane', 'N-Pentane', 'Heptane')_test.csv
+('Methane', 'Propane', 'N-Pentane', 'N-Hexane')_test.csv
+('Methane', 'Ethane', 'N-Butane', 'N-Hexane')_test.csv
+('Methane', 'Propane', 'N-Pentane', 'Heptane')_train.csv
+('Propane', 'N-Butane', 'N-Hexane', 'Heptane')_train.csv
+('N-Butane', 'N-Pentane', 'N-Hexane', 'Heptane')_test.csv
+('Methane', 'Propane', 'N-Hexane', 'Heptane')_train.csv
+('Propane', 'N-Butane', 'N-Pentane', 'Heptane')_test.csv
+('Methane', 'N-Butane', 'N-Hexane', 'Heptane')_test.csv
+('Methane', 'N-Butane', 'N-Pentane', 'N-Hexane')_test.csv
+('Methane', 'Propane', 'N-Hexane', 'Heptane')_test.csv
+('Propane', 'N-Butane', 'N-Pentane', 'N-Hexane')_train.csv
+('Methane', 'Ethane', 'Propane', 'N-Hexane')_test.csv
+('Methane', 'Ethane', 'Propane', 'N-Butane')_test.csv
+('Methane', 'Ethane', 'N-Butane', 'N-Pentane', 'N-Hexane')_test.csv
+('Methane', 'Ethane', 'N-Butane', 'N-Pentane', 'Heptane')_test.csv
+('Methane', 'Ethane', 'Propane', 'N-Butane', 'Heptane')_train.csv
+('Methane', 'Ethane', 'Propane', 'N-Hexane', 'Heptane')_train.csv
+('Propane', 'N-Butane', 'N-Pentane', 'N-Hexane', 'Heptane')_train.csv
+('Methane', 'Ethane', 'N-Butane', 'N-Pentane', 'Heptane')_train.csv
+('Methane', 'N-Butane', 'N-Pentane', 'N-Hexane', 'Heptane')_test.csv
+('Methane', 'Ethane', 'N-Pentane', 'N-Hexane', 'Heptane')_train.csv
+('Methane', 'Ethane', 'Propane', 'N-Pentane', 'Heptane')_train.csv
+('Methane', 'Propane', 'N-Butane', 'N-Hexane', 'Heptane')_train.csv
+('Ethane', 'Propane', 'N-Pentane', 'N-Hexane', 'Heptane')_train.csv
+('Methane', 'Ethane', 'N-Butane', 'N-Hexane', 'Heptane')_test.csv
+('Methane', 'Propane', 'N-Butane', 'N-Hexane', 'Heptane')_test.csv
+('Ethane', 'Propane', 'N-Butane', 'N-Pentane', 'Heptane')_test.csv
+('Methane', 'Ethane', 'Propane', 'N-Butane', 'Heptane')_test.csv
+('Ethane', 'Propane', 'N-Butane', 'N-Hexane', 'Heptane')_test.csv
+./data/cleaned_data
+('Ethane', 'Propane', 'N-Pentane')_train.csv
+('Ethane', 'N-Pentane', 'Heptane')_test.csv
+('N-Pentane', 'N-Hexane', 'Heptane')_test.csv
+('Ethane', 'N-Pentane', 'Heptane')_train.csv
+('Methane', 'N-Pentane', 'N-Hexane')_train.csv
+('Propane', 'N-Butane', 'N-Hexane')_train.csv
+('Methane', 'N-Pentane', 'Heptane')_train.csv
+('Propane', 'N-Butane', 'Heptane')_train.csv
+('Methane', 'Ethane', 'N-Butane')_train.csv
+('Methane', 'N-Hexane', 'Heptane')_test.csv
+('N-Butane', 'N-Pentane', 'Heptane')_train.csv
+('Methane', 'Ethane', 'N-Pentane')_test.csv
+('Propane', 'N-Pentane', 'N-Hexane')_test.csv
+('Ethane', 'Propane', 'N-Butane')_train.csv
+('N-Butane', 'N-Pentane', 'N-Hexane')_train.csv
+('Ethane', 'Propane', 'N-Hexane')_train.csv
+('Methane', 'N-Butane', 'Heptane')_test.csv
+('Ethane', 'Propane', 'N-Hexane')_test.csv
+('Methane', 'N-Pentane', 'Heptane')_test.csv
+('Methane', 'N-Pentane', 'N-Hexane')_test.csv
+('Propane', 'N-Pentane', 'Heptane')_test.csv
+('Methane', 'N-Butane', 'Heptane')_train.csv
+('Propane', 'N-Butane', 'N-Hexane')_test.csv
+('Ethane', 'Propane', 'N-Butane')_test.csv
+('N-Butane', 'N-Hexane', 'Heptane')_train.csv
+('Propane', 'N-Hexane', 'Heptane')_train.csv
+('Methane', 'Ethane', 'Heptane')_test.csv
+('Propane', 'N-Butane', 'N-Pentane')_test.csv
+('Methane', 'N-Butane', 'N-Pentane')_train.csv
+('Ethane', 'N-Hexane', 'Heptane')_train.csv
+('Methane', 'Propane', 'N-Butane')_train.csv
+('Propane', 'N-Hexane', 'Heptane')_test.csv
+('Methane', 'Ethane', 'N-Hexane')_test.csv
+('Propane', 'N-Butane', 'N-Pentane')_train.csv
+('Ethane', 'N-Hexane', 'Heptane')_test.csv
+('Propane', 'N-Pentane', 'Heptane')_train.csv
+('Ethane', 'N-Butane', 'N-Hexane')_train.csv
+('Ethane', 'N-Pentane', 'N-Hexane')_train.csv
+('Ethane', 'Propane', 'N-Pentane')_test.csv
+('Methane', 'N-Butane', 'N-Pentane')_test.csv
+('Methane', 'Propane', 'N-Hexane')_test.csv
+('Methane', 'Ethane', 'Propane')_test.csv
+('N-Butane', 'N-Pentane', 'N-Hexane')_test.csv
+('Ethane', 'N-Butane', 'Heptane')_train.csv
+('Propane', 'N-Pentane', 'N-Hexane')_train.csv
+('Methane', 'Ethane', 'Propane')_train.csv
+('Ethane', 'N-Butane', 'N-Pentane')_train.csv
+('Methane', 'Propane', 'Heptane')_test.csv
+('Ethane', 'Propane', 'Heptane')_test.csv
+('Ethane', 'N-Butane', 'Heptane')_test.csv
+('Methane', 'N-Hexane', 'Heptane')_train.csv
+('Methane', 'Propane', 'N-Pentane')_train.csv
+('N-Butane', 'N-Hexane', 'Heptane')_test.csv
+('Methane', 'Ethane', 'N-Pentane')_train.csv
+('Ethane', 'Propane', 'Heptane')_train.csv
+('Methane', 'Propane', 'N-Hexane')_train.csv
+('Ethane', 'N-Butane', 'N-Pentane')_test.csv
+('N-Butane', 'N-Pentane', 'Heptane')_test.csv
+('Methane', 'Ethane', 'N-Butane')_test.csv
+('Methane', 'Propane', 'N-Pentane')_test.csv
+('Methane', 'Ethane', 'Heptane')_train.csv
+('Propane', 'N-Butane', 'Heptane')_test.csv
+('Methane', 'Propane', 'N-Butane')_test.csv
+('Ethane', 'N-Butane', 'N-Hexane')_test.csv
+('Methane', 'N-Butane', 'N-Hexane')_test.csv
+('Methane', 'Propane', 'Heptane')_train.csv
+('N-Pentane', 'N-Hexane', 'Heptane')_train.csv
+('Ethane', 'N-Pentane', 'N-Hexane')_test.csv
+('Methane', 'N-Butane', 'N-Hexane')_train.csv
+('Methane', 'Ethane', 'N-Hexane')_train.csv
+('Methane', 'Propane', 'N-Butane', 'N-Hexane')_test.csv
+('Methane', 'Ethane', 'N-Pentane', 'N-Hexane')_test.csv
+('Ethane', 'N-Butane', 'N-Hexane', 'Heptane')_train.csv
+('Methane', 'Ethane', 'N-Butane', 'N-Hexane')_train.csv
+('Methane', 'Propane', 'N-Butane', 'Heptane')_test.csv
+('Propane', 'N-Pentane', 'N-Hexane', 'Heptane')_train.csv
+('Ethane', 'N-Pentane', 'N-Hexane', 'Heptane')_train.csv
+('Methane', 'N-Pentane', 'N-Hexane', 'Heptane')_train.csv
+('Methane', 'Propane', 'N-Butane', 'Heptane')_train.csv
+('Ethane', 'Propane', 'N-Butane', 'N-Pentane')_test.csv
+('Methane', 'Propane', 'N-Pentane', 'N-Hexane')_train.csv
+('Ethane', 'Propane', 'N-Hexane', 'Heptane')_test.csv
+('Methane', 'N-Pentane', 'N-Hexane', 'Heptane')_test.csv
+('Methane', 'Ethane', 'N-Butane', 'Heptane')_test.csv
+('Ethane', 'Propane', 'N-Hexane', 'Heptane')_train.csv
+('Methane', 'Ethane', 'Propane', 'Heptane')_test.csv
+('N-Butane', 'N-Pentane', 'N-Hexane', 'Heptane')_train.csv
+('Methane', 'Ethane', 'N-Butane', 'Heptane')_train.csv
+('Methane', 'Propane', 'N-Butane', 'N-Hexane')_train.csv
+('Ethane', 'Propane', 'N-Pentane', 'Heptane')_train.csv
+('Methane', 'Ethane', 'Propane', 'Heptane')_train.csv
+('Propane', 'N-Pentane', 'N-Hexane', 'Heptane')_test.csv
+('Methane', 'Propane', 'N-Butane', 'N-Pentane')_test.csv
+('Ethane', 'Propane', 'N-Pentane', 'N-Hexane')_train.csv
+('Methane', 'N-Butane', 'N-Pentane', 'Heptane')_test.csv
+('Methane', 'N-Butane', 'N-Hexane', 'Heptane')_train.csv
+('Methane', 'Ethane', 'Propane', 'N-Pentane')_train.csv
+('Methane', 'Ethane', 'N-Butane', 'N-Pentane')_test.csv
+('Ethane', 'N-Pentane', 'N-Hexane', 'Heptane')_test.csv
+('Methane', 'Ethane', 'N-Hexane', 'Heptane')_train.csv
+('Ethane', 'Propane', 'N-Pentane', 'N-Hexane')_test.csv
+('Methane', 'Propane', 'N-Butane', 'N-Pentane')_train.csv
+('Ethane', 'Propane', 'N-Butane', 'Heptane')_train.csv
+('Methane', 'Ethane', 'Propane', 'N-Butane')_train.csv
+('Ethane', 'Propane', 'N-Butane', 'N-Hexane')_test.csv
+('Methane', 'Ethane', 'N-Pentane', 'N-Hexane')_train.csv
+('Ethane', 'Propane', 'N-Butane', 'N-Pentane')_train.csv
+('Methane', 'Propane', 'N-Pentane', 'Heptane')_test.csv
+('Methane', 'Ethane', 'Propane', 'N-Pentane')_test.csv
+('Ethane', 'N-Butane', 'N-Pentane', 'N-Hexane')_test.csv
+('Propane', 'N-Butane', 'N-Hexane', 'Heptane')_test.csv
+('Ethane', 'Propane', 'N-Butane', 'Heptane')_test.csv
+('Methane', 'N-Butane', 'N-Pentane', 'N-Hexane')_train.csv
+('Methane', 'Ethane', 'N-Pentane', 'Heptane')_train.csv
+('Ethane', 'N-Butane', 'N-Hexane', 'Heptane')_test.csv
+('Methane', 'Ethane', 'N-Hexane', 'Heptane')_test.csv
+('Methane', 'N-Butane', 'N-Pentane', 'Heptane')_train.csv
+('Ethane', 'N-Butane', 'N-Pentane', 'N-Hexane')_train.csv
+('Propane', 'N-Butane', 'N-Pentane', 'Heptane')_train.csv
+('Methane', 'Ethane', 'N-Butane', 'N-Pentane')_train.csv
+('Ethane', 'N-Butane', 'N-Pentane', 'Heptane')_test.csv
+('Methane', 'Ethane', 'Propane', 'N-Hexane')_train.csv
+('Propane', 'N-Butane', 'N-Pentane', 'N-Hexane')_test.csv
+('Ethane', 'N-Butane', 'N-Pentane', 'Heptane')_train.csv
+('Ethane', 'Propane', 'N-Pentane', 'Heptane')_test.csv
+('Ethane', 'Propane', 'N-Butane', 'N-Hexane')_train.csv
+('Methane', 'Ethane', 'N-Pentane', 'Heptane')_test.csv
+('Methane', 'Propane', 'N-Pentane', 'N-Hexane')_test.csv
+('Methane', 'Ethane', 'N-Butane', 'N-Hexane')_test.csv
+('Methane', 'Propane', 'N-Pentane', 'Heptane')_train.csv
+('Propane', 'N-Butane', 'N-Hexane', 'Heptane')_train.csv
+('N-Butane', 'N-Pentane', 'N-Hexane', 'Heptane')_test.csv
+('Methane', 'Propane', 'N-Hexane', 'Heptane')_train.csv
+('Propane', 'N-Butane', 'N-Pentane', 'Heptane')_test.csv
+('Methane', 'N-Butane', 'N-Hexane', 'Heptane')_test.csv
+('Methane', 'N-Butane', 'N-Pentane', 'N-Hexane')_test.csv
+('Methane', 'Propane', 'N-Hexane', 'Heptane')_test.csv
+('Propane', 'N-Butane', 'N-Pentane', 'N-Hexane')_train.csv
+('Methane', 'Ethane', 'Propane', 'N-Hexane')_test.csv
+('Methane', 'Ethane', 'Propane', 'N-Butane')_test.csv
+('Methane', 'Ethane', 'N-Butane', 'N-Pentane', 'N-Hexane')_test.csv
+('Methane', 'Ethane', 'N-Butane', 'N-Pentane', 'Heptane')_test.csv
+('Methane', 'Ethane', 'Propane', 'N-Butane', 'Heptane')_train.csv
+('Methane', 'Ethane', 'Propane', 'N-Hexane', 'Heptane')_train.csv
+('Propane', 'N-Butane', 'N-Pentane', 'N-Hexane', 'Heptane')_train.csv
+('Methane', 'Ethane', 'N-Butane', 'N-Pentane', 'Heptane')_train.csv
+('Methane', 'N-Butane', 'N-Pentane', 'N-Hexane', 'Heptane')_test.csv
+('Methane', 'Ethane', 'N-Pentane', 'N-Hexane', 'Heptane')_train.csv
+('Methane', 'Ethane', 'Propane', 'N-Pentane', 'Heptane')_train.csv
+('Methane', 'Propane', 'N-Butane', 'N-Hexane', 'Heptane')_train.csv
+('Ethane', 'Propane', 'N-Pentane', 'N-Hexane', 'Heptane')_train.csv
+('Methane', 'Ethane', 'N-Butane', 'N-Hexane', 'Heptane')_test.csv
+('Methane', 'Propane', 'N-Butane', 'N-Hexane', 'Heptane')_test.csv
+('Ethane', 'Propane', 'N-Butane', 'N-Pentane', 'Heptane')_test.csv
+('Methane', 'Ethane', 'Propane', 'N-Butane', 'Heptane')_test.csv
+('Ethane', 'Propane', 'N-Butane', 'N-Hexane', 'Heptane')_test.csv
+('Methane', 'Propane', 'N-Butane', 'N-Pentane', 'Heptane')_train.csv
+('Methane', 'Ethane', 'Propane', 'N-Butane', 'N-Hexane')_test.csv
+('Methane', 'Ethane', 'Propane', 'N-Pentane', 'Heptane')_test.csv
+('Ethane', 'Propane', 'N-Butane', 'N-Pentane', 'Heptane')_train.csv
+('Methane', 'Ethane', 'Propane', 'N-Hexane', 'Heptane')_test.csv
+('Methane', 'Ethane', 'N-Butane', 'N-Pentane', 'N-Hexane')_train.csv
+('Methane', 'Propane', 'N-Pentane', 'N-Hexane', 'Heptane')_test.csv
+('Ethane', 'Propane', 'N-Butane', 'N-Hexane', 'Heptane')_train.csv
+('Ethane', 'N-Butane', 'N-Pentane', 'N-Hexane', 'Heptane')_train.csv
+('Ethane', 'Propane', 'N-Butane', 'N-Pentane', 'N-Hexane')_train.csv
+('Methane', 'Ethane', 'Propane', 'N-Pentane', 'N-Hexane')_test.csv
+('Methane', 'Propane', 'N-Butane', 'N-Pentane', 'Heptane')_test.csv
+('Methane', 'Propane', 'N-Butane', 'N-Pentane', 'N-Hexane')_test.csv
+('Methane', 'Ethane', 'Propane', 'N-Butane', 'N-Pentane')_train.csv
+('Methane', 'Ethane', 'N-Pentane', 'N-Hexane', 'Heptane')_test.csv
+('Ethane', 'N-Butane', 'N-Pentane', 'N-Hexane', 'Heptane')_test.csv
+('Methane', 'Ethane', 'Propane', 'N-Butane', 'N-Hexane')_train.csv
+('Methane', 'Ethane', 'Propane', 'N-Pentane', 'N-Hexane')_train.csv
+('Methane', 'N-Butane', 'N-Pentane', 'N-Hexane', 'Heptane')_train.csv
+('Methane', 'Ethane', 'N-Butane', 'N-Hexane', 'Heptane')_train.csv
+('Ethane', 'Propane', 'N-Butane', 'N-Pentane', 'N-Hexane')_test.csv
+('Methane', 'Propane', 'N-Butane', 'N-Pentane', 'N-Hexane')_train.csv
+('Ethane', 'Propane', 'N-Pentane', 'N-Hexane', 'Heptane')_test.csv
+('Methane', 'Propane', 'N-Pentane', 'N-Hexane', 'Heptane')_train.csv
+('Propane', 'N-Butane', 'N-Pentane', 'N-Hexane', 'Heptane')_test.csv
+('Methane', 'Ethane', 'Propane', 'N-Butane', 'N-Pentane')_test.csv
+('Propane',)_train.csv
+('N-Hexane',)_test.csv
+('Methane',)_test.csv
+('N-Pentane',)_train.csv
+('Ethane',)_train.csv
+('N-Pentane',)_test.csv
+('Heptane',)_test.csv
+('N-Hexane',)_train.csv
+('Heptane',)_train.csv
+('N-Butane',)_train.csv
+('Propane',)_test.csv
+('Methane',)_train.csv
+('Ethane',)_test.csv
+('N-Butane',)_test.csv
+('N-Pentane', 'N-Hexane')_test.csv
+('Ethane', 'N-Hexane')_train.csv
+('Ethane', 'N-Hexane')_test.csv
+('Ethane', 'N-Pentane')_train.csv
+('Methane', 'Propane')_test.csv
+('Methane', 'Heptane')_test.csv
+('Propane', 'N-Hexane')_test.csv
+('N-Butane', 'N-Hexane')_train.csv
+('N-Hexane', 'Heptane')_train.csv
+('Ethane', 'N-Butane')_train.csv
+('Ethane', 'N-Butane')_test.csv
+('Propane', 'N-Pentane')_train.csv
+('N-Pentane', 'N-Hexane')_train.csv
+('Ethane', 'Heptane')_train.csv
+('Methane', 'N-Butane')_train.csv
+('Propane', 'Heptane')_train.csv
+('Methane', 'Ethane')_test.csv
+('Methane', 'N-Butane')_test.csv
+('N-Butane', 'Heptane')_train.csv
+('Propane', 'N-Hexane')_train.csv
+('Methane', 'Propane')_train.csv
+('Propane', 'N-Pentane')_test.csv
+('Ethane', 'Propane')_train.csv
+('Methane', 'N-Pentane')_train.csv
+('N-Butane', 'N-Pentane')_test.csv
+('N-Pentane', 'Heptane')_test.csv
+('Methane', 'N-Hexane')_train.csv
+('Ethane', 'N-Pentane')_test.csv
+('N-Butane', 'N-Hexane')_test.csv
+('Methane', 'Ethane')_train.csv
+('Methane', 'N-Pentane')_test.csv
+('Ethane', 'Propane')_test.csv
+('Methane', 'N-Hexane')_test.csv
+('Methane', 'Heptane')_train.csv
+('N-Butane', 'Heptane')_test.csv
+('N-Butane', 'N-Pentane')_train.csv
+('N-Hexane', 'Heptane')_test.csv
+('Propane', 'Heptane')_test.csv
+('Propane', 'N-Butane')_train.csv
+('Propane', 'N-Butane')_test.csv
+('N-Pentane', 'Heptane')_train.csv
+('Ethane', 'Heptane')_test.csv
+('Ethane', 'Propane', 'N-Butane', 'N-Pentane', 'N-Hexane', 'Heptane')_test.csv
+('Methane', 'Ethane', 'Propane', 'N-Butane', 'N-Hexane', 'Heptane')_test.csv
+('Methane', 'Ethane', 'Propane', 'N-Butane', 'N-Pentane', 'N-Hexane')_train.csv
+('Methane', 'Propane', 'N-Butane', 'N-Pentane', 'N-Hexane', 'Heptane')_train.csv
+('Methane', 'Ethane', 'Propane', 'N-Butane', 'N-Pentane', 'N-Hexane')_test.csv
+('Methane', 'Ethane', 'N-Butane', 'N-Pentane', 'N-Hexane', 'Heptane')_train.csv
+('Methane', 'Ethane', 'Propane', 'N-Pentane', 'N-Hexane', 'Heptane')_train.csv
+('Methane', 'Propane', 'N-Butane', 'N-Pentane', 'N-Hexane', 'Heptane')_test.csv
+('Methane', 'Ethane', 'Propane', 'N-Butane', 'N-Hexane', 'Heptane')_train.csv
+('Methane', 'Ethane', 'N-Butane', 'N-Pentane', 'N-Hexane', 'Heptane')_test.csv
+('Methane', 'Ethane', 'Propane', 'N-Butane', 'N-Pentane', 'Heptane')_train.csv
+('Methane', 'Ethane', 'Propane', 'N-Butane', 'N-Pentane', 'Heptane')_test.csv
+('Methane', 'Ethane', 'Propane', 'N-Pentane', 'N-Hexane', 'Heptane')_test.csv
+('Ethane', 'Propane', 'N-Butane', 'N-Pentane', 'N-Hexane', 'Heptane')_train.csv
+('Methane', 'Ethane', 'Propane', 'N-Butane', 'N-Pentane', 'N-Hexane', 'Heptane')_train.csv
+('Methane', 'Ethane', 'Propane', 'N-Butane', 'N-Pentane', 'N-Hexane', 'Heptane')_test.csv
+('Methane', 'Propane', 'N-Butane', 'N-Pentane', 'Heptane')_train.csv
+('Methane', 'Ethane', 'Propane', 'N-Butane', 'N-Hexane')_test.csv
+('Methane', 'Ethane', 'Propane', 'N-Pentane', 'Heptane')_test.csv
+('Ethane', 'Propane', 'N-Butane', 'N-Pentane', 'Heptane')_train.csv
+('Methane', 'Ethane', 'Propane', 'N-Hexane', 'Heptane')_test.csv
+('Methane', 'Ethane', 'N-Butane', 'N-Pentane', 'N-Hexane')_train.csv
+('Methane', 'Propane', 'N-Pentane', 'N-Hexane', 'Heptane')_test.csv
+('Ethane', 'Propane', 'N-Butane', 'N-Hexane', 'Heptane')_train.csv
+('Ethane', 'N-Butane', 'N-Pentane', 'N-Hexane', 'Heptane')_train.csv
+('Ethane', 'Propane', 'N-Butane', 'N-Pentane', 'N-Hexane')_train.csv
+('Methane', 'Ethane', 'Propane', 'N-Pentane', 'N-Hexane')_test.csv
+('Methane', 'Propane', 'N-Butane', 'N-Pentane', 'Heptane')_test.csv
+('Methane', 'Propane', 'N-Butane', 'N-Pentane', 'N-Hexane')_test.csv
+('Methane', 'Ethane', 'Propane', 'N-Butane', 'N-Pentane')_train.csv
+('Methane', 'Ethane', 'N-Pentane', 'N-Hexane', 'Heptane')_test.csv
+('Ethane', 'N-Butane', 'N-Pentane', 'N-Hexane', 'Heptane')_test.csv
+('Methane', 'Ethane', 'Propane', 'N-Butane', 'N-Hexane')_train.csv
+('Methane', 'Ethane', 'Propane', 'N-Pentane', 'N-Hexane')_train.csv
+('Methane', 'N-Butane', 'N-Pentane', 'N-Hexane', 'Heptane')_train.csv
+('Methane', 'Ethane', 'N-Butane', 'N-Hexane', 'Heptane')_train.csv
+('Ethane', 'Propane', 'N-Butane', 'N-Pentane', 'N-Hexane')_test.csv
+('Methane', 'Propane', 'N-Butane', 'N-Pentane', 'N-Hexane')_train.csv
+('Ethane', 'Propane', 'N-Pentane', 'N-Hexane', 'Heptane')_test.csv
+('Methane', 'Propane', 'N-Pentane', 'N-Hexane', 'Heptane')_train.csv
+('Propane', 'N-Butane', 'N-Pentane', 'N-Hexane', 'Heptane')_test.csv
+('Methane', 'Ethane', 'Propane', 'N-Butane', 'N-Pentane')_test.csv
+('Propane',)_train.csv
+('N-Hexane',)_test.csv
+('Methane',)_test.csv
+('N-Pentane',)_train.csv
+('Ethane',)_train.csv
+('N-Pentane',)_test.csv
+('Heptane',)_test.csv
+('N-Hexane',)_train.csv
+('Heptane',)_train.csv
+('N-Butane',)_train.csv
+('Propane',)_test.csv
+('Methane',)_train.csv
+('Ethane',)_test.csv
+('N-Butane',)_test.csv
+('N-Pentane', 'N-Hexane')_test.csv
+('Ethane', 'N-Hexane')_train.csv
+('Ethane', 'N-Hexane')_test.csv
+('Ethane', 'N-Pentane')_train.csv
+('Methane', 'Propane')_test.csv
+('Methane', 'Heptane')_test.csv
+('Propane', 'N-Hexane')_test.csv
+('N-Butane', 'N-Hexane')_train.csv
+('N-Hexane', 'Heptane')_train.csv
+('Ethane', 'N-Butane')_train.csv
+('Ethane', 'N-Butane')_test.csv
+('Propane', 'N-Pentane')_train.csv
+('N-Pentane', 'N-Hexane')_train.csv
+('Ethane', 'Heptane')_train.csv
+('Methane', 'N-Butane')_train.csv
+('Propane', 'Heptane')_train.csv
+('Methane', 'Ethane')_test.csv
+('Methane', 'N-Butane')_test.csv
+('N-Butane', 'Heptane')_train.csv
+('Propane', 'N-Hexane')_train.csv
+('Methane', 'Propane')_train.csv
+('Propane', 'N-Pentane')_test.csv
+('Ethane', 'Propane')_train.csv
+('Methane', 'N-Pentane')_train.csv
+('N-Butane', 'N-Pentane')_test.csv
+('N-Pentane', 'Heptane')_test.csv
+('Methane', 'N-Hexane')_train.csv
+('Ethane', 'N-Pentane')_test.csv
+('N-Butane', 'N-Hexane')_test.csv
+('Methane', 'Ethane')_train.csv
+('Methane', 'N-Pentane')_test.csv
+('Ethane', 'Propane')_test.csv
+('Methane', 'N-Hexane')_test.csv
+('Methane', 'Heptane')_train.csv
+('N-Butane', 'Heptane')_test.csv
+('N-Butane', 'N-Pentane')_train.csv
+('N-Hexane', 'Heptane')_test.csv
+('Propane', 'Heptane')_test.csv
+('Propane', 'N-Butane')_train.csv
+('Propane', 'N-Butane')_test.csv
+('N-Pentane', 'Heptane')_train.csv
+('Ethane', 'Heptane')_test.csv
+('Ethane', 'Propane', 'N-Butane', 'N-Pentane', 'N-Hexane', 'Heptane')_test.csv
+('Methane', 'Ethane', 'Propane', 'N-Butane', 'N-Hexane', 'Heptane')_test.csv
+('Methane', 'Ethane', 'Propane', 'N-Butane', 'N-Pentane', 'N-Hexane')_train.csv
+('Methane', 'Propane', 'N-Butane', 'N-Pentane', 'N-Hexane', 'Heptane')_train.csv
+('Methane', 'Ethane', 'Propane', 'N-Butane', 'N-Pentane', 'N-Hexane')_test.csv
+('Methane', 'Ethane', 'N-Butane', 'N-Pentane', 'N-Hexane', 'Heptane')_train.csv
+('Methane', 'Ethane', 'Propane', 'N-Pentane', 'N-Hexane', 'Heptane')_train.csv
+('Methane', 'Propane', 'N-Butane', 'N-Pentane', 'N-Hexane', 'Heptane')_test.csv
+('Methane', 'Ethane', 'Propane', 'N-Butane', 'N-Hexane', 'Heptane')_train.csv
+('Methane', 'Ethane', 'N-Butane', 'N-Pentane', 'N-Hexane', 'Heptane')_test.csv
+('Methane', 'Ethane', 'Propane', 'N-Butane', 'N-Pentane', 'Heptane')_train.csv
+('Methane', 'Ethane', 'Propane', 'N-Butane', 'N-Pentane', 'Heptane')_test.csv
+('Methane', 'Ethane', 'Propane', 'N-Pentane', 'N-Hexane', 'Heptane')_test.csv
+('Ethane', 'Propane', 'N-Butane', 'N-Pentane', 'N-Hexane', 'Heptane')_train.csv
+('Methane', 'Ethane', 'Propane', 'N-Butane', 'N-Pentane', 'N-Hexane', 'Heptane')_train.csv
+('Methane', 'Ethane', 'Propane', 'N-Butane', 'N-Pentane', 'N-Hexane', 'Heptane')_test.csv
+('Methane', 'Propane', 'N-Butane', 'N-Pentane', 'Heptane')_train.csv
+('Methane', 'Ethane', 'Propane', 'N-Butane', 'N-Hexane')_test.csv
+('Methane', 'Ethane', 'Propane', 'N-Pentane', 'Heptane')_test.csv
+('Ethane', 'Propane', 'N-Butane', 'N-Pentane', 'Heptane')_train.csv
+('Methane', 'Ethane', 'Propane', 'N-Hexane', 'Heptane')_test.csv
+('Methane', 'Ethane', 'N-Butane', 'N-Pentane', 'N-Hexane')_train.csv
+('Methane', 'Propane', 'N-Pentane', 'N-Hexane', 'Heptane')_test.csv
+('Ethane', 'Propane', 'N-Butane', 'N-Hexane', 'Heptane')_train.csv
+('Ethane', 'N-Butane', 'N-Pentane', 'N-Hexane', 'Heptane')_train.csv
+('Ethane', 'Propane', 'N-Butane', 'N-Pentane', 'N-Hexane')_train.csv
+('Methane', 'Ethane', 'Propane', 'N-Pentane', 'N-Hexane')_test.csv
+('Methane', 'Propane', 'N-Butane', 'N-Pentane', 'Heptane')_test.csv
+('Methane', 'Propane', 'N-Butane', 'N-Pentane', 'N-Hexane')_test.csv
+('Methane', 'Ethane', 'Propane', 'N-Butane', 'N-Pentane')_train.csv
+('Methane', 'Ethane', 'N-Pentane', 'N-Hexane', 'Heptane')_test.csv
+('Ethane', 'N-Butane', 'N-Pentane', 'N-Hexane', 'Heptane')_test.csv
+('Methane', 'Ethane', 'Propane', 'N-Butane', 'N-Hexane')_train.csv
+('Methane', 'Ethane', 'Propane', 'N-Pentane', 'N-Hexane')_train.csv
+('Methane', 'N-Butane', 'N-Pentane', 'N-Hexane', 'Heptane')_train.csv
+('Methane', 'Ethane', 'N-Butane', 'N-Hexane', 'Heptane')_train.csv
+('Ethane', 'Propane', 'N-Butane', 'N-Pentane', 'N-Hexane')_test.csv
+('Methane', 'Propane', 'N-Butane', 'N-Pentane', 'N-Hexane')_train.csv
+('Ethane', 'Propane', 'N-Pentane', 'N-Hexane', 'Heptane')_test.csv
+('Methane', 'Propane', 'N-Pentane', 'N-Hexane', 'Heptane')_train.csv
+('Propane', 'N-Butane', 'N-Pentane', 'N-Hexane', 'Heptane')_test.csv
+('Methane', 'Ethane', 'Propane', 'N-Butane', 'N-Pentane')_test.csv
+('Propane',)_train.csv
+('N-Hexane',)_test.csv
+('Methane',)_test.csv
+('N-Pentane',)_train.csv
+('Ethane',)_train.csv
+('N-Pentane',)_test.csv
+('Heptane',)_test.csv
+('N-Hexane',)_train.csv
+('Heptane',)_train.csv
+('N-Butane',)_train.csv
+('Propane',)_test.csv
+('Methane',)_train.csv
+('Ethane',)_test.csv
+('N-Butane',)_test.csv
+('N-Pentane', 'N-Hexane')_test.csv
+('Ethane', 'N-Hexane')_train.csv
+('Ethane', 'N-Hexane')_test.csv
+('Ethane', 'N-Pentane')_train.csv
+('Methane', 'Propane')_test.csv
+('Methane', 'Heptane')_test.csv
+('Propane', 'N-Hexane')_test.csv
+('N-Butane', 'N-Hexane')_train.csv
+('N-Hexane', 'Heptane')_train.csv
+('Ethane', 'N-Butane')_train.csv
+('Ethane', 'N-Butane')_test.csv
+('Propane', 'N-Pentane')_train.csv
+('N-Pentane', 'N-Hexane')_train.csv
+('Ethane', 'Heptane')_train.csv
+('Methane', 'N-Butane')_train.csv
+('Propane', 'Heptane')_train.csv
+('Methane', 'Ethane')_test.csv
+('Methane', 'N-Butane')_test.csv
+('N-Butane', 'Heptane')_train.csv
+('Propane', 'N-Hexane')_train.csv
+('Methane', 'Propane')_train.csv
+('Propane', 'N-Pentane')_test.csv
+('Ethane', 'Propane')_train.csv
+('Methane', 'N-Pentane')_train.csv
+('N-Butane', 'N-Pentane')_test.csv
+('N-Pentane', 'Heptane')_test.csv
+('Methane', 'N-Hexane')_train.csv
+('Ethane', 'N-Pentane')_test.csv
+('N-Butane', 'N-Hexane')_test.csv
+('Methane', 'Ethane')_train.csv
+('Methane', 'N-Pentane')_test.csv
+('Ethane', 'Propane')_test.csv
+('Methane', 'N-Hexane')_test.csv
+('Methane', 'Heptane')_train.csv
+('N-Butane', 'Heptane')_test.csv
+('N-Butane', 'N-Pentane')_train.csv
+('N-Hexane', 'Heptane')_test.csv
+('Propane', 'Heptane')_test.csv
+('Propane', 'N-Butane')_train.csv
+('Propane', 'N-Butane')_test.csv
+('N-Pentane', 'Heptane')_train.csv
+('Ethane', 'Heptane')_test.csv
+('Ethane', 'Propane', 'N-Butane', 'N-Pentane', 'N-Hexane', 'Heptane')_test.csv
+('Methane', 'Ethane', 'Propane', 'N-Butane', 'N-Hexane', 'Heptane')_test.csv
+('Methane', 'Ethane', 'Propane', 'N-Butane', 'N-Pentane', 'N-Hexane')_train.csv
+('Methane', 'Propane', 'N-Butane', 'N-Pentane', 'N-Hexane', 'Heptane')_train.csv
+('Methane', 'Ethane', 'Propane', 'N-Butane', 'N-Pentane', 'N-Hexane')_test.csv
+('Methane', 'Ethane', 'N-Butane', 'N-Pentane', 'N-Hexane', 'Heptane')_train.csv
+('Methane', 'Ethane', 'Propane', 'N-Pentane', 'N-Hexane', 'Heptane')_train.csv
+('Methane', 'Propane', 'N-Butane', 'N-Pentane', 'N-Hexane', 'Heptane')_test.csv
+('Methane', 'Ethane', 'Propane', 'N-Butane', 'N-Hexane', 'Heptane')_train.csv
+('Methane', 'Ethane', 'N-Butane', 'N-Pentane', 'N-Hexane', 'Heptane')_test.csv
+('Methane', 'Ethane', 'Propane', 'N-Butane', 'N-Pentane', 'Heptane')_train.csv
+('Methane', 'Ethane', 'Propane', 'N-Butane', 'N-Pentane', 'Heptane')_test.csv
+('Methane', 'Ethane', 'Propane', 'N-Pentane', 'N-Hexane', 'Heptane')_test.csv
+('Ethane', 'Propane', 'N-Butane', 'N-Pentane', 'N-Hexane', 'Heptane')_train.csv
+('Methane', 'Ethane', 'Propane', 'N-Butane', 'N-Pentane', 'N-Hexane', 'Heptane')_train.csv
+('Methane', 'Ethane', 'Propane', 'N-Butane', 'N-Pentane', 'N-Hexane', 'Heptane')_test.csv
+('Methane', 'Propane', 'N-Butane', 'N-Pentane', 'Heptane')_train.csv
+('Methane', 'Ethane', 'Propane', 'N-Butane', 'N-Hexane')_test.csv
+('Methane', 'Ethane', 'Propane', 'N-Pentane', 'Heptane')_test.csv
+('Ethane', 'Propane', 'N-Butane', 'N-Pentane', 'Heptane')_train.csv
+('Methane', 'Ethane', 'Propane', 'N-Hexane', 'Heptane')_test.csv
+('Methane', 'Ethane', 'N-Butane', 'N-Pentane', 'N-Hexane')_train.csv
+('Methane', 'Propane', 'N-Pentane', 'N-Hexane', 'Heptane')_test.csv
+('Ethane', 'Propane', 'N-Butane', 'N-Hexane', 'Heptane')_train.csv
+('Ethane', 'N-Butane', 'N-Pentane', 'N-Hexane', 'Heptane')_train.csv
+('Ethane', 'Propane', 'N-Butane', 'N-Pentane', 'N-Hexane')_train.csv
+('Methane', 'Ethane', 'Propane', 'N-Pentane', 'N-Hexane')_test.csv
+('Methane', 'Propane', 'N-Butane', 'N-Pentane', 'Heptane')_test.csv
+('Methane', 'Propane', 'N-Butane', 'N-Pentane', 'N-Hexane')_test.csv
+('Methane', 'Ethane', 'Propane', 'N-Butane', 'N-Pentane')_train.csv
+('Methane', 'Ethane', 'N-Pentane', 'N-Hexane', 'Heptane')_test.csv
+('Ethane', 'N-Butane', 'N-Pentane', 'N-Hexane', 'Heptane')_test.csv
+('Methane', 'Ethane', 'Propane', 'N-Butane', 'N-Hexane')_train.csv
+('Methane', 'Ethane', 'Propane', 'N-Pentane', 'N-Hexane')_train.csv
+('Methane', 'N-Butane', 'N-Pentane', 'N-Hexane', 'Heptane')_train.csv
+('Methane', 'Ethane', 'N-Butane', 'N-Hexane', 'Heptane')_train.csv
+('Ethane', 'Propane', 'N-Butane', 'N-Pentane', 'N-Hexane')_test.csv
+('Methane', 'Propane', 'N-Butane', 'N-Pentane', 'N-Hexane')_train.csv
+('Ethane', 'Propane', 'N-Pentane', 'N-Hexane', 'Heptane')_test.csv
+('Methane', 'Propane', 'N-Pentane', 'N-Hexane', 'Heptane')_train.csv
+('Propane', 'N-Butane', 'N-Pentane', 'N-Hexane', 'Heptane')_test.csv
+('Methane', 'Ethane', 'Propane', 'N-Butane', 'N-Pentane')_test.csv
+('Propane',)_train.csv
+('N-Hexane',)_test.csv
+('Methane',)_test.csv
+('N-Pentane',)_train.csv
+('Ethane',)_train.csv
+('N-Pentane',)_test.csv
+('Heptane',)_test.csv
+('N-Hexane',)_train.csv
+('Heptane',)_train.csv
+('N-Butane',)_train.csv
+('Propane',)_test.csv
+('Methane',)_train.csv
+('Ethane',)_test.csv
+('N-Butane',)_test.csv
+('N-Pentane', 'N-Hexane')_test.csv
+('Ethane', 'N-Hexane')_train.csv
+('Ethane', 'N-Hexane')_test.csv
+('Ethane', 'N-Pentane')_train.csv
+('Methane', 'Propane')_test.csv
+('Methane', 'Heptane')_test.csv
+('Propane', 'N-Hexane')_test.csv
+('N-Butane', 'N-Hexane')_train.csv
+('N-Hexane', 'Heptane')_train.csv
+('Ethane', 'N-Butane')_train.csv
+('Ethane', 'N-Butane')_test.csv
+('Propane', 'N-Pentane')_train.csv
+('N-Pentane', 'N-Hexane')_train.csv
+('Ethane', 'Heptane')_train.csv
+('Methane', 'N-Butane')_train.csv
+('Propane', 'Heptane')_train.csv
+('Methane', 'Ethane')_test.csv
+('Methane', 'N-Butane')_test.csv
+('N-Butane', 'Heptane')_train.csv
+('Propane', 'N-Hexane')_train.csv
+('Methane', 'Propane')_train.csv
+('Propane', 'N-Pentane')_test.csv
+('Ethane', 'Propane')_train.csv
+('Methane', 'N-Pentane')_train.csv
+('N-Butane', 'N-Pentane')_test.csv
+('N-Pentane', 'Heptane')_test.csv
+('Methane', 'N-Hexane')_train.csv
+('Ethane', 'N-Pentane')_test.csv
+('N-Butane', 'N-Hexane')_test.csv
+('Methane', 'Ethane')_train.csv
+('Methane', 'N-Pentane')_test.csv
+('Ethane', 'Propane')_test.csv
+('Methane', 'N-Hexane')_test.csv
+('Methane', 'Heptane')_train.csv
+('N-Butane', 'Heptane')_test.csv
+('N-Butane', 'N-Pentane')_train.csv
+('N-Hexane', 'Heptane')_test.csv
+('Propane', 'Heptane')_test.csv
+('Propane', 'N-Butane')_train.csv
+('Propane', 'N-Butane')_test.csv
+('N-Pentane', 'Heptane')_train.csv
+('Ethane', 'Heptane')_test.csv
+('Ethane', 'Propane', 'N-Butane', 'N-Pentane', 'N-Hexane', 'Heptane')_test.csv
+('Methane', 'Ethane', 'Propane', 'N-Butane', 'N-Hexane', 'Heptane')_test.csv
+('Methane', 'Ethane', 'Propane', 'N-Butane', 'N-Pentane', 'N-Hexane')_train.csv
+('Methane', 'Propane', 'N-Butane', 'N-Pentane', 'N-Hexane', 'Heptane')_train.csv
+('Methane', 'Ethane', 'Propane', 'N-Butane', 'N-Pentane', 'N-Hexane')_test.csv
+('Methane', 'Ethane', 'N-Butane', 'N-Pentane', 'N-Hexane', 'Heptane')_train.csv
+('Methane', 'Ethane', 'Propane', 'N-Pentane', 'N-Hexane', 'Heptane')_train.csv
+('Methane', 'Propane', 'N-Butane', 'N-Pentane', 'N-Hexane', 'Heptane')_test.csv
+('Methane', 'Ethane', 'Propane', 'N-Butane', 'N-Hexane', 'Heptane')_train.csv
+('Methane', 'Ethane', 'N-Butane', 'N-Pentane', 'N-Hexane', 'Heptane')_test.csv
+('Methane', 'Ethane', 'Propane', 'N-Butane', 'N-Pentane', 'Heptane')_train.csv
+('Methane', 'Ethane', 'Propane', 'N-Butane', 'N-Pentane', 'Heptane')_test.csv
+('Methane', 'Ethane', 'Propane', 'N-Pentane', 'N-Hexane', 'Heptane')_test.csv
+('Ethane', 'Propane', 'N-Butane', 'N-Pentane', 'N-Hexane', 'Heptane')_train.csv
+('Methane', 'Ethane', 'Propane', 'N-Butane', 'N-Pentane', 'N-Hexane', 'Heptane')_train.csv
+('Methane', 'Ethane', 'Propane', 'N-Butane', 'N-Pentane', 'N-Hexane', 'Heptane')_test.csv
+# mpiexec: finished at Sun 10 Jul 14:08:29 BST 2022

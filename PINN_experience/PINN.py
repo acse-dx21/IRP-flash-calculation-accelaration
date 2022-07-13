@@ -21,9 +21,9 @@ mini_data_path=".."+os.sep+"data"+os.sep+f"mini_cleaned_data_{data_num}"+os.sep
 saved_root="."+os.sep+f"mini_data_{data_num}"+os.sep
 All_ID = ['Methane', 'Ethane', 'Propane', 'N-Butane', 'N-Pentane', 'N-Hexane', 'Heptane']
 
-saved_root="."+os.sep+"complete_dataset"+os.sep  #for complete dataset
+# saved_root="."+os.sep+"complete_dataset"+os.sep  #for complete dataset
 relate_data = generate_data.multicsv_data_generater()
-relate_data[0]
+
 X_train = 0
 y_train = 0
 X_test = 0

@@ -1,0 +1,43 @@
+/rds/general/user/dx21/home
+/rds/general/user/dx21/home/IRP_flash_calculation_accelaration
+
+# mpiexec: MPI Program startup
+
+
+# mpiexec: Running in job 5814844.pbs at Sun 10 Jul 13:57:17 BST 2022
+# mpiexec: Fabric configuration:
+# mpiexec: node class CX3
+# mpiexec: libfabric provider verbs
+# mpiexec: libfabric inferface eth0
+# mpiexec: MPI-IO configuration on / gpfs
+# mpiexec: full path to program is /rds/general/user/dx21/home/anaconda3/bin/python
+# mpiexec: program arguments are: split.py
+# mpiexec: 4 ranks allocated via PBS select
+# mpiexec: 1 OpenMP threads / rank allocated by PBS select
+# mpiexec: 4 ranks per node
+# mpiexec: There are 256 cores/node. 4 will be used for this job
+# mpiexec: Job has shared use of the allocated nodes. Disabling process-pinning
+# mpiexec: Node is shared. Disabling process pinning
+# mpiexec: machinefile configured as:
+cx3-12-16.cx3.hpc.ic.ac.uk:4
+#
+# mpiexec: Checking all nodes are ONLINE using ping:
+# mpiexec: All nodes appear ONLINE
+# mpiexec: Checking all nodes are ONLINE using ssh:
+# cx3-12-16.cx3.hpc.ic.ac.uk : # mpiexec: Dynamic linking for /rds/general/user/dx21/home/anaconda3/bin/python:
+	linux-vdso.so.1 (0x00007ffdfdbad000)
+	/apps/rcs-tmpfile-replacement/rcs-tmpfile-replacement/libc-replaced-tmpnam.so (0x000014c8d6108000)
+	/apps/rcs-tmpfile-replacement/rcs-tmpfile-replacement/libc-replaced-tmpfile.so (0x000014c8d5f06000)
+	/apps/rcs-setxattr-replacement/rcs-setxattr-replacement/libc-setxattr-shim.so (0x000014c8d68f1000)
+	libdl.so.2 => /lib64/libdl.so.2 (0x000014c8d5d02000)
+	libutil.so.1 => /lib64/libutil.so.1 (0x000014c8d5afe000)
+	libm.so.6 => /lib64/libm.so.6 (0x000014c8d577c000)
+	libpthread.so.0 => /lib64/libpthread.so.0 (0x000014c8d555c000)
+	libc.so.6 => /lib64/libc.so.6 (0x000014c8d5197000)
+	/lib64/ld-linux-x86-64.so.2 (0x000014c8d66ce000)
+# mpiexec: launch started at Sun 10 Jul 13:57:21 BST 2022
+# mpiexec: launching program...
+# mpiexec: /rds/general/user/dx21/home/anaconda3/bin/python split.py
+# mpiexec: PROGRAM OUTPUT FOLLOWS
+(cx3-12-16.cx3.hpc.ic.ac.uk:0,1,2,3)
+

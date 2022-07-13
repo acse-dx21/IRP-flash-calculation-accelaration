@@ -1,0 +1,298 @@
+/rds/general/user/dx21/home
+/rds/general/user/dx21/home/IRP_flash_calculation_accelaration/PINN_experience
+
+# mpiexec: MPI Program startup
+
+
+# mpiexec: Running in job 5815049.pbs at Sun 10 Jul 16:13:30 BST 2022
+# mpiexec: Fabric configuration:
+# mpiexec: node class CX3
+# mpiexec: libfabric provider verbs
+# mpiexec: libfabric inferface eth0
+# mpiexec: MPI-IO configuration on / gpfs
+# mpiexec: full path to program is /rds/general/user/dx21/home/anaconda3/bin/python
+# mpiexec: program arguments are: PINN.py
+# mpiexec: 96 ranks allocated via PBS select, but -n argument reduces that to 24
+# mpiexec: 1 OpenMP threads / rank allocated by PBS select
+# mpiexec: 96 ranks per node
+# mpiexec: There are 256 cores/node. 96 will be used for this job
+# mpiexec: Job has shared use of the allocated nodes. Disabling process-pinning
+# mpiexec: Node is shared. Disabling process pinning
+# mpiexec: machinefile configured as:
+cx3-14-11.cx3.hpc.ic.ac.uk:96
+#
+# mpiexec: Checking all nodes are ONLINE using ping:
+# mpiexec: All nodes appear ONLINE
+# mpiexec: Checking all nodes are ONLINE using ssh:
+# cx3-14-11.cx3.hpc.ic.ac.uk : # mpiexec: Dynamic linking for /rds/general/user/dx21/home/anaconda3/bin/python:
+	linux-vdso.so.1 (0x00007fffbf1e2000)
+	/apps/rcs-tmpfile-replacement/rcs-tmpfile-replacement/libc-replaced-tmpnam.so (0x000014725b8a4000)
+	/apps/rcs-tmpfile-replacement/rcs-tmpfile-replacement/libc-replaced-tmpfile.so (0x000014725b6a2000)
+	/apps/rcs-setxattr-replacement/rcs-setxattr-replacement/libc-setxattr-shim.so (0x000014725c08d000)
+	libdl.so.2 => /lib64/libdl.so.2 (0x000014725b49e000)
+	libutil.so.1 => /lib64/libutil.so.1 (0x000014725b29a000)
+	libm.so.6 => /lib64/libm.so.6 (0x000014725af18000)
+	libpthread.so.0 => /lib64/libpthread.so.0 (0x000014725acf8000)
+	libc.so.6 => /lib64/libc.so.6 (0x000014725a933000)
+	/lib64/ld-linux-x86-64.so.2 (0x000014725be6a000)
+# mpiexec: launch started at Sun 10 Jul 16:13:34 BST 2022
+# mpiexec: launching program...
+# mpiexec: /rds/general/user/dx21/home/anaconda3/bin/python PINN.py
+# mpiexec: PROGRAM OUTPUT FOLLOWS
+(cx3-14-11.cx3.hpc.ic.ac.uk:0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+('Methane', 'N-Pentane', 'N-Hexane')
+
+('Propane', 'N-Butane', 'Heptane')
+
+('Methane', 'N-Pentane', 'Heptane')
+
+('N-Butane', 'N-Pentane', 'N-Hexane')
+
+('Methane', 'Propane', 'N-Butane')
+
+('Methane', 'Ethane', 'N-Butane')
+
+('Ethane', 'Propane', 'N-Pentane')
+
+('N-Butane', 'N-Pentane', 'Heptane')
+
+('Methane', 'Ethane', 'Propane')
+
+('Propane', 'N-Butane', 'N-Pentane')
+
+('Ethane', 'N-Butane', 'Heptane')
+
+('Ethane', 'Propane', 'N-Butane')
+
+('Propane', 'N-Hexane', 'Heptane')
+
+('Propane', 'N-Pentane', 'N-Hexane')
+
+('Ethane', 'N-Pentane', 'Heptane')
+
+('Propane', 'N-Butane', 'N-Hexane')
+
+('N-Butane', 'N-Hexane', 'Heptane')
+
+('Ethane', 'N-Pentane', 'N-Hexane')
+
+('Methane', 'N-Butane', 'Heptane')
+
+('Methane', 'N-Butane', 'N-Pentane')
+
+('Ethane', 'Propane', 'N-Hexane')
+
+('Ethane', 'N-Hexane', 'Heptane')
+
+('Propane', 'N-Pentane', 'Heptane')
+
+('Ethane', 'N-Butane', 'N-Hexane')
+
+('Methane', 'Propane', 'N-Hexane')
+
+('Methane', 'Propane', 'N-Pentane')
+
+('Methane', 'Ethane', 'Heptane')
+
+('Methane', 'N-Butane', 'N-Hexane')
+
+('Ethane', 'Propane', 'Heptane')
+
+('Methane', 'Propane', 'N-Butane', 'Heptane')
+
+('Methane', 'Ethane', 'N-Butane', 'Heptane')
+
+('Methane', 'N-Hexane', 'Heptane')
+
+('Ethane', 'Propane', 'N-Pentane', 'Heptane')
+
+('Propane', 'N-Pentane', 'N-Hexane', 'Heptane')
+
+('Methane', 'Propane', 'N-Butane', 'N-Hexane')
+
+('Methane', 'Ethane', 'Propane', 'Heptane')
+
+('N-Pentane', 'N-Hexane', 'Heptane')
+
+('Methane', 'Ethane', 'N-Pentane')
+
+('Ethane', 'N-Butane', 'N-Pentane')
+
+('Methane', 'Propane', 'Heptane')
+
+('Ethane', 'N-Butane', 'N-Hexane', 'Heptane')
+
+('Methane', 'Ethane', 'N-Hexane')
+
+('Ethane', 'N-Pentane', 'N-Hexane', 'Heptane')
+
+('Ethane', 'Propane', 'N-Hexane', 'Heptane')
+
+('Methane', 'Ethane', 'N-Butane', 'N-Hexane')
+
+('Methane', 'Propane', 'N-Pentane', 'N-Hexane')
+
+('Methane', 'N-Pentane', 'N-Hexane', 'Heptane')
+
+('N-Butane', 'N-Pentane', 'N-Hexane', 'Heptane')
+
+('Ethane', 'Propane', 'N-Butane', 'Heptane')
+
+('Methane', 'Ethane', 'Propane', 'N-Butane')
+
+('Methane', 'Propane', 'N-Hexane', 'Heptane')
+
+('Propane', 'N-Butane', 'N-Pentane', 'N-Hexane')
+
+('Methane', 'Ethane', 'Propane', 'N-Pentane')
+
+('Methane', 'Ethane', 'Propane', 'N-Hexane', 'Heptane')
+
+('Methane', 'Propane', 'N-Butane', 'N-Pentane')
+
+('Methane', 'N-Butane', 'N-Hexane', 'Heptane')
+
+('Methane', 'Ethane', 'Propane', 'N-Butane', 'Heptane')
+
+('Ethane', 'N-Butane', 'N-Pentane', 'Heptane')
+
+('Methane', 'Ethane', 'N-Hexane', 'Heptane')
+
+('Methane', 'Ethane', 'N-Pentane', 'N-Hexane')
+
+('Ethane', 'Propane', 'N-Pentane', 'N-Hexane')
+
+('Propane', 'N-Butane', 'N-Hexane', 'Heptane')
+
+('Methane', 'Propane', 'N-Pentane', 'Heptane')
+
+('Propane', 'N-Butane', 'N-Pentane', 'Heptane')
+
+('Methane', 'N-Butane', 'N-Pentane', 'N-Hexane')
+
+('Ethane', 'N-Butane', 'N-Pentane', 'N-Hexane')
+
+('Ethane', 'Propane', 'N-Butane', 'N-Pentane')
+
+('Methane', 'Ethane', 'N-Butane', 'N-Pentane')
+
+('Ethane', 'Propane', 'N-Butane', 'N-Hexane')
+
+('Methane', 'Ethane', 'N-Pentane', 'Heptane')
+
+('Methane', 'N-Butane', 'N-Pentane', 'Heptane')
+
+('Methane', 'Ethane', 'Propane', 'N-Hexane')
+
+('Methane', 'Ethane', 'N-Butane', 'N-Hexane', 'Heptane')
+
+('Methane', 'Propane', 'N-Butane', 'N-Pentane', 'Heptane')
+
+('N-Pentane',)
+
+('Ethane',)
+
+('Methane', 'Ethane', 'N-Butane', 'N-Pentane', 'Heptane')
+
+('Ethane', 'Propane', 'N-Pentane', 'N-Hexane', 'Heptane')
+
+('N-Hexane',)
+
+('Methane', 'Ethane', 'N-Pentane', 'N-Hexane', 'Heptane')
+
+('Methane', 'Propane', 'N-Butane', 'N-Hexane', 'Heptane')
+
+('Propane',)
+
+('Propane', 'N-Butane', 'N-Pentane', 'N-Hexane', 'Heptane')
+
+('Methane', 'Ethane', 'Propane', 'N-Butane', 'N-Pentane')
+
+('Methane', 'Ethane', 'Propane', 'N-Pentane', 'Heptane')
+
+('Ethane', 'Propane', 'N-Butane', 'N-Pentane', 'Heptane')
+
+('Ethane', 'Propane', 'N-Butane', 'N-Hexane', 'Heptane')
+
+('Heptane',)
+
+('Methane', 'Propane', 'N-Pentane', 'N-Hexane', 'Heptane')
+
+('Methane', 'Ethane', 'Propane', 'N-Butane', 'N-Hexane')
+
+('Methane', 'Ethane', 'N-Butane', 'N-Pentane', 'N-Hexane')
+
+('Methane', 'Ethane', 'Propane', 'N-Pentane', 'N-Hexane')
+
+('Ethane', 'Propane', 'N-Butane', 'N-Pentane', 'N-Hexane')
+
+('Methane', 'Propane', 'N-Butane', 'N-Pentane', 'N-Hexane')
+
+('Ethane', 'N-Butane', 'N-Pentane', 'N-Hexane', 'Heptane')
+
+('Methane', 'N-Butane', 'N-Pentane', 'N-Hexane', 'Heptane')
+
+('Methane', 'N-Pentane')
+('N-Butane', 'N-Pentane')
+('Propane', 'N-Butane')
+('N-Pentane', 'Heptane')
+('Methane', 'Heptane')
+('Propane', 'N-Pentane')
+('Methane', 'Ethane')
+('N-Butane', 'Heptane')
+('N-Butane',)
+
+('Ethane', 'Heptane')
+('Propane', 'N-Hexane')
+('Methane', 'Ethane', 'Propane', 'N-Butane', 'N-Pentane', 'N-Hexane')
+('Ethane', 'N-Hexane')
+
+('Propane', 'Heptane')
+('N-Pentane', 'N-Hexane')
+('Methane', 'Propane')
+('Methane', 'N-Hexane')
+('Methane',)
+
+('N-Hexane', 'Heptane')
+
+('Ethane', 'Propane')
+('Methane', 'N-Butane')
+('N-Butane', 'N-Hexane')
+
+('Ethane', 'N-Butane')
+
+('Ethane', 'N-Pentane')
+
+('Methane', 'Propane', 'N-Butane', 'N-Pentane', 'N-Hexane', 'Heptane')
+('Methane', 'Ethane', 'Propane', 'N-Pentane', 'N-Hexane', 'Heptane')
+('Methane', 'Ethane', 'N-Butane', 'N-Pentane', 'N-Hexane', 'Heptane')
+('Ethane', 'Propane', 'N-Butane', 'N-Pentane', 'N-Hexane', 'Heptane')
+('Methane', 'Ethane', 'Propane', 'N-Butane', 'N-Pentane', 'N-Hexane', 'Heptane')
+('Methane', 'Ethane', 'Propane', 'N-Butane', 'N-Pentane', 'Heptane')
+('Methane', 'Ethane', 'Propane', 'N-Butane', 'N-Hexane', 'Heptane')
+# mpiexec: finished at Sun 10 Jul 16:29:07 BST 2022

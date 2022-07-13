@@ -5,13 +5,17 @@ from data import generate_data
 import pandas as pd
 from mpi4py import MPI
 
-All_ID = ['Methane', 'Ethane', 'Propane', 'N-Butane', 'N-Pentane', 'N-Hexane', 'Heptane']
 
 from sklearn.model_selection import GridSearchCV
 import time
 import os
 from xgboost import XGBRegressor
-mini_data_path=".."+os.sep+"data"+os.sep+"mini_cleaned_data"+os.sep
+
+data_num=2
+mini_data_path=".."+os.sep+"data"+os.sep+f"mini_cleaned_data_{data_num}"+os.sep
+saved_root="."+os.sep+f"mini_data_{data_num}"+os.sep
+All_ID = ['Methane', 'Ethane', 'Propane', 'N-Butane', 'N-Pentane', 'N-Hexane', 'Heptane']
+# saved_root="."+os.sep+"complete_dataset"+os.sep  #for complete dataset
 relate_data = generate_data.multicsv_data_generater(mini_data_path)
 # relate_data = generate_data.multicsv_data_generater()
 
@@ -141,13 +145,12 @@ def run_bayes_optimize(num_of_iteration=10, data_index=10):
     rf_bo.maximize(n_iter=num_of_iteration)
     result_data_root = "." + os.sep + "BO_result_data" + os.sep
     routing_data_root = "." + os.sep + "BO_training_routing" + os.sep
-    print(pd.DataFrame(data_record))
-    print(os.getcwd())
-    print(routing_data_root + get_related_path(Material_ID))
-    print(pd.DataFrame(data_record).to_csv(routing_data_root + get_related_path(Material_ID)))
+    pd.DataFrame(data_record)
+    routing_data_root + get_related_path(Material_ID)
+    pd.DataFrame(data_record).to_csv(saved_root+routing_data_root + get_related_path(Material_ID))
     data_record["trainning_time_consume(s)"].clear()
     data_record["test_time_consume(s)"].clear()
-    # pd.DataFrame(rf_bo.res).to_csv(result_data_root+get_related_path(Material_ID))
+    pd.DataFrame(rf_bo.res).to_csv(saved_root+result_data_root+get_related_path(Material_ID))
 
 
 def run_Grid_search(num_of_iteration):
@@ -166,12 +169,11 @@ if __name__ == "__main__":
 
     args = parser.parse_args()
 
-    if args.BO is not None or stratigy == "BO":
 
-        for i in range(rank, 128, size):
-            run_bayes_optimize(5, i)
-    elif args.GS is not None or stratigy == "GS":
-        run_Grid_search(args.GS)
+    for i in range(rank, 127, size):
+            run_bayes_optimize(55, i)
+    # elif args.GS is not None or stratigy == "GS":
+    #     run_Grid_search(args.GS)
 
     # all_data = generate_data.multicsv_data_generater(data_path)
     #

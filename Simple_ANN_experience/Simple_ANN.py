@@ -32,8 +32,9 @@ from itertools import combinations
 from sklearn.model_selection import GridSearchCV
 import time
 
-mini_data_path = ".." + os.sep + "data" + os.sep + "mini_cleaned_data" + os.sep
-root = "." + os.sep + "mini_data_1" + os.sep
+data_num=5
+mini_data_path=".."+os.sep+"data"+os.sep+f"mini_cleaned_data_{data_num}"+os.sep
+saved_root="."+os.sep+f"mini_data_{data_num}"+os.sep
 All_ID = ['Methane', 'Ethane', 'Propane', 'N-Butane', 'N-Pentane', 'N-Hexane', 'Heptane']
 relate_data = generate_data.multicsv_data_generater(mini_data_path)
 
@@ -52,6 +53,8 @@ param_grid = [
      'colsample_bytree': [0.6],
      'reg_lambda': [10]}
 ]
+
+
 
 from model.train import check_IDexist
 from tool.log import log
@@ -99,8 +102,8 @@ def model_cv(**kwargs):
     data_record["trainning_time_consume(s)"].append(train_time)
     data_record["test_time_consume(s)"].append(test_time)
 
-    epoch_root = root + "." + os.sep + "BO_epoch_routing" + os.sep
-    pd.DataFrame(model_instance.data_record).to_csv(epoch_root + get_related_path(Material_ID))
+    epoch_root = "." + os.sep + "BO_epoch_routing" + os.sep
+    pd.DataFrame(model_instance.data_record).to_csv(saved_root+epoch_root + get_related_path(Material_ID))
 
     return -score
 
@@ -111,8 +114,8 @@ from mpi4py import MPI
 
 
 def run_bayes_optimize(num_of_iteration=1, data_index=10):
-    BO_root = root + "." + os.sep + "BO_result_data" + os.sep
-    BO_routing = root + "." + os.sep + "BO_training_routing" + os.sep
+    BO_root =  "." + os.sep + "BO_result_data" + os.sep
+    BO_routing =  "." + os.sep + "BO_training_routing" + os.sep
 
     global X_train, y_train, X_test, y_test, Material_ID
 
@@ -125,9 +128,8 @@ def run_bayes_optimize(num_of_iteration=1, data_index=10):
     )
 
     rf_bo.maximize(n_iter=num_of_iteration)
-    pd.DataFrame(rf_bo.res).to_csv(BO_root + get_related_path(Material_ID))
-
-    pd.DataFrame(data_record).to_csv(BO_routing + get_related_path(Material_ID))
+    pd.DataFrame(rf_bo.res).to_csv(saved_root+BO_root + get_related_path(Material_ID))
+    pd.DataFrame(data_record).to_csv(saved_root+BO_routing + get_related_path(Material_ID))
     data_record["trainning_time_consume(s)"].clear()
     data_record["test_time_consume(s)"].clear()
 
@@ -139,7 +141,7 @@ if __name__ == "__main__":
 
     for i in range(rank, 127, size):
 
-        run_bayes_optimize(40, i)
+        run_bayes_optimize(55, i)
 
     # for i in range(119, 127, size):
     #     run_bayes_optimize(100,i)
