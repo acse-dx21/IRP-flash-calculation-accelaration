@@ -28,7 +28,7 @@ class epoch_log(log):
 
 class TPZs_log(log):
     def __init__(self,name):
-        super().__init__(name,columns=["T","P","Zs"])
+        super().__init__(name,columns=["T","P","zs"])
 
 class data_num_log(log):
     def __init__(self,name):

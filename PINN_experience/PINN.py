@@ -16,17 +16,21 @@ from model.loss_function import My_Mass_Balance_loss
 from model import ArtificialNN
 import pandas as pd
 import numpy as np
-
-mini_data_path=".."+os.sep+"data"+os.sep+"mini_cleaned_data"+os.sep
-
+data_num=5
+mini_data_path=".."+os.sep+"data"+os.sep+f"mini_cleaned_data_{data_num}"+os.sep
+saved_root="."+os.sep+f"mini_data_{data_num}"+os.sep
 All_ID = ['Methane', 'Ethane', 'Propane', 'N-Butane', 'N-Pentane', 'N-Hexane', 'Heptane']
-relate_data = generate_data.multicsv_data_generater(mini_data_path)
-
+relate_data = generate_data.multicsv_data_generater()
+print(len(relate_data))
 X_train = 0
 y_train = 0
 X_test = 0
 y_test = 0
 Material_ID = 0
+
+start_time=[]
+train_time=[]
+test_time=[]
 
 param_grid = [
     {'subsample': [0.2, 0.6, 1.0],
@@ -42,7 +46,7 @@ from tool.log import log
 
 import os
 
-data_path = ".." + os.sep + "data" + os.sep + "mini_cleaned_data" + os.sep
+
 result_path = "." + os.sep + "MSELoss_data" + os.sep
 
 from mpi4py import MPI
@@ -60,7 +64,23 @@ def get_related_path(Material_ID):
 
 from bayes_opt import BayesianOptimization
 
+class time_clock:
+    def __init__(self,name):
+        self.name=name
+        self.start_times=[]
+        self.end_times=[]
 
+    def start_record(self):
+        self.start_times.append(time.time())
+
+    def end_record(self):
+        self.end_times.append(time.time())
+
+    def save(self,path):
+        pd.DataFrame({"start":self.start_times,"end":self.end_times}).to_csv(path)
+
+data_record = {"trainning_time_consume(s)": [], "test_time_consume(s)": []}
+import time
 def model_cv(**kwargs):
     model_kwargs = {}
     model_kwargs["Nodes_per_layer"] = 300
@@ -69,13 +89,26 @@ def model_cv(**kwargs):
     model_instance = ArtificialNN.Neural_Model_Sklearn_style(ArtificialNN.simple_ANN, model_kwargs
                                                              )
 
-    PINN_loss = My_Mass_Balance_loss(kwargs["My_Mass_Balance_loss"],1 )
+    PINN_loss = My_Mass_Balance_loss(kwargs["My_Mass_Balance_loss"],1)
+
+
+
+    start_train = time.time()
     model_instance.fit(X_train, y_train, epoch=30, criterion=PINN_loss)
+    train_time = time.time() - start_train
 
     score = model_instance.score(X_test, y_test)
 
-    data_root = "." + os.sep + "BO_training_routing" + os.sep
-    pd.DataFrame(model_instance.data_record).to_csv(data_root + get_related_path(Material_ID))
+    start_pred = time.time()
+    model_instance.predict(X_test)
+    test_time = time.time() - start_pred
+
+    data_record["trainning_time_consume(s)"].append(train_time)
+    data_record["test_time_consume(s)"].append(test_time)
+
+    epoch_root = "." + os.sep + "BO_epoch_routing" + os.sep
+    pd.DataFrame(model_instance.data_record).to_csv(epoch_root + get_related_path(Material_ID))
+
 
     return -score
 
@@ -86,7 +119,9 @@ from mpi4py import MPI
 
 
 def run_bayes_optimize(num_of_iteration=1, data_index=10):
-    BO_root = "." + os.sep + "BO_result_data" + os.sep
+    dataset="."+os.sep+"mini_data_1"+os.sep
+    BO_result_data = "." + os.sep + "BO_result_data" + os.sep
+    BO_training_routing = "." + os.sep + "BO_training_routing" + os.sep
     global X_train, y_train, X_test, y_test, Material_ID
     X_train, y_train, X_test, y_test, Material_ID = relate_data[data_index]
     rf_bo = BayesianOptimization(
@@ -95,50 +130,81 @@ def run_bayes_optimize(num_of_iteration=1, data_index=10):
     )
 
     rf_bo.maximize(n_iter=num_of_iteration)
-    pd.DataFrame(rf_bo.res).to_csv(BO_root + get_related_path(Material_ID))
+    # pd.DataFrame(rf_bo.res).to_csv(dataset+BO_result_data + get_related_path(Material_ID))
+    pd.DataFrame(data_record).to_csv(dataset+BO_training_routing + get_related_path(Material_ID))
+    data_record["trainning_time_consume(s)"].clear()
+    data_record["test_time_consume(s)"].clear()
+
 
 
 def model_gs(args):
-    num, Material_ID, data_index = args
+    num, X_train, y_train, X_test, y_test, Material_ID,root = args
     model_kwargs = {}
     model_kwargs["Nodes_per_layer"] = 300
     model_kwargs["deepth"] = 3
 
-    X_train, y_train, X_test, y_test, Material_ID = relate_data[data_index]
-
     model_kwargs["material"] = Material_ID
-    model_instance = ArtificialNN.Neural_Model_Sklearn_style(ArtificialNN.simple_ANN, model_kwargs
-                                                             )
+    model_instance = ArtificialNN.Neural_Model_Sklearn_style(ArtificialNN.simple_ANN, model_kwargs)
 
-    PINN_loss = My_Mass_Balance_loss(1, num)
+    PINN_loss = My_Mass_Balance_loss(num,1)
+
+    #train and record
+    start_train = time.time()
     model_instance.fit(X_train, y_train, epoch=30, criterion=PINN_loss)
+    train_time = time.time() - start_train
 
+
+    #test and record
+    start_pred = time.time()
     score = model_instance.score(X_test, y_test)
+    test_time = time.time() - start_pred
 
-    data_root = "." + os.sep + "GS_training_routing" + os.sep
-    pd.DataFrame(model_instance.data_record).to_csv(data_root + get_related_path(Material_ID))
-    print("score ", score)
-    return -score
+    # data_record["trainning_time_consume(s)"].append(train_time)
+    # data_record["test_time_consume(s)"].append(test_time)
+
+    epoch_root = "." + os.sep + "GS_epoch_routing" + os.sep
+    pd.DataFrame(model_instance.data_record).to_csv(root+epoch_root + get_related_path(Material_ID))
+
+
+    return -score ,train_time,test_time
 
 
 from multiprocessing import Pool
 
 
-def run_grid_search(num_of_iteration=1, data_index=10):
-    BO_root = "." + os.sep + "GS_result_data" + os.sep
+def run_grid_search(data_index=10):
+    GS_root = "." + os.sep + "GS_result_data" + os.sep
+    GS_routing = "." + os.sep + "GS_training_routing" + os.sep
 
-    np.linspace(0.05, 1, 20), np.linspace(1, 10, 20)
-    test = np.concatenate([np.linspace(0.05, 0.5, 19), np.linspace(0.5, 100, 20)], axis=0)
-    material_ID_list = [Material_ID] * len(test)
-    data_index_list = [data_index] * len(test)
+    X_train, y_train, X_test, y_test, Material_ID = relate_data[data_index]
+    params = np.concatenate([np.linspace(0.05, 0.45, 40), np.linspace(0.45, 100, 20)], axis=0)
 
-    args = list(zip(test, material_ID_list, data_index_list))
-    result = []
+    X_train_list=[X_train]*len(params)
+    y_train_list=[y_train]*len(params)
+    X_test_list=[X_test]*len(params)
+    y_test_list=[y_test]*len(params)
+    root_list = [saved_root] * len(params)
+    material_ID_list = [Material_ID] * len(params)
 
-    with Pool(2) as p:
-        result = p.map(model_gs, args)
 
-    pd.DataFrame({"target": result, "params": test}).to_csv(BO_root + get_related_path(Material_ID))
+    args = list(zip(params,X_train_list,y_train_list,X_test_list,y_test_list, material_ID_list,root_list))
+
+
+    with Pool(6) as p:
+        paral_result = np.array(p.map(model_gs, args))
+
+    result,train_time,test_time=paral_result[:,0],paral_result[:,1],paral_result[:,2]
+
+
+
+    data_record["trainning_time_consume(s)"]=train_time
+    data_record["test_time_consume(s)"]=test_time
+
+
+    pd.DataFrame({"target": result, "params": params}).to_csv(saved_root+GS_root + get_related_path(Material_ID))
+    print(Material_ID)
+
+    pd.DataFrame(data_record).to_csv(saved_root+GS_routing + get_related_path(Material_ID))
 
 
 if __name__ == "__main__":
@@ -146,8 +212,8 @@ if __name__ == "__main__":
     rank = comm.Get_rank()
     size = comm.Get_size()
 
-    for i in range(rank, 128, size):
-        run_bayes_optimize(100, i)
+    for i in range(rank, 127, size):
+        run_grid_search(i)
 #
 #     all_data = generate_data.multicsv_data_generater(data_path, return_type="Dataloader")
 #

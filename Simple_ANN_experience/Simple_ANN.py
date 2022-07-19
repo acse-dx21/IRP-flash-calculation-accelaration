@@ -26,19 +26,38 @@ from sklearn.multioutput import MultiOutputRegressor
 import random
 
 from sklearn.model_selection import GridSearchCV
-
+import itertools
 
 from itertools import combinations
-
+from scipy.special import comb, perm
 from sklearn.model_selection import GridSearchCV
 import time
 
-mini_data_path=".."+os.sep+"data"+os.sep+"mini_cleaned_data"+os.sep
 
-All_ID = ['Methane', 'Ethane', 'Propane', 'N-Butane', 'N-Pentane', 'N-Hexane', 'Heptane']
-relate_data=generate_data.multicsv_data_generater(mini_data_path)
+mix_index="all"
+device = "cuda"
+data_root = "." + os.sep + "mini_cleaned_data" + os.sep
+def get_range(mix_index):
+    """
+    use to fine target mixture
+    :param mix_index: "all" or int range from 1-7
+    :return:
+    """
+    if(mix_index=="all"):
+        return 0,127
+    assert mix_index>0
+    start=0
+    end=comb(7,1)
 
-relate_data.set_batch_size(128)
+    for i in range(1,mix_index):
+        start+=comb(7,i)
+        end+=comb(7,i+1)
+
+    return int(start),int(end)
+
+
+
+
 X_train=0
 y_train=0
 X_test=0
@@ -88,13 +107,15 @@ def model_cv(**kwargs):
     kwargs["deepth"] = int(kwargs["deepth"])
     kwargs["material"]=Material_ID
     model_instance = ArtificialNN.Neural_Model_Sklearn_style(ArtificialNN.simple_ANN,kwargs)
-
+    model_instance.set_device(device)
+    print(model_instance)
     # record_data
     start_train = time.time()
     model_instance.fit(X_train,y_train,epoch=30)
+    train_time = time.time() - start_train
+
     score=model_instance.score(X_test,y_test)
 
-    train_time = time.time() - start_train
     start_pred = time.time()
     pred = model_instance.predict(X_test)
     test_time = time.time() - start_pred
@@ -103,7 +124,11 @@ def model_cv(**kwargs):
     data_record["test_time_consume(s)"].append(test_time)
 
     epoch_root="."+os.sep+"BO_epoch_routing"+os.sep
-    pd.DataFrame(model_instance.data_record).to_csv(epoch_root + get_related_path(Material_ID))
+    pd.DataFrame(model_instance.data_record).to_csv(saved_root+epoch_root + get_related_path(Material_ID))
+
+    f = open(saved_root+epoch_root + get_related_path(Material_ID), "a+")
+    f.write(f"# {device}")
+    f.close()
 
     return -score
 
@@ -114,21 +139,29 @@ from mpi4py import MPI
 
 
 def run_bayes_optimize(num_of_iteration=1,data_index=10):
+
     BO_root="."+os.sep+"BO_result_data"+os.sep
-    BO_routing = "." + os.sep + "BO_training_routing" + os.sep
+    BO_routing =  "." + os.sep + "BO_training_routing" + os.sep
+
     global X_train, y_train, X_test, y_test, Material_ID
 
     X_train, y_train, X_test, y_test, Material_ID = relate_data[data_index]
-
     rf_bo = BayesianOptimization(
             model_cv,
-        {'Nodes_per_layer': [100, 1000],
-         "deepth": [2,  5]}
+        {'Nodes_per_layer': (100, 1000),
+         "deepth": (2,  6)}
         )
 
-    rf_bo.maximize(n_iter=num_of_iteration)
-    # pd.DataFrame(rf_bo.res).to_csv(BO_root+get_related_path(Material_ID))
-    pd.DataFrame(data_record).to_csv(BO_routing + get_related_path(Material_ID))
+    rf_bo.maximize(init_points=5,n_iter=num_of_iteration)
+
+    pd.DataFrame(rf_bo.res).to_csv(saved_root+BO_root+get_related_path(Material_ID))
+    f=open(saved_root+BO_root+get_related_path(Material_ID),"a+")
+    f.write(f"# {device}")
+    f.close()
+    pd.DataFrame(data_record).to_csv(saved_root+BO_routing+ get_related_path(Material_ID))
+    f = open(saved_root+BO_routing+ get_related_path(Material_ID), "a+")
+    f.write(f"# {device}")
+    f.close()
     data_record["trainning_time_consume(s)"].clear()
     data_record["test_time_consume(s)"].clear()
 
@@ -138,10 +171,29 @@ if __name__ == "__main__":
     rank = comm.Get_rank()
     size = comm.Get_size()
 
+    data_set_index=[1,2,3,4,5]
+    start,end = get_range(mix_index)
 
-    # for i in range(rank, 127, size):
-    #     print(i)
-    run_bayes_optimize(10,126)
+    product_index = list(itertools.product(data_set_index, list(range(start,end))))
+    print(product_index)
+    print("total size",len(product_index))
+    for index in range(rank, len(product_index), size):
+        data_index,i=product_index[index]
+        print(data_index,i)
+
+        mini_data_path = ".." + os.sep + "data" + os.sep + data_root+ f"mini_data_{data_index}" + os.sep
+        saved_root = data_root+ f"mini_data_{data_index}" + os.sep
+        All_ID = ['Methane', 'Ethane', 'Propane', 'N-Butane', 'N-Pentane', 'N-Hexane', 'Heptane']
+        relate_data = generate_data.multicsv_data_generater(mini_data_path)
+        # collector=generate_data.collector()
+        # collector.set_collect_method("VF")
+        # relate_data.set_collector(collector)
+        relate_data.set_batch_size(128)
+        relate_data.set_collector("VF")
+
+        print("compute mixture ", str(mix_index))
+
+        run_bayes_optimize(45, i)
 
 
 

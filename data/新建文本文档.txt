@@ -1,0 +1,1 @@
+<EquilibriumState, T=100.0000, P=100000.0000, zs=[0.0, 1.0], betas=[1.0], phases=[<CEOSLiquid, T=100 K, P=100000 Pa>]>

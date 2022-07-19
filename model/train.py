@@ -4,7 +4,8 @@ import time
 sys.path.append("..")
 from tool.log import epoch_log,log
 import torch
-
+import torch.nn as nn
+nn.Conv1d
 device = "cuda" if torch.cuda.is_available() else "cpu"
 
 
