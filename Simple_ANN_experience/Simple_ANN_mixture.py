@@ -33,10 +33,11 @@ from scipy.special import comb, perm
 from sklearn.model_selection import GridSearchCV
 import time
 
-data_set_index = [0, 1, 2, 3, 4, 5]
+data_set_index = [0, 3, 4, 5]
 mix_index="all"
 device = "cuda"
 data_root = "." + os.sep + "mini_cleaned_data" + os.sep
+save_data=False
 def get_range(mix_index):
     """
     use to fine target mixture
@@ -155,15 +156,15 @@ def run_bayes_optimize(num_of_iteration=1,mix=2):
         )
 
     rf_bo.maximize(init_points=5,n_iter=num_of_iteration)
-
-    pd.DataFrame(rf_bo.res).to_csv(saved_root+BO_root+get_related_path(Material_ID))
-    f=open(saved_root+BO_root+get_related_path(Material_ID),"a+")
-    f.write(f"# {device}")
-    f.close()
-    pd.DataFrame(data_record).to_csv(saved_root+BO_routing+ get_related_path(Material_ID))
-    f = open(saved_root+BO_routing+ get_related_path(Material_ID), "a+")
-    f.write(f"# {device}")
-    f.close()
+    if save_data:
+        pd.DataFrame(rf_bo.res).to_csv(saved_root+BO_root+get_related_path(Material_ID))
+        f=open(saved_root+BO_root+get_related_path(Material_ID),"a+")
+        f.write(f"# {device}")
+        f.close()
+        pd.DataFrame(data_record).to_csv(saved_root+BO_routing+ get_related_path(Material_ID))
+        f = open(saved_root+BO_routing+ get_related_path(Material_ID), "a+")
+        f.write(f"# {device}")
+        f.close()
     data_record["trainning_time_consume(s)"].clear()
     data_record["test_time_consume(s)"].clear()
 
@@ -184,7 +185,7 @@ if __name__ == "__main__":
         print(data_index)
 
         mini_data_path = ".." + os.sep + "data" + os.sep + data_root+ f"mini_data_{data_index}" + os.sep
-        saved_root = "."+os.sep+"mini_cleaned_data_mixture"+os.sep+ f"mini_data_{data_index}" + os.sep
+        saved_root = "." + os.sep + "mini_cleaned_data_mixture_" + device + os.sep + f"mini_data_{data_index}" + os.sep
         All_ID = ['Methane', 'Ethane', 'Propane', 'N-Butane', 'N-Pentane', 'N-Hexane', 'Heptane']
         relate_data = generate_data.mixture_generater(mini_data_path)
         # collector=generate_data.collector()

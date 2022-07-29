@@ -170,8 +170,8 @@ if __name__ == '__main__':
 # test_loader = DataLoader(test_set, shuffle=False,
 #                           batch_size=test_set.__len__(), collate_fn=generate_data.collate_VL_NParray)
 
-
-
+a=np.random.randn(1000).reshape((100,10))
+print(a[...,-2:])
 
 ##ANN
 

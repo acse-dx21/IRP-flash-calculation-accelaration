@@ -1,5 +1,5 @@
 import sys
-
+import numpy as np
 sys.path.append("..")
 from data import generate_data
 import pandas as pd
@@ -10,7 +10,7 @@ import time
 import os
 from xgboost import XGBRegressor
 
-data_set_index = [3, 4, 5]
+data_set_index = [0,5]
 mix_index="all"
 device = "cuda"
 data_root = "." + os.sep + "mini_cleaned_data" + os.sep
@@ -131,7 +131,7 @@ def model_cv(**kwargs):
         max_depth=int(max_depth),
         colsample_bytree=colsample_bytree,
         reg_lambda=reg_lambda,
-
+        predictor="gpu_predictor",
         n_jobs=1
 
     ).fit(X_train, y_train)
@@ -139,8 +139,10 @@ def model_cv(**kwargs):
     if save_model:
         model_instance.save_model(model_save_path+get_related_path(Material_ID).replace(".csv",".json"))
     start_pred = time.time()
-    pred = model_instance.predict(X_test)
+    pred = model_instance.predict(np.array([X_test[0,:]]))
     test_time = time.time() - start_pred
+    print("test time",test_time)
+    exit(0)
 
     data_record["trainning_time_consume(s)"].append(train_time)
     data_record["test_time_consume(s)"].append(test_time)
@@ -198,7 +200,7 @@ if __name__ == "__main__":
 
         model_save_path="."+os.sep+"saved_model"+os.sep+"mini_dataset_mixture"+os.sep+f"mini_data_{data_index}"+ os.sep
         mini_data_path = ".." + os.sep + "data" + os.sep + data_root+ f"mini_data_{data_index}" + os.sep
-        saved_root = "."+os.sep+"mini_cleaned_data_mixture"+os.sep+ f"mini_data_{data_index}" + os.sep
+        saved_root = "."+os.sep+"mini_cleaned_data_mixture_"+device+os.sep+ f"mini_data_{data_index}" + os.sep
         All_ID = ['Methane', 'Ethane', 'Propane', 'N-Butane', 'N-Pentane', 'N-Hexane', 'Heptane']
         relate_data = generate_data.mixture_generater(mini_data_path)
         # collector=generate_data.collector()

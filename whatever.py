@@ -40,16 +40,16 @@ import matplotlib.pyplot as plt
 
 num=800
 zs=[[0.5,0.5] for i in range(num)]
-temp=310.59
-pressure=50
+temp=277.59
+pressure=30
 phase="gas"
 index=len(ID)*0 if phase=="liquid" else len(ID)*1
-row_data=[list(np.ones(num) *temp),list(np.linspace(0.3,1,num)*pressure*100000)]
+row_data=[list(np.ones(num) *temp),np.linspace(0.2,1,num)*pressure]
 # row_data=[list(np.linspace(0.5,1,num)*temp),list(np.ones(num)*pressure*100000)]
 
-test = flashdata(constants, properties, {"T": row_data[0], "P": row_data[1]}, zs, "Vapor_Liquid")
+test = flashdata(constants, properties, {"T": row_data[0], "P": list(row_data[1]*100000)}, zs, "Vapor_Liquid")
 
-def pr():
+def pl():
     x=[]
     y=[]
     for i in range(len(test)):
@@ -60,22 +60,23 @@ def pr():
             # print(test[i].betas)
 
             try:
-                if test[i].gas is not None and test[i].liquid0 is not None:
-                    #test1_ phase fraction of material
-                    if phase == "liquid":
-                        y.append(np.array(test[i].liquid0.zs)*test[i].LF/(np.array(test[i].liquid0.zs)*test[i].LF+np.array(test[i].gas.zs)*test[i].VF))
-                    else:
-                        y.append(np.array(test[i].gas.zs) * test[i].VF / (
-                                    np.array(test[i].liquid0.zs) * test[i].LF + np.array(test[i].gas.zs) * test[i].VF))
-                        print(np.array(test[i].gas.zs) * test[i].VF / (
-                                    np.array(test[i].liquid0.zs) * test[i].LF + np.array(test[i].gas.zs) * test[i].VF),
-                              np.array(test[i].liquid0.zs)*test[i].LF/(np.array(test[i].liquid0.zs)*test[i].LF+np.array(test[i].gas.zs)*test[i].VF))
 
-                    # test2_ phase fraction of phase
-                    # if phase == "gas":
-                    #     y.append(test[i].gas.zs)
+                    #test1_ phase fraction of material
+                    # if phase == "liquid":
+                    #     y.append(np.array(test[i].liquid0.zs)*test[i].LF/(np.array(test[i].liquid0.zs)*test[i].LF+np.array(test[i].gas.zs)*test[i].VF))
                     # else:
-                    #     y.append(test[i].liquid0.zs)
+                    #     y.append(np.array(test[i].gas.zs) * test[i].VF / (
+                    #                 np.array(test[i].liquid0.zs) * test[i].LF + np.array(test[i].gas.zs) * test[i].VF))
+                    #     print(np.array(test[i].gas.zs) * test[i].VF / (
+                    #                 np.array(test[i].liquid0.zs) * test[i].LF + np.array(test[i].gas.zs) * test[i].VF),
+                    #           np.array(test[i].liquid0.zs)*test[i].LF/(np.array(test[i].liquid0.zs)*test[i].LF+np.array(test[i].gas.zs)*test[i].VF))
+                    # y.append(np.array(test[i].liquid0.zs)*test[i].LF/(np.array(test[i].liquid0.zs)*test[i].LF+np.array(test[i].gas.zs)*test[i].VF))
+                    # test2_ phase fraction of phase
+                    if phase == "gas":
+                        y.append(test[i].gas.zs)
+                        print(test[i].gas.zs)
+                    else:
+                        y.append(test[i].liquid0.zs)
 
                     # test2_ phase fraction of phase
                     # if phase == "gas":
@@ -85,22 +86,27 @@ def pr():
 
                     x.append(row_data[1][i])
             except:
+                print(test[i].gas)
                 pass
-    print(y)
 
 
     y=np.array(y)
     print(y)
+    print(np.array(x),y[:,0])
     print(y.shape)
-    plt.plot(x,y[:,0])
+    plt.plot(np.array(x),y[:,0])
     my_y_ticks = np.arange(0, 1.2, 0.2)
     plt.yticks(my_y_ticks)
     plt.title(ID[0]+"-"+ID[1]+str(zs[0])+","+phase+","+str(temp)+"K")
-    plt.xlabel("pressure(PA)")
+    plt.xlabel("pressure(bar)")
     plt.ylabel("material0 "+phase+" fraction")
+    plt.ylim(0,1.2)
+    plt.xlim(0.3*pressure,pressure)
     plt.show()
     exit(0)
-pr()
+pl()
+
+
 
 #
 # collector=generate_data.collector()

@@ -11,9 +11,9 @@ import os
 from pytorch_tabnet.tab_model import TabNetRegressor
 import torch.optim as optim
 
-data_set_index = [0,1,2, 3, 4, 5]
+data_set_index = [0,1,2,3]
 mix_index = "all"
-device = "cuda"
+device = "cpu"
 data_root = "." + os.sep + "mini_cleaned_data" + os.sep
 save_model = False
 save_data = True
@@ -95,7 +95,7 @@ from sklearn.metrics import mean_squared_error
 
 #
 
-data_record = {"trainning_time_consume(s)": [], "test_time_consume(s)": []}
+data_record = {"trainning_time_consume(s)": [], "test_time_consume(s)": [],"epochs":[]}
 
 import argparse
 # print(a)
@@ -127,8 +127,8 @@ def model_cv(**kwargs):
     n_shared = kwargs["n_shared"] if "n_shared" in kwargs.keys() else 1
     print(n_d)
 
+    epochs=250
 
-    start_train = time.time()
     model_instance = TabNetRegressor(
         int(n_d),
         int(n_a),
@@ -144,20 +144,24 @@ def model_cv(**kwargs):
             mode="min", patience=5, min_lr=1e-5, factor=0.9),
         scheduler_fn=ReduceLROnPlateau,
         seed=25,
-        verbose=10
-
+        verbose=10,
+    device_name=device
     )
-    model_instance.fit(X_train, y_train)
 
+    start_train = time.time()
+    model_instance.fit(X_train, y_train,max_epochs=epochs)
     train_time = time.time() - start_train
+
     if save_model:
         model_instance.save_model(model_save_path + get_related_path(Material_ID).replace(".csv", ".json"))
     start_pred = time.time()
     pred = model_instance.predict(X_test)
     test_time = time.time() - start_pred
 
+    print("test_time",test_time)
     data_record["trainning_time_consume(s)"].append(train_time)
     data_record["test_time_consume(s)"].append(test_time)
+    data_record["epochs"].append(epochs)
 
     return -mean_squared_error(pred, y_test)
 
@@ -183,18 +187,38 @@ def run_bayes_optimize(num_of_iteration=10, data_index=2):
         }
     )
 
-    rf_bo.maximize(n_iter=num_of_iteration)
+    rf_bo.maximize(init_points=5,n_iter=num_of_iteration)
+
+    #save data
     result_data_root = "." + os.sep + "BO_result_data" + os.sep
     routing_data_root = "." + os.sep + "BO_training_routing" + os.sep
     pd.DataFrame(data_record)
     routing_data_root + get_related_path(Material_ID)
     if save_data:
-        pd.DataFrame(data_record).to_csv(saved_root + routing_data_root + get_related_path(Material_ID))
-        pd.DataFrame(rf_bo.res).to_csv(saved_root + result_data_root + get_related_path(Material_ID))
-
+        if os.path.exists(saved_root + result_data_root + get_related_path(Material_ID)):
+            pd.concat([pd.DataFrame(rf_bo.res),pd.read_csv(saved_root + result_data_root + get_related_path(Material_ID),index_col=0,comment="#")],ignore_index=True).to_csv(saved_root + result_data_root + get_related_path(Material_ID))
+            f = open(saved_root + result_data_root + get_related_path(Material_ID), "a+")
+            f.write(f"# {device}")
+            f.close()
+            pd.concat([pd.DataFrame(data_record),
+                       pd.read_csv(saved_root + routing_data_root + get_related_path(Material_ID), index_col=0,
+                                   comment="#")], ignore_index=True).to_csv(
+                saved_root + routing_data_root + get_related_path(Material_ID))
+            f = open(saved_root + routing_data_root + get_related_path(Material_ID), "a+")
+            f.write(f"# {device}")
+            f.close()
+        else:
+            pd.DataFrame(rf_bo.res).to_csv(saved_root + result_data_root + get_related_path(Material_ID))
+            f = open(saved_root + result_data_root + get_related_path(Material_ID), "a+")
+            f.write(f"# {device}")
+            f.close()
+            pd.DataFrame(data_record).to_csv(saved_root + routing_data_root + get_related_path(Material_ID))
+            f = open(saved_root + routing_data_root + get_related_path(Material_ID), "a+")
+            f.write(f"# {device}")
+            f.close()
     data_record["trainning_time_consume(s)"].clear()
     data_record["test_time_consume(s)"].clear()
-
+    data_record["epochs"].clear()
 
 def run_Grid_search(num_of_iteration):
     print(num_of_iteration)
@@ -216,7 +240,7 @@ if __name__ == "__main__":
 
         model_save_path = "." + os.sep + "saved_model" + os.sep + "mini_dataset_mixture" + os.sep + f"mini_data_{data_index}" + os.sep
         mini_data_path = ".." + os.sep + "data" + os.sep + data_root + f"mini_data_{data_index}" + os.sep
-        saved_root = "." + os.sep + "mini_cleaned_data_mixture" + os.sep + f"mini_data_{data_index}" + os.sep
+        saved_root = "." + os.sep + "mini_cleaned_data_mixture_"+device + os.sep + f"mini_data_{data_index}" + os.sep
         All_ID = ['Methane', 'Ethane', 'Propane', 'N-Butane', 'N-Pentane', 'N-Hexane', 'Heptane']
         relate_data = generate_data.mixture_generater(mini_data_path)
         # collector=generate_data.collector()

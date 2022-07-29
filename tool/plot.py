@@ -111,6 +111,7 @@ class line_bar_plot_from_csv_norm:
         ax.boxplot(data_rearrange, positions=position, patch_artist=True, label="")
 
     def plot_box(self):
+        print(self.data)
         cnt = 0
         for key in self.data.keys():
 
@@ -165,6 +166,8 @@ class line_bar_plot_from_csv_norm2:
         self.data = []
         self.fig, self.ax = plt.subplots()
         self.colors = ['pink', 'lightgreen', 'lightblue']
+        self.comment=["norm"]
+        self.cnt=0
 
     def collect_file_path(self, root):
         collected_file = []
@@ -183,8 +186,14 @@ class line_bar_plot_from_csv_norm2:
         :param root:
         :return:data {c_i:
         """
-        cnt = 0
+        comment=" "
 
+        for i in self.comment:
+            if i in root:
+                comment+="regulization "
+
+        cnt = 0
+        comment += str(self.cnt)
         data_in_this_model=[]
         for roots, dir, files in os.walk(root):
             sigle_material_data = []
@@ -197,13 +206,13 @@ class line_bar_plot_from_csv_norm2:
                     reformed_data = {"target": self._collect_data(os.path.join(roots, file), target) * 1000
                                                / self._collect_data(os.path.join(roots, file), norm),
                                      "mixture": roots.split(os.sep)[-1], "material": file.replace(".csv", ""),
-                                     "model": root.split(os.sep)[1]}
+                                     "model": root.split(os.sep)[1]+comment}
 
                     sigle_material_data.append(pd.DataFrame(reformed_data))
                 else:
                     reformed_data={"target":self._collect_data(os.path.join(roots, file), target),\
                                    "mixture":roots.split(os.sep)[-1],"material":file.replace(".csv",""),
-                                   "model":root.split(os.sep)[1]}
+                                   "model":root.split(os.sep)[1]+comment}
 
 
                     sigle_material_data.append(pd.DataFrame(reformed_data))
@@ -219,10 +228,16 @@ class line_bar_plot_from_csv_norm2:
             # print(root)
 
 
-        self.data.append(pd.concat(data_in_this_model,axis=0,ignore_index=True))
+        if(len(data_in_this_model)>1):
+            self.data.append(pd.concat(data_in_this_model,axis=0,ignore_index=True))
+        else:
+            self.data.append(*data_in_this_model)
+            print(self.data)
+        self.cnt+=1
         return self.data
 
     def plot(self):
+
         data_rearrange = []
         position = []
         fig, ax = plt.subplots()  # 子图
@@ -241,9 +256,11 @@ class line_bar_plot_from_csv_norm2:
     def plot_box(self):
 
         multi_model_data=pd.concat(self.data,axis=0,ignore_index=True)
+
+        multi_model_data = multi_model_data.loc[multi_model_data["mixture"] == "mix_2"]
         sns.catplot(x="mixture", y="target",
                     hue="model",
-                    data=multi_model_data, kind="box",
+                    data=multi_model_data, kind="box",height=6,ci=96,margin_titles=True,
                      aspect=1.7)
 
 
@@ -286,26 +303,36 @@ a = line_bar_plot_from_csv_norm2("test")
 # root1="..\\Simple_ANN_experience\\BO_result_data\\"
 # root2="..\\XGB_experience\\BO_result_data\\"
 # root3="..\\LightGBM_experience\\BO_result_data\\"
-data_num = 2
+data_num = 0
 
-root1 = f"..\\Simple_ANN_experience\\BO_training_routing\\"
-root2 = f"..\\XGB_experience\\mini_cleaned_data\\mini_data_{data_num}\\training_routing\\"
-# root3=f"..\\XGB_experience\\HPC_CPU\\mini_data_{data_num}\\BO_training_routing\\"
-# root4=f"..\\PINN_experience\\mini_data_{data_num}\\GS_training_routing\\"
+# root1 = f"..\\1dcnn_experience\\mini_cleaned_data_mixture\\mini_data_{data_num}\\BO_training_routing\\"
 
+root1=f"..\\my_tabnet_experience\\mini_cleaned_data_mixture_cuda\\mini_data_{data_num}\\BO_result_data\\"
+root2 = f"..\\tabnet_experience\\mini_cleaned_data_mixture_cuda\\mini_data_{data_num}\\BO_result_data\\"
+root3=f"..\\XGB_experience\\mini_cleaned_data_mixture\\mini_data_{data_num}\\BO_result_data\\"
+# root4=f"..\\Simple_ANN_experience\\mini_cleaned_data\\mini_data_{data_num}\\BO_result_data\\"
 
 # print(a.data)
-target2 = "test_time_consume(s)"
-a.structed_add_files(root2, target2, "data_size")
 
-target1 = "test_time_consume(s)"
+
+target1 = "target"
 a.structed_add_files(root1, target1)
+
+target2 = "target"
+a.structed_add_files(root2, target2)
+
+target2 = "target"
+a.structed_add_files(root3, target2)
+
+# target1 = "target"
+# a.structed_add_files(root4, target1)
+
 
 # a.structed_add_files(root4,target)
 # a.structed_add_files(root3,target)
 ax = a.plot_box()
-plt.title(f"model_cross_plot")
-plt.ylabel(target2)
+plt.title(f"model_cross_plot_GPU"+str(data_num))
+plt.ylabel("MSEloss")
 plt.xlabel('mixture_i')
 # plt.ylabel(target)
 plt.show()

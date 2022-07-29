@@ -1,0 +1,19 @@
+#PBS -N process_XGB_BO_80_128_96_2
+#PBS -l walltime=48:00:00
+#PBS -l select=1:ncpus=96:mpiprocs=96:mem=240GB
+
+module load intel-suite
+module load mpi
+module load anaconda3/personal
+
+cd $home
+
+pwd
+
+cd IRP_flash_calculation_accelaration
+
+cd XGB_experience
+
+pwd
+
+mpiexec -n 48 python XGB.py --BO 100

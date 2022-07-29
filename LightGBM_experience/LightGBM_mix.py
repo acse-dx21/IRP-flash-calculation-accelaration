@@ -15,6 +15,7 @@ data_set_index = [0,1,2,3, 4, 5]
 mix_index="all"
 device = "cuda"
 data_root = "." + os.sep + "mini_cleaned_data" + os.sep
+
 save_model=False
 save_data=True
 
@@ -113,7 +114,7 @@ def model_cv(**kwargs):
             max_depth=int(max_depth),
         colsample_bytree=colsample_bytree,
         reg_lambda=reg_lambda,
-            n_jobs=2)
+            n_jobs=1)
         ).fit(X_train, y_train)
 
     train_time = time.time() - start_train
@@ -166,12 +167,11 @@ def run_bayes_optimize(num_of_iteration=10,data_index=10):
 
     rf_bo.maximize(n_iter=num_of_iteration)
     routing_data_root = "." + os.sep + "BO_training_routing" + os.sep
-
-    pd.DataFrame(data_record).to_csv(routing_data_root + get_related_path(material_ID))
+    if save_data:
+        pd.DataFrame(data_record).to_csv(save_root + routing_data_root + get_related_path(material_ID))
+        pd.DataFrame(rf_bo.res).to_csv(save_root+BO_root+get_related_path(material_ID))
     data_record["trainning_time_consume(s)"].clear()
     data_record["test_time_consume(s)"].clear()
-    # pd.DataFrame(rf_bo.res).to_csv(BO_root+get_related_path(material_ID))
-
 def run_Grid_search(num_of_iteration):
     print(num_of_iteration)
 
@@ -193,7 +193,7 @@ if __name__ == "__main__":
 
         model_save_path="."+os.sep+"saved_model"+os.sep+"mini_dataset_mixture"+os.sep+f"mini_data_{data_index}"+ os.sep
         mini_data_path = ".." + os.sep + "data" + os.sep + data_root+ f"mini_data_{data_index}" + os.sep
-        saved_root = "."+os.sep+"mini_cleaned_data_mixture"+os.sep+ f"mini_data_{data_index}" + os.sep
+        save_root ="."+os.sep+"mini_cleaned_data_mixture"+os.sep+ f"mini_data_{data_index}" + os.sep
         All_ID = ['Methane', 'Ethane', 'Propane', 'N-Butane', 'N-Pentane', 'N-Hexane', 'Heptane']
         relate_data = generate_data.mixture_generater(mini_data_path)
         # collector=generate_data.collector()

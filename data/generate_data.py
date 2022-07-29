@@ -16,7 +16,7 @@ from itertools import chain
 sys.path.append("..")
 from tool.log import TPZs_log
 
-
+bool_shulfle=True
 class flashdata_modified(Dataset):
     """
     dataset of output: phase component of
@@ -609,9 +609,9 @@ class Generate_data_from_csv:
         test_set = flashdata(constants, properties, {"T": T_set_test, "P": P_set_test}, Zs_set_test,
                              self.system)
 
-        train_loader = DataLoader(train_set, shuffle=False,
+        train_loader = DataLoader(train_set, shuffle=bool_shulfle,
                                   batch_size=train_set.__len__(), collate_fn=collector)
-        test_loader = DataLoader(test_set, shuffle=False,
+        test_loader = DataLoader(test_set, shuffle=bool_shulfle,
                                  batch_size=test_set.__len__(), collate_fn=collector)
 
         X_train, y_train = next(iter(train_loader))
@@ -630,9 +630,9 @@ class Generate_data_from_csv:
         test_set = flashdata(constants, properties, {"T": T_set_test, "P": P_set_test}, Zs_set_test,
                              self.system)
 
-        train_loader = DataLoader(train_set, shuffle=False,
+        train_loader = DataLoader(train_set, shuffle=bool_shulfle,
                                   batch_size=batch_size, collate_fn=collector)
-        test_loader = DataLoader(test_set, shuffle=False,
+        test_loader = DataLoader(test_set, shuffle=bool_shulfle,
                                  batch_size=batch_size, collate_fn=collector)
 
         return train_loader, test_loader
@@ -740,6 +740,8 @@ class multicsv_data_generater:
 from scipy.special import comb
 
 
+
+
 class mixture_generater:
     """
     generate all data from single file,defualt "separate"
@@ -763,6 +765,16 @@ class mixture_generater:
             end += comb(7, i + 1)
 
         return int(start), int(end)
+
+    @staticmethod
+    def get_material(materials, length):
+        """
+        use to fine target mixture
+        :param mix_index: "all" or int range from 1-7
+        :return:
+        """
+
+        return [x for x in materials if len(x) == length]
 
     def __init__(self, file_path_root=os.path.dirname(__file__) + os.sep + "cleaned_data" + os.sep,
                  return_type="separate", transform=None):
@@ -811,43 +823,47 @@ class mixture_generater:
 
         :return:
         """
-        print("data return type ",self.return_type)
-        D_train_data=[]
+        print("data return type ", self.return_type)
+        D_train_data = []
         D_test_data = []
 
-        X_train_list=[]
-        y_train_list=[]
-        X_test_list=[]
-        y_test_list=[]
+        X_train_list = []
+        y_train_list = []
+        X_test_list = []
+        y_test_list = []
 
-
-        material_IDs=[]
+        material_IDs = []
         start, end = mixture_generater.get_range(idx)
+
         if self.return_type == "Dataloader":
 
-            for i in range(start, end):
-                train_dataloader,test_dataloader=Generate_data_from_csv(self.csv_train[self.materials[i]],
-                                                         self.csv_test[self.materials[i]]).to_dataloader(self.batch_size, collector=self.collector)
+            for material_ID in self.get_material(self.materials,idx):
+                train_dataloader, test_dataloader = Generate_data_from_csv(self.csv_train[material_ID],
+                                                                           self.csv_test[
+                                                                               material_ID]).to_dataloader(
+                    self.batch_size, collector=self.collector)
                 D_train_data.append(train_dataloader)
                 D_test_data.append(test_dataloader)
-                material_IDs.append(self.materials[i])
+                material_IDs.append(material_ID)
 
-            print("data_size",len(D_train_data))
+            print("data_size", len(D_train_data))
 
             return chain(*D_train_data), chain(*D_test_data), material_IDs
 
         elif self.return_type == "separate":
 
-            for i in range(start, end):
-                X_train, y_train, X_test, y_test=Generate_data_from_csv(self.csv_train[self.materials[i]],
-                                                         self.csv_test[self.materials[i]]).to_numpy(collector=self.collector)
+            for material_ID in self.get_material(self.materials,idx):
+                X_train, y_train, X_test, y_test = Generate_data_from_csv(self.csv_train[material_ID],
+                                                                          self.csv_test[material_ID]).to_numpy(
+                    collector=self.collector)
                 X_train_list.append(X_train)
                 y_train_list.append(y_train)
                 X_test_list.append(X_test)
                 y_test_list.append(y_test)
-                material_IDs.append(self.materials[i])
+                material_IDs.append(material_ID)
             print("data_size", len(X_train_list))
-            return np.concatenate(X_train_list,axis=0), np.concatenate(y_train_list,axis=0), np.concatenate(X_test_list,axis=0), np.concatenate(y_test_list,axis=0), material_IDs
+            return np.concatenate(X_train_list, axis=0), np.concatenate(y_train_list, axis=0), np.concatenate(
+                X_test_list, axis=0), np.concatenate(y_test_list, axis=0), material_IDs
 
         else:
             print(

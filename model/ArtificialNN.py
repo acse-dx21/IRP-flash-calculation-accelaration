@@ -51,6 +51,8 @@ class simple_ANN(nn.Module):
         x = self.act(self.output(x))
         return x
 
+
+
 class ANN_material0(nn.Module):
     name = "neural_network"
 
@@ -91,75 +93,14 @@ class Mass_Balence_loss(nn.Module):
         return torch.abs(M1 - M2)
 
 
-class Neural_Model_Sklearn_style:
-    def __init__(self, core, core_parameter):
 
-        self.model = core(**core_parameter)
-        self.data_record = {}
-        self.device = "cuda" if torch.cuda.is_available() else "cpu"
-
-    def fit(self, Data_loader, epoch=15, criterion=nn.MSELoss(), optimizer=None):
-        self.model.train()
-
-        if optimizer == None:
-            optimizer = torch.optim.Adam(self.model.parameters())
-        train_loss_record = []
-        start = time.time()
-
-        for i in range(epoch):
-            for x, y in Data_loader:
-                loss_to_mean = []
-                x, y = x.to(self.device), y.to(self.device)
-                y_pred = self.model(x)
-                optimizer.zero_grad()
-                if not isinstance(criterion, nn.MSELoss):
-                    loss = criterion(y_pred, y, x[:, -self.model.material_num:])
-                else:
-                    loss = criterion(y_pred, y)
-                loss.backward()
-                loss_to_mean.append(loss.item())
-                optimizer.step()
-            train_loss_record.append(np.mean(loss_to_mean))
-
-        self.data_record["trainning_time_consume(s)"] = time.time() - start
-        self.data_record["train_loss_record"] = train_loss_record
-        return self.data_record
-
-    def score(self, Test_loader, criterion=nn.MSELoss()):
-        self.model.eval()
-        start = time.time()
-        test_loss_record = []
-        for x, y in Test_loader:
-            x, y = x.to(self.device), y.to(self.device)
-            y_pred = self.model(x)
-            # loss = self.criterion(y_pred, y,x[:,-self.material_num:])
-            loss = criterion(y_pred, y)
-            test_loss_record.append(loss.item())
-
-        loss = np.mean(test_loss_record)
-
-        self.data_record["test_loss_record"] = loss
-        self.data_record["test_time_consume(s)"] = time.time() - start
-        return loss
-
-    def predict(self, x):
-        return self.model(x)
-
-    @property
-    def get_device(self):
-        return self.device
-
-    @property
-    def get_core_name(self):
-        return type(self.model).__name__
-
-    @property
-    def get_data(self):
-        return self.data_record
-
-    def set_device(self, device):
-        self.device = device
 import torch.nn.functional as F
+
+
+
+
+
+
 class OneD_CNN(nn.Module):
     def __init__(self, num_features, num_targets, hidden_size):
         super(OneD_CNN, self).__init__()
@@ -184,7 +125,7 @@ class OneD_CNN(nn.Module):
 
         self.batch_norm_c1 = nn.BatchNorm1d(cha_1)
         self.dropout_c1 = nn.Dropout(0.1)
-        self.conv1 = nn.utils.weight_norm(nn.Conv1d(cha_1, cha_2, kernel_size=5, stride=1, padding=2, bias=False),
+        self.conv1 = nn.utils.weight_norm(nn.Conv1d(cha_1, cha_2, kernel_size=1, stride=1, padding=2, bias=False),
                                           dim=None)
 
         self.ave_po_c1 = nn.AdaptiveAvgPool1d(output_size=cha_po_1)
@@ -254,6 +195,196 @@ class OneD_CNN(nn.Module):
 from torch.utils.data import TensorDataset, DataLoader
 
 
+class FeatureBlock(nn.Module):
+    def glu(self,x, devide):
+        """Generalized linear unit nonlinear activation."""
+        return x[:, :devide] * torch.sigmoid()(x[:, devide:])
+
+    def __init__(self,input_dim,feature_dim,apply_glu=False,bn_momentum=0.9,fc=None,epsilon=1e-5):
+        super(FeatureBlock, self).__init__()
+        self.apply_gpu = apply_glu
+        self.feature_dim = feature_dim
+        units = feature_dim * 2 if apply_glu else feature_dim
+        self.fc=nn.Linear(input_dim,units,bias=False) if fc is None else fc
+        self.bn=nn.BatchNorm1d(units,momentum=bn_momentum)
+
+    def forward(self, x):
+        x = self.fc(x)
+        x = self.bn(x)
+        if self.apply_gpu:
+            return self.glu(x, self.feature_dim)  # GLU activation applied to BN output
+
+        return x
+
+
+class FeatureTransformer(nn.Module):
+    def __init__(
+            self,
+            input_dim,
+            feature_dim,
+
+            share_fcs=[],
+            n_shared=2,
+            n_total=4,
+            bn_momentum=0.9,
+    ):
+        super(FeatureTransformer, self).__init__()
+        self.n_total, self.n_shared = n_total, n_shared
+        kwrgs = {
+            "input_dim":feature_dim,
+            "feature_dim": feature_dim,
+            "bn_momentum": bn_momentum,
+        }
+
+        kwrgs0 = {
+            "input_dim": input_dim,
+            "feature_dim": feature_dim,
+            "bn_momentum": bn_momentum,
+        }
+        self.blocks = nn.ModuleList()
+        if (len(share_fcs)>0):
+            self.blocks.append(FeatureBlock(**kwrgs0, fc=share_fcs[0]))
+        else:
+            self.blocks.append(FeatureBlock(**kwrgs0))
+
+
+        for n in range(1,n_total):
+            if share_fcs and n < len(share_fcs):
+                self.blocks.append(FeatureBlock(**kwrgs, fc=share_fcs[n]))  # Building shared blocks by providing FC layers
+            else:
+                self.blocks.append(FeatureBlock(**kwrgs))
+
+    def forward(self,x):
+        x=self.blocks[0](x)
+        for n in range(1, self.n_total):
+            x=x*np.sqrt(0.5)+self.blocks[n](x)
+        return x
+
+    @property
+    def shared_fcs(self):
+        return [self.blocks[i].fc for i in range(self.n_shared)]
+from sparsemax import Sparsemax
+class AttentiveTransformer(nn.Module):
+    def __init__(self,input_dim,feature_dim):
+        super(AttentiveTransformer, self).__init__()
+        self.block = FeatureBlock(
+            input_dim,
+            feature_dim,
+            apply_glu=False,  # sparsemax instead of glu
+        )
+
+    def forward(self,x,prior_scales):
+        x = self.block(x)
+
+        return Sparsemax()(x * prior_scales)
+
+
+# x=torch.randn((10,100))
+# a=FeatureTransformer(100,100)
+# print(a(x).shape)
+
+def sparse_loss(at_mask):
+    # print(-at_mask,torch.log(at_mask + 1e-15))
+    # print(torch.multiply(-at_mask,  torch.log(at_mask + 1e-15)))
+    # print(torch.sum( torch.multiply(-at_mask,  torch.log(at_mask + 1e-15)),
+    #                   axis=1))
+
+    loss = torch.mean(
+        torch.sum( torch.multiply(-at_mask,  torch.log(at_mask + 1e-15)),
+                      axis=1)
+    )
+
+    return loss
+
+
+not_sparse_mask = torch.Tensor([[0.4, 0.5, 0.05, 0.05],
+                            [0.2, 0.2, 0.5, 0.1]])
+
+sparse_mask = torch.Tensor([[0.0, 0.0, 0.7, 0.3],
+                        [0.0, 0.0, 1, 0.0]])
+
+# print('Loss for non-sparse attention mask:', sparse_loss(not_sparse_mask).numpy())
+# print('Loss for sparse attention mask:', sparse_loss(sparse_mask).numpy())
+#
+
+
+class my_tabnet(nn.Module):
+    def __init__(self,
+                 input_dim,
+            inner_feature_dim,
+            out_feature_dim,
+                 output_dim,
+            n_step=2,
+            n_total=4,
+            n_shared=2,
+            relaxation_factor=1.5,
+            bn_epsilon=1e-5,
+            bn_momentum=0.7,
+            sparsity_coefficient=1e-5):
+        super(my_tabnet, self).__init__()
+        self.output_dim, self.input_dim = output_dim, input_dim
+
+        self.inner_feature_dim, self.out_feature_dim = inner_feature_dim, out_feature_dim
+
+        self.bn=nn.BatchNorm1d(input_dim,eps=bn_epsilon,momentum=bn_momentum)
+
+        self.relaxation_factor=torch.tensor(relaxation_factor,requires_grad=False)
+
+        self.n_step=n_step
+
+        kargs = {
+            "input_dim": input_dim,
+            "feature_dim": inner_feature_dim + out_feature_dim,
+            "n_total": n_total,
+            "n_shared": n_shared,
+            "bn_momentum": bn_momentum
+        }
+        self.feature_transforms = nn.ModuleList()
+        self.attentive_transforms = nn.ModuleList()
+        self.feature_transforms.append(FeatureTransformer(**kargs))
+
+        for i in range(n_step):
+            self.feature_transforms.append(
+                FeatureTransformer(**kargs, share_fcs=self.feature_transforms[0].shared_fcs)
+            )
+            self.attentive_transforms.append(
+                AttentiveTransformer(inner_feature_dim,input_dim)
+            )
+
+        self.act=nn.ReLU()
+        self.output=nn.Linear(out_feature_dim,output_dim)
+
+    def forward(self,features):
+        bs=features.shape[0]
+        features = self.bn(features)  # Batch Normalisation
+        masked_features = features
+        out_agg = torch.zeros((bs, self.out_feature_dim),requires_grad=False).to(features.device)
+
+        prior_scales = torch.ones((bs, self.input_dim)).to(features.device)
+        for step_i in range(self.n_step+1):
+            inner_feature= self.feature_transforms[step_i](
+                masked_features
+            )
+            if(step_i>0):
+                out=self.act(inner_feature[..., : self.out_feature_dim])
+                # print(out.shape)
+                out_agg+=out
+#                 importance add here
+
+            if step_i < self.n_step:
+                feature_for_mask = inner_feature[:, self.out_feature_dim:]
+                mask_values = self.attentive_transforms[step_i](
+                    feature_for_mask, prior_scales
+                )
+                # print("here",mask_values.shape)
+                prior_scales =prior_scales* self.relaxation_factor - mask_values
+                masked_features=torch.multiply(mask_values,features)
+
+        final_output = self.output(out)
+        return final_output
+
+
+
 class Neural_Model_Sklearn_style:
     def __init__(self, core, core_parameter):
         print(core.__name__)
@@ -264,15 +395,16 @@ class Neural_Model_Sklearn_style:
     def fit(self, train, target, epoch=15, batch_size=128, criterion=nn.MSELoss(), optimizer=None):
         self.model.to(self.device)
         self.model.train()
+        print(self.device)
         Data_loader = DataLoader(
             TensorDataset(torch.from_numpy(train.astype(np.float32)), torch.from_numpy(target.astype(np.float32))),
             batch_size=batch_size, shuffle=True)
         if optimizer == None:
             optimizer = torch.optim.Adam(self.model.parameters())
+            optimizer.zero_grad()
         train_loss_record = []
         train_time_record = []
         start = time.time()
-
         for i in range(epoch):
             for x, y in Data_loader:
                 loss_to_mean = []
@@ -325,6 +457,17 @@ class Neural_Model_Sklearn_style:
     def predict(self, x):
         return self.model(torch.tensor(x.astype(np.float32)).to(self.device)).detach().cpu().numpy()
 
+
+    def continues_predict(self,x0,Ts,Ps):
+        for T,P in zip(Ts,Ps):
+            out=self.model(torch.tensor(x0.astype(np.float32)).to(self.device)).detach().cpu().numpy()
+            x0[...,-2:]=self.compute_material_fraction(out)
+            x0[..., -3] = P
+            x0[..., -4:] = T
+
+    def compute_material_fraction(self,out):
+        material_num=int((len(out)-2)/2)
+        return out[...,:material_num]*out[...,-2]+out[...,:2*material_num]*out[...,-1]
     @property
     def get_device(self):
         return self.device
@@ -339,7 +482,6 @@ class Neural_Model_Sklearn_style:
 
     def set_device(self, device):
         self.device = device
-
 
 
 
