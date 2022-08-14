@@ -16,7 +16,9 @@ from itertools import chain
 sys.path.append("..")
 from tool.log import TPZs_log
 
-bool_shulfle=True
+bool_shulfle = True
+
+
 class flashdata_modified(Dataset):
     """
     dataset of output: phase component of
@@ -323,173 +325,7 @@ class collector:
         else:
             self.cast = method
 
-
-def _collect_gas_liq_phase(flash):
-    Material_num = len(flash.names)
-    if Material_num > 1:
-        if not hasattr(flash, "gas") or ((hasattr(flash, "gas") and (flash.gas is None))):
-            gas = np.zeros(Material_num)
-            temp_output = np.concatenate((gas, np.array(flash.liquid0.zs)), 0)
-        if not hasattr(flash, "liquid0") or ((hasattr(flash, "liquid0") and (flash.liquid0 is None))):
-            liquid0 = np.zeros(Material_num)
-            temp_output = np.concatenate((np.array(flash.gas.zs), liquid0), 0)
-        if hasattr(flash, "liquid0") and (flash.liquid0 is not None) and (hasattr(flash, "gas")) and (
-                flash.gas is not None):
-            temp_output = np.concatenate((np.array(flash.gas.zs), np.array(flash.liquid0.zs)), 0)
-
-        beta = np.array([flash.VF, flash.LF])
-        return np.concatenate((temp_output, beta), 0)
-
-    else:
-        if hasattr(flash, "liquids"):
-            if len(flash.liquids) > 0:
-                result = [0, 1, 0, 1]
-                return np.array(result)
-        if hasattr(flash, "gas"):
-            result = [1, 0, 1, 0]
-            return np.array(result)
-
-        print("last Mix_1 collecton doesnt not have liquid and gas attribute")
-        raise RuntimeError
-
-
-def _collect_material(flash):
-    Material_num = len(flash.names)
-    if Material_num > 1:
-
-        if flash.gas == None:
-            gas = np.zeros(Material_num)
-            temp_output = np.concatenate((gas, np.array(flash.liquid0.zs)), 0)
-        if not hasattr(flash, "liquid0") or ((hasattr(flash, "liquid0") and (flash.liquid0 is None))):
-            liquid0 = np.zeros(Material_num)
-            temp_output = np.concatenate((np.array(flash.gas.zs), liquid0), 0)
-        if hasattr(flash, "liquid0") and (flash.liquid0 is not None) and (hasattr(flash, "gas")) and (
-                flash.gas is not None):
-            temp_output = np.concatenate((np.array(flash.gas.zs), np.array(flash.liquid0.zs)), 0)
-
-        beta = np.array([flash.VF, flash.LF])
-        return np.concatenate((temp_output, beta), 0)
-
-    else:
-        if hasattr(flash, "liquids"):
-            if len(flash.liquids) > 0:
-                result = [0, 1, 0, 1]
-                return np.array(result)
-        if hasattr(flash, "gas"):
-            result = [1, 0, 1, 0]
-            return np.array(result)
-
-        print("last Mix_1 collecton doesnt not have liquid and gas attribute")
-        raise RuntimeError
-
-
-def collate_VL(batch):
-    """
-    return structure:(torch.tensor)gas:[material0,material1,material2,...], liquid:[material0,material1,material2,...],[gas fraction, liquid fraction]
-    """
-    output = to_numpy()
-    input = to_numpy()
-
-    for flash in batch:
-        # print(flash)
-        input(np.concatenate(
-            (np.array(flash.constants.Pcs), np.array(flash.constants.Tcs), np.array(flash.constants.omegas), [flash.T],
-             [flash.P], flash.zs), 0))
-
-        output(_collect_gas_liq_phase(flash))
-
-    return torch.tensor(input.release()), torch.tensor(output.release())
-
-
-def collate_VL_NParray(batch):
-    """
-     return structure: (numpy array)gas:[material0,material1,material2,...], liquid:[material0,material1,material2,...],[gas fraction, liquid fraction]
-    """
-    output = to_numpy()
-    input = to_numpy()
-
-    for flash in batch:
-        # print(flash)
-
-        input(np.concatenate(
-            (np.array(flash.constants.Pcs), np.array(flash.constants.Tcs), np.array(flash.constants.omegas), [flash.T],
-             [flash.P], flash.zs), 0))
-
-        output(_collect_gas_liq_phase(flash))
-
-    return np.array(input.release()), np.array(output.release())
-
-
-def collate_Materials(batch):
-    """
-    return structure: (torch.tensor)material0:[gas,liquid], material1:[gas,liquid] , ... , material0,material1,...
-    """
-    output = to_numpy()
-    input = to_numpy()
-
-    for flash in batch:
-        # print(flash)
-        input(np.concatenate(
-            (np.array(flash.constants.Pcs), np.array(flash.constants.Tcs), np.array(flash.constants.omegas), [flash.T],
-             [flash.P], flash.zs), 0))
-
-        output(_collect_material(flash))
-
-    return torch.tensor(input.release()), torch.tensor(output.release())
-
-
-def collate_Materials_NParray(batch):
-    """
-    return structure: (numpy array)material0:[gas,liquid], material1:[gas,liquid] , ... , material0,material1,...
-    """
-    output = to_numpy()
-    input = to_numpy()
-
-    for flash in batch:
-        # print(flash)
-
-        input(np.concatenate(
-            (np.array(flash.constants.Pcs), np.array(flash.constants.Tcs), np.array(flash.constants.omegas), [flash.T],
-             [flash.P], flash.zs), 0))
-
-        output(_collect_material(flash))
-    return np.array(input.release()), np.array(output.release())
-
-
-def collate_first_Material(batch):
-    """
-    return structure: (torch.tensor)material0:[gas,liquid]
-    """
-    output = to_numpy()
-    input = to_numpy()
-
-    for flash in batch:
-        # print(flash)
-        input(np.concatenate(
-            (np.array(flash.constants.Pcs), np.array(flash.constants.Tcs), np.array(flash.constants.omegas), [flash.T],
-             [flash.P], flash.zs), 0))
-
-        output(_collect_material(flash))
-
-    return torch.tensor(input.release()), torch.tensor(output.release())
-
-
-def collate_first_Material_NParray(batch):
-    """
-    return structure: (numpy array)material0:[gas,liquid]
-    """
-    output = to_numpy()
-    input = to_numpy()
-
-    for flash in batch:
-        # print(flash)
-
-        input(np.concatenate(
-            (np.array(flash.constants.Pcs), np.array(flash.constants.Tcs), np.array(flash.constants.omegas), [flash.T],
-             [flash.P], flash.zs), 0))
-
-        output(_collect_material(flash))
-    return np.array(input.release()), np.array(output.release())
+default_collector=collector()
 
 
 def genertate_T(size, min, max):
@@ -577,6 +413,16 @@ class Generate_data_from_csv:
             Zs_set[i] = eval(Zs_set[i])
         return T_set, P_set, Zs_set
 
+    def reset_Ts(self, Ts):
+        self.T_set_test_all = np.array(self.T_set_test_all)
+        self.T_set_test_all[...,:]=Ts
+        self.T_set_test_all=self.T_set_test_all.tolist()
+
+    def reset_Ps(self, Ps):
+        self.P_set_test_all = np.array(self.P_set_test_all)
+        self.P_set_test_all[...,:] = Ps
+        self.P_set_test_all = self.P_set_test_all.tolist()
+
     def __init__(self, path_train, path_test):
         self.T_set_train_all, self.P_set_train_all, self.Zs_set_train_all = Generate_data_from_csv.read_good_TPZ_from_csv(
             path_train)
@@ -595,7 +441,7 @@ class Generate_data_from_csv:
 
         self.system = "pure" if len(self.material_ID) == 1 else "Vapor_Liquid"
 
-    def to_numpy(self, collector=collate_VL_NParray):
+    def to_numpy(self, collector=collector(return_type="NParray")):
         # if data_max== None:
         #     data_max=len(self.T_set_train_all)
         T_set_train, P_set_train, Zs_set_train = self.T_set_train_all, self.P_set_train_all, self.Zs_set_train_all
@@ -618,7 +464,20 @@ class Generate_data_from_csv:
         X_test, y_test = next(iter(test_loader))
         return X_train, y_train, X_test, y_test
 
-    def to_dataloader(self, batch_size, collector=collate_VL):
+    def to_numpy_test_only(self, collector=collector(return_type="NParray")):
+        T_set_test, P_set_test, Zs_set_test = self.T_set_test_all, self.P_set_test_all, self.Zs_set_test_all
+        constants, properties = ChemicalConstantsPackage.from_IDs(self.material_ID)
+
+        test_set = flashdata(constants, properties, {"T": T_set_test, "P": P_set_test}, Zs_set_test,
+                             self.system)
+
+        test_loader = DataLoader(test_set, shuffle=bool_shulfle,
+                                 batch_size=test_set.__len__(), collate_fn=collector)
+
+        X_test, y_test = next(iter(test_loader))
+        return X_test, y_test
+
+    def to_dataloader(self, batch_size, collector=collector(return_type="tensor")):
         # if data_max== None:
         #     data_max=len(self.T_set_train_all)
         T_set_train, P_set_train, Zs_set_train = self.T_set_train_all, self.P_set_train_all, self.Zs_set_train_all
@@ -740,8 +599,6 @@ class multicsv_data_generater:
 from scipy.special import comb
 
 
-
-
 class mixture_generater:
     """
     generate all data from single file,defualt "separate"
@@ -777,10 +634,14 @@ class mixture_generater:
         return [x for x in materials if len(x) == length]
 
     def __init__(self, file_path_root=os.path.dirname(__file__) + os.sep + "cleaned_data" + os.sep,
-                 return_type="separate", transform=None):
+                 return_type="separate", transform=None, reset_Ts=None, reset_Ps=None):
 
         self.file_path = file_path_root
         self.transform = transform
+
+        self.reset_Ts = reset_Ts
+        self.reset_Ps = reset_Ps
+
         self.csv_train = {}
         self.csv_test = {}
         self.labels_train = []
@@ -837,11 +698,14 @@ class mixture_generater:
 
         if self.return_type == "Dataloader":
 
-            for material_ID in self.get_material(self.materials,idx):
-                train_dataloader, test_dataloader = Generate_data_from_csv(self.csv_train[material_ID],
-                                                                           self.csv_test[
-                                                                               material_ID]).to_dataloader(
-                    self.batch_size, collector=self.collector)
+            for material_ID in self.get_material(self.materials, idx):
+                data = Generate_data_from_csv(self.csv_train[material_ID], self.csv_test[material_ID])
+                if (self.reset_Ts):
+                    data.reset_Ts(self.reset_Ts)
+                if (self.reset_Ps):
+                    data.reset_Ps(self.reset_Ps)
+
+                train_dataloader, test_dataloader = data.to_dataloader(self.batch_size, collector=self.collector)
                 D_train_data.append(train_dataloader)
                 D_test_data.append(test_dataloader)
                 material_IDs.append(material_ID)
@@ -852,10 +716,10 @@ class mixture_generater:
 
         elif self.return_type == "separate":
 
-            for material_ID in self.get_material(self.materials,idx):
-                X_train, y_train, X_test, y_test = Generate_data_from_csv(self.csv_train[material_ID],
-                                                                          self.csv_test[material_ID]).to_numpy(
-                    collector=self.collector)
+            for material_ID in self.get_material(self.materials, idx):
+                data = Generate_data_from_csv(self.csv_train[material_ID], self.csv_test[material_ID])
+
+                X_train, y_train, X_test, y_test = data.to_numpy(collector=self.collector)
                 X_train_list.append(X_train)
                 y_train_list.append(y_train)
                 X_test_list.append(X_test)
@@ -864,6 +728,24 @@ class mixture_generater:
             print("data_size", len(X_train_list))
             return np.concatenate(X_train_list, axis=0), np.concatenate(y_train_list, axis=0), np.concatenate(
                 X_test_list, axis=0), np.concatenate(y_test_list, axis=0), material_IDs
+
+        elif self.return_type == "test":
+
+            for material_ID in self.get_material(self.materials, idx):
+                data = Generate_data_from_csv(self.csv_train[material_ID], self.csv_test[material_ID])
+
+                if (self.reset_Ts):
+                    data.reset_Ts(self.reset_Ts)
+                if (self.reset_Ps):
+                    data.reset_Ps(self.reset_Ps)
+
+                X_test, y_test = data.to_numpy_test_only(collector=self.collector)
+                X_test_list.append(X_test)
+                y_test_list.append(y_test)
+                material_IDs.append(material_ID)
+            print("data_size", len(X_train_list))
+            return np.concatenate(X_test_list, axis=0), np.concatenate(y_test_list, axis=0), material_IDs
+
 
         else:
             print(
@@ -880,12 +762,18 @@ class mixture_generater:
         self.collector.set_output_type(method)
 
     def set_return_type(self, return_type):
-        assert return_type in ["Dataloader", "separate"]
+        assert return_type in ["Dataloader", "separate", "test"]
         self.return_type = return_type
 
     def set_batch_size(self, batch_size):
         assert batch_size > 0
         self.batch_size = batch_size
+
+    def set_Ps(self, Ps):
+        self.reset_Ps = Ps
+
+    def set_Ts(self, Ts):
+        self.reset_Ts = Ts
 
     @property
     def get_return_type(self):

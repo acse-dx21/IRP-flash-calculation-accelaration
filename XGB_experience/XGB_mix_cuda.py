@@ -10,9 +10,9 @@ import time
 import os
 from xgboost import XGBRegressor
 
-data_set_index = [0,2,3,3]
+data_set_index = [0,]
 mix_index="all"
-device = "cpu"
+device = "cuda"
 data_root = "." + os.sep + "mini_cleaned_data" + os.sep
 save_model=False
 save_data=True
@@ -92,7 +92,41 @@ from sklearn.metrics import mean_squared_error
 
 data_record = {"trainning_time_consume(s)": [], "test_time_consume(s)": []}
 
+def normalization(ypred,drop_rata=None):
+    result = []
+    divide = 2
+    data = pd.DataFrame(ypred)
+    data2 = pd.DataFrame(ypred)
 
+    data[data.columns[0]] = data[data.columns[0]] + data[data.columns[1]]
+    data[data.columns[1]] = data[data.columns[0]]
+
+    data[data.columns[2]] = data[data.columns[2]] + data[data.columns[3]]
+    data[data.columns[3]] = data[data.columns[2]]
+
+    data[data.columns[4]] = data[data.columns[4]] + data[data.columns[5]]
+    data[data.columns[5]] = data[data.columns[4]]
+    # data2=data2.where(data>0.55,0)
+    data2.loc[data2[4] > 1, [4, 5]] = [1, 0]
+    data2.loc[data2[4] < 0, [4, 5]] = [0, 1]
+    data2.loc[data2[5] > 1, [4, 5]] = [0, 1]
+    data2.loc[data2[5] < 0, [4, 5]] = [1, 0]
+
+    data2 = data2.where(data2 < 1, 1)
+    data2 = data2.where(data2 > 0, 0)
+
+    # data2.loc[data[0] < drop_rata, [0,1,4,5]] =[0,0,0,1]
+    # data2.loc[data[2] < drop_rata, [2,3,4,5]] =[0,0,1,0]
+
+    data2.loc[(data2[4] == 0) | (data2[5] == 1), [0, 1]] = 0
+    data2.loc[(data2[5] == 0) | (data2[4] == 1), [2, 3]] = 0
+    data2 = data2.to_numpy()
+    #
+    # return np.concatenate([normalize(data2[:, :divide].view(), norm='l1'),
+    #                 normalize(data2[:, divide:2 * divide].view(), norm='l1'),
+    #                 normalize(data2[:, 2 * divide:].view(), norm='l1')], axis=1)
+
+    return data2
 
 
 
@@ -114,8 +148,10 @@ def grid_i(X_train, y_train):
     grid_search.fit(X_train, y_train)
     print("Run time = ", time.time() - start)
     return grid_search
+
 from sklearn.model_selection import KFold
 import numpy as np
+
 def model_cv(**kwargs):
     subsample = kwargs["subsample"] if "subsample" in kwargs.keys() else 0.5
     learning_rate = kwargs["learning_rate"] if "learning_rate" in kwargs.keys() else 0.05
@@ -130,17 +166,19 @@ def model_cv(**kwargs):
 
     X = np.concatenate([X_train, X_test])
     y = np.concatenate([y_train, y_test])
-    print("totalsize", X.shape)
+    print("totalsize",X.shape)
     kf = KFold(n_splits=4, shuffle=True, random_state=12346)
     for train_index, test_index in kf.split(X):
         print("train_size", train_index.shape, "test_size", test_index.shape)
         model_instance = XGBRegressor(
+            tree_method="gpu_hist",
             subsample=subsample,
             learning_rate=learning_rate,  # float
             n_estimators=int(n_estimators),
             max_depth=int(max_depth),
             colsample_bytree=colsample_bytree,
             reg_lambda=reg_lambda,
+            predictor="gpu_predictor",
             n_jobs=1
         )
         start_train = time.time()
@@ -151,7 +189,7 @@ def model_cv(**kwargs):
         test_time.append(time.time() - start_pred)
 
         MSE_loss.append(mean_squared_error(pred, y[test_index]))
-    loss = np.mean(MSE_loss)
+    loss=np.mean(MSE_loss)
     if save_model:
         model_instance.save_model(model_save_path + get_related_path(Material_ID).replace(".csv", ""))
 
@@ -180,7 +218,6 @@ def run_bayes_optimize(num_of_iteration=10, data_index=2):
     )
 
     rf_bo.maximize(n_iter=num_of_iteration)
-
     result_data_root = "." + os.sep + "BO_result_data" + os.sep
     routing_data_root = "." + os.sep + "BO_training_routing" + os.sep
     pd.DataFrame(data_record)
@@ -242,4 +279,4 @@ if __name__ == "__main__":
         # relate_data.set_collector(collector)
         relate_data.set_batch_size(128)
         relate_data.set_collector("VF")
-        run_bayes_optimize(1, 2)
+        run_bayes_optimize(10, 2)

@@ -8,9 +8,9 @@ import itertools
 from sklearn.model_selection import GridSearchCV
 import time
 import os
-from xgboost import XGBRegressor
-
-data_set_index = [0,2,3,3]
+from catboost import CatBoostRegressor
+from sklearn.multioutput import MultiOutputRegressor
+data_set_index = [1,2,3,3]
 mix_index="all"
 device = "cpu"
 data_root = "." + os.sep + "mini_cleaned_data" + os.sep
@@ -114,8 +114,7 @@ def grid_i(X_train, y_train):
     grid_search.fit(X_train, y_train)
     print("Run time = ", time.time() - start)
     return grid_search
-from sklearn.model_selection import KFold
-import numpy as np
+
 def model_cv(**kwargs):
     subsample = kwargs["subsample"] if "subsample" in kwargs.keys() else 0.5
     learning_rate = kwargs["learning_rate"] if "learning_rate" in kwargs.keys() else 0.05
@@ -123,43 +122,24 @@ def model_cv(**kwargs):
     max_depth = kwargs["min_samples_split"] if "min_samples_split" in kwargs.keys() else 12
     colsample_bytree = kwargs["colsample_bytree"] if "colsample_bytree" in kwargs.keys() else 0.8
     reg_lambda = kwargs["reg_lambda"] if "reg_lambda" in kwargs.keys() else 15
+    start_train = time.time()
+    model_instance = MultiOutputRegressor(CatBoostRegressor(iterations=2,
+                          depth=2,
+                          learning_rate=1,
+                          loss_function='RMSE')).fit(X_train, y_train)
 
-    train_time = []
-    test_time = []
-    MSE_loss = []
-
-    X = np.concatenate([X_train, X_test])
-    y = np.concatenate([y_train, y_test])
-    print("totalsize", X.shape)
-    kf = KFold(n_splits=4, shuffle=True, random_state=12346)
-    for train_index, test_index in kf.split(X):
-        print("train_size", train_index.shape, "test_size", test_index.shape)
-        model_instance = XGBRegressor(
-            subsample=subsample,
-            learning_rate=learning_rate,  # float
-            n_estimators=int(n_estimators),
-            max_depth=int(max_depth),
-            colsample_bytree=colsample_bytree,
-            reg_lambda=reg_lambda,
-            n_jobs=1
-        )
-        start_train = time.time()
-        model_instance.fit(X[train_index], y[train_index])
-        train_time.append(time.time() - start_train)
-        start_pred = time.time()
-        pred = model_instance.predict(X[test_index])
-        test_time.append(time.time() - start_pred)
-
-        MSE_loss.append(mean_squared_error(pred, y[test_index]))
-    loss = np.mean(MSE_loss)
+    train_time = time.time() - start_train
     if save_model:
-        model_instance.save_model(model_save_path + get_related_path(Material_ID).replace(".csv", ""))
+        model_instance.save_model(model_save_path+get_related_path(Material_ID).replace(".csv",".json"))
+    start_pred = time.time()
+    pred = model_instance.predict(X_test)
+    test_time = time.time() - start_pred
+    print("test time",test_time)
 
-    print("test_time", test_time)
-    data_record["trainning_time_consume(s)"].append(np.mean(train_time))
-    data_record["test_time_consume(s)"].append(np.mean(test_time))
+    data_record["trainning_time_consume(s)"].append(train_time)
+    data_record["test_time_consume(s)"].append(test_time)
 
-    return -loss
+    return -mean_squared_error(pred, y_test)
 
 
 def run_bayes_optimize(num_of_iteration=10, data_index=2):
@@ -242,4 +222,4 @@ if __name__ == "__main__":
         # relate_data.set_collector(collector)
         relate_data.set_batch_size(128)
         relate_data.set_collector("VF")
-        run_bayes_optimize(1, 2)
+        run_bayes_optimize(10, 2)

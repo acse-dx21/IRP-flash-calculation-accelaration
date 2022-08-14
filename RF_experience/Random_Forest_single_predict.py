@@ -1,5 +1,5 @@
 import sys
-
+import numpy as np
 sys.path.append("..")
 from data import generate_data
 import pandas as pd
@@ -8,26 +8,21 @@ import itertools
 from sklearn.model_selection import GridSearchCV
 import time
 import os
-from model import ArtificialNN
-import torch.optim as optim
-import numpy as np
 
-data_set_index = [0, 1, 2, 3, 4, 5]
-mix_index = "all"
-device = "cuda"
+from sklearn.ensemble import RandomForestRegressor
+data_set_index = [0]
+mix_index="all"
+device = "cpu"
 data_root = "." + os.sep + "mini_cleaned_data" + os.sep
-save_model = False
-save_data = True
-from torch.optim.lr_scheduler import ReduceLROnPlateau
-
-
+save_model=True
+save_data=True
 def get_related_path(Material_ID):
     print(Material_ID)
     print(type(Material_ID))
-    if isinstance(Material_ID, list):
-        return "mix_" + str(len(Material_ID[0])) + os.sep + "mixture.csv"
+    if isinstance(Material_ID,list):
+        return "mix_"+str(len(Material_ID[0]))+os.sep+"mixture.csv"
     else:
-        return "mix_" + str(len(Material_ID)) + os.sep + str(Material_ID) + ".csv"
+        return "mix_"+str(len(Material_ID))+os.sep+str(Material_ID)+".csv"
     print("func:get_related_path  problem")
     raise RuntimeError
 
@@ -38,18 +33,17 @@ def get_range(mix_index):
     :param mix_index: "all" or int range from 1-7
     :return:
     """
-    if (mix_index == "all"):
-        return 0, 127
-    assert mix_index > 0
-    start = 0
-    end = comb(7, 1)
+    if(mix_index=="all"):
+        return 0,127
+    assert mix_index>0
+    start=0
+    end=comb(7,1)
 
-    for i in range(1, mix_index):
-        start += comb(7, i)
-        end += comb(7, i + 1)
+    for i in range(1,mix_index):
+        start+=comb(7,i)
+        end+=comb(7,i+1)
 
-    return int(start), int(end)
-
+    return int(start),int(end)
 
 param_grid = [
     # try combinations of hyperparameters
@@ -61,90 +55,93 @@ param_grid = [
      'reg_lambda': [10]}
 ]
 
+
+def grid_i(X_train, y_train):
+    # train across 3 folds
+    grid_search = GridSearchCV(RandomForestRegressor(objective='reg:squarederror', n_jobs=3, random_state=42),
+                               param_grid,
+                               cv=3,
+                               scoring='neg_mean_squared_error',
+                               return_train_score=True,
+                               verbose=1,
+                               n_jobs=2)
+
+    start = time.time()
+    grid_search.fit(X_train, y_train)
+    print("Run time = ", time.time() - start)
+    return grid_search
+
+
+# @Misc{,
+#     author = {Fernando Nogueira},
+#     title = {{Bayesian Optimization}: Open source constrained global optimization tool for {Python}},
+#     year = {2014--},
+#     url = " https://github.com/fmfn/BayesianOptimization"
+# }
+# import os
+#
+# data_path = ".." + os.sep + "cleaned_data" + os.sep
+# result_path = "." + os.sep + "result_data" + os.sep
+#
+#
+
 from bayes_opt import BayesianOptimization
 from sklearn.metrics import mean_squared_error
 
 #
 
-data_record = {"trainning_time_consume(s)": [], "test_time_consume(s)": [],"epochs":[]}
+data_record = { "test_time_consume(s)": []}
+
+
+
+
 
 import argparse
 # print(a)
 from mpi4py import MPI
 
-import tensorflow as tf
-
-
-
-
-from sklearn.model_selection import KFold
-import numpy as np
 
 
 def model_cv(**kwargs):
-    kwargs["inner_feature_dim"] = int(kwargs["inner_feature_dim"])
-    kwargs["out_feature_dim"] = int(kwargs["out_feature_dim"])
-    kwargs["n_step"] = int(kwargs["n_step"])
-    kwargs["n_total"] = int(kwargs["n_total"])
-    kwargs["n_shared"] = int(kwargs["n_shared"])
 
-    kwargs["input_dim"] = X_train.shape[-1]
-    kwargs["output_dim"] = y_train.shape[-1]
-    epochs=150
-
-    model_instance = ArtificialNN.Neural_Model_Sklearn_style(ArtificialNN.my_tabnet, kwargs)
-    model_instance.set_device(device)
     start_train = time.time()
-    train_time = []
-    test_time = []
-    MSE_loss = []
+    model_instance = RandomForestRegressor(
+        n_estimators=int(kwargs['n_estimators']),
 
-    X = np.concatenate([X_train, X_test])
-    y = np.concatenate([y_train, y_test])
-    print("totalsize", X.shape)
-    kf = KFold(n_splits=4, shuffle=True, random_state=12346)
-    for train_index, test_index in kf.split(X):
-        print("train_size", train_index.shape, "test_size", test_index.shape)
-        model_instance = ArtificialNN.Neural_Model_Sklearn_style(ArtificialNN.my_tabnet, kwargs)
-        start_train = time.time()
-        model_instance.fit(X[train_index], y[train_index])
-        train_time.append(time.time() - start_train)
+        min_samples_split= int(kwargs['min_samples_split']),
+    min_impurity_decrease=kwargs['min_impurity_decrease'],
+    max_depth=int(kwargs['max_depth'])
+    ).fit(X_train, y_train)
+    train_time = time.time() - start_train
+
+    for i in range(100):
         start_pred = time.time()
-        pred = model_instance.predict(X[test_index])
-        test_time.append(time.time() - start_pred)
+        pred = model_instance.predict([X_test[i, :]])
+        test_time = time.time() - start_pred
 
-        MSE_loss.append(mean_squared_error(pred, y[test_index]))
-    loss = np.mean(MSE_loss)
-    if save_model:
-        model_instance.save_model(model_save_path + get_related_path(Material_ID).replace(".csv", ""))
+        data_record["test_time_consume(s)"].append(test_time)
+    # data_record["epochs"].append(epochs)
 
-    print("loss", MSE_loss)
-    data_record["trainning_time_consume(s)"].append(np.mean(train_time))
-    data_record["test_time_consume(s)"].append(np.mean(test_time))
-
-    return -loss
+    return -1
 
 
 def run_bayes_optimize(num_of_iteration=10, data_index=2):
     BO_root = "." + os.sep + "BO_result_data" + os.sep
     global X_train, y_train, X_test, y_test, Material_ID
     X_train, y_train, X_test, y_test, Material_ID = relate_data[data_index]
-
-    print(model_save_path + get_related_path(Material_ID).replace(".csv", ".json"))
+    print("train_size",X_train.shape,"test_size",X_test.shape)
+    print(model_save_path+get_related_path(Material_ID).replace(".csv",".json"))
 
     rf_bo = BayesianOptimization(
         model_cv,
-        {
-            "inner_feature_dim": [50, 400],
-            "out_feature_dim": [100, 200],
-            "n_total": [4, 8],
-            "n_shared": [2, 3],
-            "n_step": [2, 5]
-        }
+        {"n_estimators":[5,300],
+         'min_samples_split': [10, 100],
+         'min_impurity_decrease': [0, 0.1],
+         'max_depth': [3, 50]}
+
     )
 
     rf_bo.maximize(n_iter=num_of_iteration)
-    # save data
     result_data_root = "." + os.sep + "BO_result_data" + os.sep
     routing_data_root = "." + os.sep + "BO_training_routing" + os.sep
     pd.DataFrame(data_record)
@@ -174,9 +171,7 @@ def run_bayes_optimize(num_of_iteration=10, data_index=2):
             f = open(saved_root + routing_data_root + get_related_path(Material_ID), "a+")
             f.write(f"# {device}")
             f.close()
-    data_record["trainning_time_consume(s)"].clear()
     data_record["test_time_consume(s)"].clear()
-    data_record["epochs"].clear()
 
 def run_Grid_search(num_of_iteration):
     print(num_of_iteration)
@@ -187,17 +182,19 @@ if __name__ == "__main__":
     rank = comm.Get_rank()
     size = comm.Get_size()
 
-    start, end = get_range(mix_index)
 
-    product_index = list(itertools.product(data_set_index, list(range(start, end))))
+    start,end = get_range(mix_index)
 
+    product_index = list(itertools.product(data_set_index, list(range(start,end))))
+    print(product_index)
+    print("total size",len(product_index))
     for index in range(rank, len(data_set_index), size):
-        data_index = data_set_index[index]
+        data_index=data_set_index[index]
         print(data_index)
 
-        model_save_path = "." + os.sep + "saved_model" + os.sep + "mini_dataset_mixture" + os.sep + f"mini_data_{data_index}" + os.sep
-        mini_data_path = ".." + os.sep + "data" + os.sep + data_root + f"mini_data_{data_index}" + os.sep
-        saved_root = "." + os.sep + "mini_cleaned_data_mixture_" + device + os.sep + f"mini_data_{data_index}" + os.sep
+        model_save_path="."+os.sep+"saved_model"+os.sep+"mini_dataset_mixture"+os.sep+f"mini_data_{data_index}"+ os.sep
+        mini_data_path = ".." + os.sep + "data" + os.sep + data_root+ f"mini_data_{data_index}" + os.sep
+        saved_root = "." + os.sep + "mini_cleaned_data_mixture_" + device + os.sep + f"single_predict" + os.sep
         All_ID = ['Methane', 'Ethane', 'Propane', 'N-Butane', 'N-Pentane', 'N-Hexane', 'Heptane']
         relate_data = generate_data.mixture_generater(mini_data_path)
         # collector=generate_data.collector()
@@ -205,4 +202,4 @@ if __name__ == "__main__":
         # relate_data.set_collector(collector)
         relate_data.set_batch_size(128)
         relate_data.set_collector("VF")
-        run_bayes_optimize(1, 2)
+        run_bayes_optimize(3, 2)

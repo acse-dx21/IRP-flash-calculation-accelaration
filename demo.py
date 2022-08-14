@@ -26,7 +26,8 @@ import csv
 
 
 #
-All_ID = ['Methane','Ethane', 'Propane', 'N-Butane','N-Pentane', 'N-Hexane', 'Heptane']
+All_ID = ['Methane','Ethane', 'Propane', 'N-Butane','N-Pentane', 'N-Hexane', 'Heptane','water', 'hexane','toluene','ethanol', 'methanol','toluene','m-xylene','ethanol', 'isopropanol']
+print("All_IDs",len(All_ID))
 # ID=['Ethane']
 # constants, properties = ChemicalConstantsPackage.from_IDs(ID)
 #
@@ -103,24 +104,41 @@ def f(ID):
     i=len(ID)
     print((ID))
     num=0
-    root_path = "."+os.sep+"data"+os.sep+"mini_cleaned_data_equal"+os.sep +"mini_data_"+str(num) + os.sep + "mix_" + str(i) + os.sep
+    root_path = "."+os.sep+"data"+os.sep+"mini_cleaned_data"+os.sep +"mini_data_multi_mix" + os.sep + "mix_"+str(i)+ os.sep
 
     constants, properties = ChemicalConstantsPackage.from_IDs(ID)
-    generate_data.generate_good_TPZ(100,constants, properties,root_path+str(ID)+"_test",comment=str(ID))
-    generate_data.generate_good_TPZ(300, constants, properties, root_path + str(ID) + "_train", comment=str(ID))
+    generate_data.generate_good_TPZ(1000,constants, properties,root_path+str(ID)+"_test",comment=str(ID))
+    generate_data.generate_good_TPZ(3000, constants, properties, root_path + str(ID) + "_train", comment=str(ID))
 
     return 0
 
+# open(".\\data\\mini_cleaned_data\\mini_data_multi_mix\\mix_7\\('Methane', 'Ethane', 'Propane', 'N-Butane', 'N-Pentane', 'N-Hexane', 'Heptane', 'water', 'hexane', 'toluene', 'ethanol', 'methanol', 'toluene', 'm-xylene')_test.csv")
+# print(os.listdir(".\\data\\mini_cleaned_data\\mini_data_multi_mix\\mix_14"))
 IDs=[]
 if __name__ == '__main__':
     comm=MPI.COMM_WORLD
     rank=comm.Get_rank()
 
     size=comm.Get_size()
-    #
-    for i in range(1,8):
-        for com in combinations(All_ID,i):
-            IDs.append(com)
+
+    # cnt = 0
+    # for com in combinations(All_ID, 2):
+    #     IDs.append(com)
+    #     cnt += 1
+    #     if (cnt == 10): break
+
+    cnt2=0
+    for com in combinations(All_ID,6):
+        IDs.append(com)
+        cnt2+=1
+
+        if(cnt2==10):break
+
+    # cnt3=0
+    # for com in combinations(All_ID,12):
+    #     IDs.append(com)
+    #     cnt3 += 1
+    #     if (cnt3 == 10): break
     for i in range(rank,len(IDs),size):
         f(IDs[i])
 

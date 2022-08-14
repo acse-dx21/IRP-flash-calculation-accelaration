@@ -75,11 +75,31 @@ from mpi4py import MPI
 import tensorflow as tf
 
 
+def prepare_tf_dataset(
+        X,
+        batch_size,
+        y=None,
+        shuffle=False,
+        drop_remainder=False,
+):
+    size_of_dataset = len(X)
+    if y is not None:
+        y = tf.one_hot(y.astype(int), 2)
+        ds = tf.data.Dataset.from_tensor_slices((np.array(X.astype(np.float32)), y))
+    else:
+        ds = tf.data.Dataset.from_tensor_slices(np.array(X.astype(np.float32)))
+    if shuffle:
+        ds = ds.shuffle(buffer_size=size_of_dataset)
+    ds = ds.batch(batch_size, drop_remainder=drop_remainder)
 
+    autotune = tf.data.experimental.AUTOTUNE
+    ds = ds.prefetch(autotune)
+    return ds
 
-from sklearn.model_selection import KFold
-import numpy as np
-
+num=20
+temp = 500
+pressure = 30*100000
+row_data = [list(np.linspace(0.5, 1, num) * temp), np.linspace(0.2, 1, num) * pressure]
 
 def model_cv(**kwargs):
     kwargs["inner_feature_dim"] = int(kwargs["inner_feature_dim"])
@@ -90,39 +110,30 @@ def model_cv(**kwargs):
 
     kwargs["input_dim"] = X_train.shape[-1]
     kwargs["output_dim"] = y_train.shape[-1]
-    epochs=150
+    epochs=10
 
     model_instance = ArtificialNN.Neural_Model_Sklearn_style(ArtificialNN.my_tabnet, kwargs)
     model_instance.set_device(device)
     start_train = time.time()
-    train_time = []
-    test_time = []
-    MSE_loss = []
 
-    X = np.concatenate([X_train, X_test])
-    y = np.concatenate([y_train, y_test])
-    print("totalsize", X.shape)
-    kf = KFold(n_splits=4, shuffle=True, random_state=12346)
-    for train_index, test_index in kf.split(X):
-        print("train_size", train_index.shape, "test_size", test_index.shape)
-        model_instance = ArtificialNN.Neural_Model_Sklearn_style(ArtificialNN.my_tabnet, kwargs)
-        start_train = time.time()
-        model_instance.fit(X[train_index], y[train_index])
-        train_time.append(time.time() - start_train)
-        start_pred = time.time()
-        pred = model_instance.predict(X[test_index])
-        test_time.append(time.time() - start_pred)
+    model_instance.fit(X_train, y_train, epoch=epochs)
 
-        MSE_loss.append(mean_squared_error(pred, y[test_index]))
-    loss = np.mean(MSE_loss)
+    train_time = time.time() - start_train
+
+    print("first_pred",model_instance.score(X_test, y_test))
+    conti_pred = model_instance.continues_predict(relate_data, row_data[0], row_data[1])
+    print("success")
+    exit(0)
     if save_model:
-        model_instance.save_model(model_save_path + get_related_path(Material_ID).replace(".csv", ""))
+        model_instance.save_model(model_save_path + get_related_path(Material_ID).replace(".csv", ".json"))
+    start_pred = time.time()
+    pred = model_instance.predict(X_test)
+    test_time = time.time() - start_pred
 
-    print("loss", MSE_loss)
-    data_record["trainning_time_consume(s)"].append(np.mean(train_time))
-    data_record["test_time_consume(s)"].append(np.mean(test_time))
-
-    return -loss
+    data_record["trainning_time_consume(s)"].append(train_time)
+    data_record["test_time_consume(s)"].append(test_time)
+    data_record["epochs"].append(epochs)
+    return -mean_squared_error(pred, y_test)
 
 
 def run_bayes_optimize(num_of_iteration=10, data_index=2):

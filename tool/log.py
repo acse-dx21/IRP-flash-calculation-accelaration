@@ -13,7 +13,7 @@ class log:
         self.cnt+=1
 
     def release(self,comment="No comment"):
-        self.csv.to_csv(self.name+".csv")
+        self.csv.to_csv(self.name+".csv",mode="a")
         self.add(comment)
 
     def add(self,content):

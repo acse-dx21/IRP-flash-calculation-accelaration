@@ -10,12 +10,13 @@ import time
 import os
 from xgboost import XGBRegressor
 
-data_set_index = [0,5]
+data_set_index = [0]
 mix_index="all"
 device = "cuda"
 data_root = "." + os.sep + "mini_cleaned_data" + os.sep
-save_model=False
+save_model=True
 save_data=True
+
 def get_related_path(Material_ID):
     print(Material_ID)
     print(type(Material_ID))
@@ -90,7 +91,7 @@ from sklearn.metrics import mean_squared_error
 
 #
 
-data_record = {"trainning_time_consume(s)": [], "test_time_consume(s)": []}
+data_record = {"test_time_consume(s)": []}
 
 
 
@@ -138,23 +139,26 @@ def model_cv(**kwargs):
     train_time = time.time() - start_train
     if save_model:
         model_instance.save_model(model_save_path+get_related_path(Material_ID).replace(".csv",".json"))
-    start_pred = time.time()
-    pred = model_instance.predict(np.array([X_test[0,:]]))
-    test_time = time.time() - start_pred
-    print("test time",test_time)
-    exit(0)
+    for i in range(100):
+        start_pred = time.time()
+        pred = model_instance.predict([X_test[i, :]])
+        test_time = time.time() - start_pred
 
-    data_record["trainning_time_consume(s)"].append(train_time)
+        data_record["test_time_consume(s)"].append(test_time)
+    print("test time",test_time)
+
+
+
     data_record["test_time_consume(s)"].append(test_time)
 
-    return -mean_squared_error(pred, y_test)
+    return -1
 
 
 def run_bayes_optimize(num_of_iteration=10, data_index=2):
     BO_root = "." + os.sep + "BO_result_data" + os.sep
     global X_train, y_train, X_test, y_test, Material_ID
     X_train, y_train, X_test, y_test, Material_ID = relate_data[data_index]
-
+    print("train_size",X_train.shape,"test_size",X_test.shape)
     print(model_save_path+get_related_path(Material_ID).replace(".csv",".json"))
 
     rf_bo = BayesianOptimization(
@@ -167,16 +171,37 @@ def run_bayes_optimize(num_of_iteration=10, data_index=2):
          'reg_lambda': [10, 30]}
     )
 
-    rf_bo.maximize(n_iter=num_of_iteration)
+    rf_bo.maximize(n_iter=num_of_iteration,init_points=1)
     result_data_root = "." + os.sep + "BO_result_data" + os.sep
     routing_data_root = "." + os.sep + "BO_training_routing" + os.sep
     pd.DataFrame(data_record)
     routing_data_root + get_related_path(Material_ID)
     if save_data:
-        pd.DataFrame(data_record).to_csv(saved_root + routing_data_root + get_related_path(Material_ID))
-        pd.DataFrame(rf_bo.res).to_csv(saved_root + result_data_root + get_related_path(Material_ID))
+        if os.path.exists(saved_root + result_data_root + get_related_path(Material_ID)):
+            pd.concat([pd.DataFrame(rf_bo.res),
+                       pd.read_csv(saved_root + result_data_root + get_related_path(Material_ID), index_col=0,
+                                   comment="#")], ignore_index=True).to_csv(
+                saved_root + result_data_root + get_related_path(Material_ID))
+            f = open(saved_root + result_data_root + get_related_path(Material_ID), "a+")
+            f.write(f"# {device}")
+            f.close()
+            pd.concat([pd.DataFrame(data_record),
+                       pd.read_csv(saved_root + routing_data_root + get_related_path(Material_ID), index_col=0,
+                                   comment="#")], ignore_index=True).to_csv(
+                saved_root + routing_data_root + get_related_path(Material_ID))
+            f = open(saved_root + routing_data_root + get_related_path(Material_ID), "a+")
+            f.write(f"# {device}")
+            f.close()
+        else:
+            pd.DataFrame(rf_bo.res).to_csv(saved_root + result_data_root + get_related_path(Material_ID))
+            f = open(saved_root + result_data_root + get_related_path(Material_ID), "a+")
+            f.write(f"# {device}")
+            f.close()
+            pd.DataFrame(data_record).to_csv(saved_root + routing_data_root + get_related_path(Material_ID))
+            f = open(saved_root + routing_data_root + get_related_path(Material_ID), "a+")
+            f.write(f"# {device}")
+            f.close()
 
-    data_record["trainning_time_consume(s)"].clear()
     data_record["test_time_consume(s)"].clear()
 
 def run_Grid_search(num_of_iteration):
@@ -200,7 +225,7 @@ if __name__ == "__main__":
 
         model_save_path="."+os.sep+"saved_model"+os.sep+"mini_dataset_mixture"+os.sep+f"mini_data_{data_index}"+ os.sep
         mini_data_path = ".." + os.sep + "data" + os.sep + data_root+ f"mini_data_{data_index}" + os.sep
-        saved_root = "."+os.sep+"mini_cleaned_data_mixture_"+device+os.sep+ f"mini_data_{data_index}" + os.sep
+        saved_root = "."+os.sep+"mini_cleaned_data_mixture_"+device+os.sep+ "single_predict" + os.sep
         All_ID = ['Methane', 'Ethane', 'Propane', 'N-Butane', 'N-Pentane', 'N-Hexane', 'Heptane']
         relate_data = generate_data.mixture_generater(mini_data_path)
         # collector=generate_data.collector()
@@ -208,4 +233,4 @@ if __name__ == "__main__":
         # relate_data.set_collector(collector)
         relate_data.set_batch_size(128)
         relate_data.set_collector("VF")
-        run_bayes_optimize(10, 2)
+        run_bayes_optimize(1, 2)

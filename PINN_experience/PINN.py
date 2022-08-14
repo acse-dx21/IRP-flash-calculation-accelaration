@@ -12,25 +12,16 @@ from my_test import test_data_set
 from thermo import ChemicalConstantsPackage, CEOSGas, CEOSLiquid, SRKMIX, FlashVLN, PropertyCorrelationsPackage, \
     HeatCapacityGas
 from torch.utils.data import DataLoader
-from model.loss_function import My_Mass_Balance_loss
+from model.my_loss_function import My_Mass_Balance_loss_modified
 from model import ArtificialNN
 import pandas as pd
 import numpy as np
-data_num=5
-mini_data_path=".."+os.sep+"data"+os.sep+f"mini_cleaned_data_{data_num}"+os.sep
-saved_root="."+os.sep+f"mini_data_{data_num}"+os.sep
-All_ID = ['Methane', 'Ethane', 'Propane', 'N-Butane', 'N-Pentane', 'N-Hexane', 'Heptane']
-relate_data = generate_data.multicsv_data_generater()
-print(len(relate_data))
-X_train = 0
-y_train = 0
-X_test = 0
-y_test = 0
-Material_ID = 0
-
-start_time=[]
-train_time=[]
-test_time=[]
+data_set_index = [0]
+mix_index = "all"
+device = "cuda"
+data_root = "." + os.sep + "mini_cleaned_data" + os.sep
+save_model = False
+save_data = False
 
 param_grid = [
     {'subsample': [0.2, 0.6, 1.0],
@@ -85,16 +76,16 @@ def model_cv(**kwargs):
     model_kwargs = {}
     model_kwargs["Nodes_per_layer"] = 300
     model_kwargs["deepth"] = 3
-    model_kwargs["material"] = Material_ID
+    model_kwargs["material"] = Material_ID[0]
     model_instance = ArtificialNN.Neural_Model_Sklearn_style(ArtificialNN.simple_ANN, model_kwargs
                                                              )
 
-    PINN_loss = My_Mass_Balance_loss(kwargs["My_Mass_Balance_loss"],1)
+    PINN_loss = My_Mass_Balance_loss_modified(kwargs["My_Mass_Balance_loss"],1)
 
 
 
     start_train = time.time()
-    model_instance.fit(X_train, y_train, epoch=30, criterion=PINN_loss)
+    model_instance.fit(X_train, y_train, epoch=25, my_criterion=PINN_loss)
     train_time = time.time() - start_train
 
     score = model_instance.score(X_test, y_test)
@@ -103,12 +94,9 @@ def model_cv(**kwargs):
     model_instance.predict(X_test)
     test_time = time.time() - start_pred
 
+
     data_record["trainning_time_consume(s)"].append(train_time)
     data_record["test_time_consume(s)"].append(test_time)
-
-    epoch_root = "." + os.sep + "BO_epoch_routing" + os.sep
-    pd.DataFrame(model_instance.data_record).to_csv(epoch_root + get_related_path(Material_ID))
-
 
     return -score
 
@@ -131,7 +119,35 @@ def run_bayes_optimize(num_of_iteration=1, data_index=10):
 
     rf_bo.maximize(n_iter=num_of_iteration)
     # pd.DataFrame(rf_bo.res).to_csv(dataset+BO_result_data + get_related_path(Material_ID))
-    pd.DataFrame(data_record).to_csv(dataset+BO_training_routing + get_related_path(Material_ID))
+    result_data_root = "." + os.sep + "BO_result_data" + os.sep
+    routing_data_root = "." + os.sep + "BO_training_routing" + os.sep
+    pd.DataFrame(data_record)
+    routing_data_root + get_related_path(Material_ID)
+    if save_data:
+        if os.path.exists(saved_root + result_data_root + get_related_path(Material_ID)):
+            pd.concat([pd.DataFrame(rf_bo.res),
+                       pd.read_csv(saved_root + result_data_root + get_related_path(Material_ID), index_col=0,
+                                   comment="#")], ignore_index=True).to_csv(
+                saved_root + result_data_root + get_related_path(Material_ID))
+            f = open(saved_root + result_data_root + get_related_path(Material_ID), "a+")
+            f.write(f"# {device}")
+            f.close()
+            pd.concat([pd.DataFrame(data_record),
+                       pd.read_csv(saved_root + routing_data_root + get_related_path(Material_ID), index_col=0,
+                                   comment="#")], ignore_index=True).to_csv(
+                saved_root + routing_data_root + get_related_path(Material_ID))
+            f = open(saved_root + routing_data_root + get_related_path(Material_ID), "a+")
+            f.write(f"# {device}")
+            f.close()
+        else:
+            pd.DataFrame(rf_bo.res).to_csv(saved_root + result_data_root + get_related_path(Material_ID))
+            f = open(saved_root + result_data_root + get_related_path(Material_ID), "a+")
+            f.write(f"# {device}")
+            f.close()
+            pd.DataFrame(data_record).to_csv(saved_root + routing_data_root + get_related_path(Material_ID))
+            f = open(saved_root + routing_data_root + get_related_path(Material_ID), "a+")
+            f.write(f"# {device}")
+            f.close()
     data_record["trainning_time_consume(s)"].clear()
     data_record["test_time_consume(s)"].clear()
 
@@ -212,9 +228,24 @@ if __name__ == "__main__":
     rank = comm.Get_rank()
     size = comm.Get_size()
 
-    for i in range(rank, 127, size):
-        run_grid_search(i)
-#
+
+
+    for index in range(rank, len(data_set_index), size):
+        data_index = data_set_index[index]
+        print(data_index)
+
+        model_save_path = "." + os.sep + "saved_model" + os.sep + "mini_dataset_mixture" + os.sep + f"mini_data_{data_index}" + os.sep
+        mini_data_path = ".." + os.sep + "data" + os.sep + data_root + f"mini_data_{data_index}" + os.sep
+        saved_root = "." + os.sep + "mini_cleaned_data_mixture_"+device + os.sep + f"mini_data_{data_index}" + os.sep
+        All_ID = ['Methane', 'Ethane', 'Propane', 'N-Butane', 'N-Pentane', 'N-Hexane', 'Heptane']
+        relate_data = generate_data.mixture_generater(mini_data_path)
+        # collector=generate_data.collector()
+        # collector.set_collect_method("VF")
+        # relate_data.set_collector(collector)
+        relate_data.set_batch_size(128)
+        relate_data.set_collector("VF")
+        run_bayes_optimize(100, 2)
+
 #     all_data = generate_data.multicsv_data_generater(data_path, return_type="Dataloader")
 #
 #     for i in range(len(all_data) - rank - 1, -1, -size):
