@@ -1,0 +1,4 @@
+,target,params
+0,-1.0,"{'colsample_bytree': 0.9828706014280619, 'learning_rate': 0.05058749432326063, 'max_depth': 6.843477431662363, 'n_estimators': 354.18941321711674, 'reg_lambda': 17.83002226270127, 'subsample': 0.4469787707118422}"
+1,-1.0,"{'colsample_bytree': 0.9263501760179167, 'learning_rate': 0.050145277062355983, 'max_depth': 3.654617837207583, 'n_estimators': 321.3213929452208, 'reg_lambda': 21.056833553394064, 'subsample': 0.49220382463236423}"
+# cpu

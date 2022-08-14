@@ -1,0 +1,4 @@
+,target,params
+0,-1.0,"{'colsample_bytree': 0.7693994702012993, 'learning_rate': 0.05234825543507454, 'max_depth': 7.82422906127652, 'n_estimators': 473.3791641561753, 'reg_lambda': 24.304450277272544, 'subsample': 0.40219514055472233}"
+1,-1.0,"{'colsample_bytree': 0.7235181077220844, 'learning_rate': 0.0735712571583691, 'max_depth': 9.949012511948112, 'n_estimators': 397.94173894148275, 'reg_lambda': 15.833263312042432, 'subsample': 0.28540212124754333}"
+# cuda
