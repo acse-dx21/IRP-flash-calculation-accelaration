@@ -27,50 +27,6 @@ def get_related_path(Material_ID):
     raise RuntimeError
 
 
-def get_range(mix_index):
-    """
-    use to fine target mixture
-    :param mix_index: "all" or int range from 1-7
-    :return:
-    """
-    if(mix_index=="all"):
-        return 0,127
-    assert mix_index>0
-    start=0
-    end=comb(7,1)
-
-    for i in range(1,mix_index):
-        start+=comb(7,i)
-        end+=comb(7,i+1)
-
-    return int(start),int(end)
-
-param_grid = [
-    # try combinations of hyperparameters
-    {'subsample': [0.2, 0.6, 1.0],
-     'learning_rate': [0.01, 0.05, 0.1],
-     'n_estimators': [300, 400, 500],
-     'max_depth': [3, 5, 10],
-     'colsample_bytree': [0.6],
-     'reg_lambda': [10]}
-]
-
-
-def grid_i(X_train, y_train):
-    # train across 3 folds
-    grid_search = GridSearchCV(RandomForestRegressor(objective='reg:squarederror', n_jobs=3, random_state=42),
-                               param_grid,
-                               cv=3,
-                               scoring='neg_mean_squared_error',
-                               return_train_score=True,
-                               verbose=1,
-                               n_jobs=2)
-
-    start = time.time()
-    grid_search.fit(X_train, y_train)
-    print("Run time = ", time.time() - start)
-    return grid_search
-
 
 # @Misc{,
 #     author = {Fernando Nogueira},
@@ -139,13 +95,14 @@ def model_cv(**kwargs):
     data_record["test_time_consume(s)"].append(np.mean(test_time))
 
     return -loss
+from sklearn.model_selection import train_test_split
 
 def run_bayes_optimize(num_of_iteration=10, data_index=2):
     BO_root = "." + os.sep + "BO_result_data" + os.sep
-    global X_train, y_train, X_test, y_test, Material_ID
+    global X_train, y_train,X_val, y_val, X_test, y_test, Material_ID
     X_train, y_train, X_test, y_test, Material_ID = relate_data[data_index]
-    print("train_size",X_train.shape,"test_size",X_test.shape)
-    print(model_save_path+get_related_path(Material_ID).replace(".csv",".json"))
+
+    X_train, X_val, y_train, y_val = train_test_split(X_train, y_train, test_size=0.25, random_state=4)
 
     rf_bo = BayesianOptimization(
         model_cv,
@@ -198,12 +155,6 @@ if __name__ == "__main__":
     rank = comm.Get_rank()
     size = comm.Get_size()
 
-
-    start,end = get_range(mix_index)
-
-    product_index = list(itertools.product(data_set_index, list(range(start,end))))
-    print(product_index)
-    print("total size",len(product_index))
     for index in range(rank, len(data_set_index), size):
         data_index=data_set_index[index]
         print(data_index)

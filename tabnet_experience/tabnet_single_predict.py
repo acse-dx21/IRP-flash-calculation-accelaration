@@ -13,7 +13,7 @@ import torch.optim as optim
 
 data_set_index = [0]
 mix_index = "all"
-device = "cpu"
+device = "cuda"
 data_root = "." + os.sep + "mini_cleaned_data" + os.sep
 save_model = True
 save_data = True
@@ -131,6 +131,7 @@ def model_cv(**kwargs):
 
     model_instance = TabNetRegressor()
     model_instance.load_model(".\\saved_model\\mini_dataset_mixture_cuda\\mini_data_0\\mix_2\\mixture.zip")
+
     print(model_instance)
 
     for i in range(100):
@@ -143,13 +144,20 @@ def model_cv(**kwargs):
 
     return -1
 
+from sklearn.model_selection import train_test_split
 
+import sklearn
 def run_bayes_optimize(num_of_iteration=10, data_index=2):
     BO_root = "." + os.sep + "BO_result_data" + os.sep
-    global X_train, y_train, X_test, y_test, Material_ID
+    global X_train, y_train, X_val, y_val, X_test, y_test, Material_ID
     X_train, y_train, X_test, y_test, Material_ID = relate_data[data_index]
+    preprocess = sklearn.preprocessing.StandardScaler().fit(X_train)
 
-    print(model_save_path + get_related_path(Material_ID).replace(".csv", ".json"))
+    print(X_test)
+    X_train = preprocess.transform(X_train)
+    X_test = preprocess.transform(X_test)
+    print(X_test)
+    X_train, X_val, y_train, y_val = train_test_split(X_train, y_train, test_size=0.25, random_state=4)
 
     rf_bo = BayesianOptimization(
         model_cv,

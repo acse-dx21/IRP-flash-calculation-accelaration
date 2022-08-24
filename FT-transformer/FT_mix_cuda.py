@@ -22,11 +22,10 @@ import torch.nn as nn
 import numpy as np
 import torch.nn.functional as F
 import zero
-data_set_index = [3]
+data_set_index = [0,1,2,3]
 mix_index = "all"
 device = "cuda"
 data_root = "." + os.sep + "mini_cleaned_data" + os.sep
-save_model = True
 save_data = True
 from torch.optim.lr_scheduler import ReduceLROnPlateau
 task_type = 'regression'
@@ -41,51 +40,6 @@ def get_related_path(Material_ID):
     print("func:get_related_path  problem")
     raise RuntimeError
 
-
-def get_range(mix_index):
-    """
-    use to fine target mixture
-    :param mix_index: "all" or int range from 1-7
-    :return:
-    """
-    if (mix_index == "all"):
-        return 0, 127
-    assert mix_index > 0
-    start = 0
-    end = comb(7, 1)
-
-    for i in range(1, mix_index):
-        start += comb(7, i)
-        end += comb(7, i + 1)
-
-    return int(start), int(end)
-
-
-param_grid = [
-    # try combinations of hyperparameters
-    {'subsample': [0.2, 0.6, 1.0],
-     'learning_rate': [0.01, 0.05, 0.1],
-     'n_estimators': [300, 400, 500],
-     'max_depth': [3, 5, 10],
-     'colsample_bytree': [0.6],
-     'reg_lambda': [10]}
-]
-
-
-def grid_i(X_train, y_train):
-    # train across 3 folds
-    grid_search = GridSearchCV(TabNetRegressor(objective='reg:squarederror', n_jobs=3, random_state=42),
-                               param_grid,
-                               cv=3,
-                               scoring='neg_mean_squared_error',
-                               return_train_score=True,
-                               verbose=1,
-                               n_jobs=2)
-
-    start = time.time()
-    grid_search.fit(X_train, y_train)
-    print("Run time = ", time.time() - start)
-    return grid_search
 
 
 # @Misc{,
@@ -106,64 +60,62 @@ from sklearn.metrics import mean_squared_error
 
 #
 
-data_record = {"trainning_time_consume(s)": [], "test_time_consume(s)": []}
+data_record = {"trainning_time_consume(s)": [], "test_time_consume(s)": [],"epochs":[]}
 
 import argparse
 # print(a)
 from mpi4py import MPI
 
 
-def grid_i(X_train, y_train):
-    grid_search = GridSearchCV(TabNetRegressor(objective='reg:squarederror', n_jobs=1, random_state=42),
-                               param_grid,
-                               cv=3,
-                               scoring='neg_mean_squared_error',
-                               return_train_score=True,
-                               verbose=1,
-                               n_jobs=2)
-
-    start = time.time()
-    grid_search.fit(X_train, y_train)
-    print("Run time = ", time.time() - start)
-    return grid_search
-
-
 def model_cv(**kwargs):
+    start=time.time()
+    n_block = kwargs["n_blocks"]
+
+    ffn_d_hidden = kwargs["ffn_d_hidden"]
+    attention_dropout = kwargs["attention_dropout"]  # 0.2,
+    ffn_dropout = kwargs["ffn_dropout"]  # 0.1,
+    residual_dropout = kwargs["residual_dropout"]
+
     X = {}
     y = {}
-    n_epochs = 200
-    X['train'], X['val'], y['train'], y['val'] = sklearn.model_selection.train_test_split(
-        X_train, y_train, train_size=0.8
-    )
-    X['test']= X_test
-    y['test']=y_test
+    max_epochs = 1000
+    patience=100
+    X['train'], X['val'], y['train'], y['val'] = X_train, X_val, y_train, y_val
+    X['test'],y['test']= X_test,y_test
 
+    print("train_shape",X['train'].shape,"val_shape",X['val'].shape)
+    checkpoint_path = model_save_path + get_related_path(Material_ID).replace(".csv", ".pt")
     # not the best way to preprocess features, but enough for the demonstration
-    preprocess = sklearn.preprocessing.StandardScaler().fit(X['train'])
+
     X = {
-        k: torch.tensor(preprocess.fit_transform(v), device=device)
+        k: torch.tensor(v, device=device)
         for k, v in X.items()
     }
     y = {k: torch.tensor(v, device=device) for k, v in y.items()}
 
     # !!! CRUCIAL for neural networks when solving regression problems !!!
-    if task_type == 'regression':
-        y_mean = y['train'].mean().item()
-        y_std = y['train'].std().item()
-        y = {k: (v - y_mean) / y_std for k, v in y.items()}
-    else:
-        y_std = y_mean = None
+    # if task_type == 'regression':
+    #     y_mean = y['train'].mean().item()
+    #     y_std = y['train'].std().item()
+    #     y = {k: (v - y_mean) / y_std for k, v in y.items()}
+    # else:
+    #     y_std = y_mean = None
 
     if task_type != 'multiclass':
         y = {k: v.float() for k, v in y.items()}
 
 
-    model =rtdl.FTTransformer.make_default(
-    n_num_features=10,
-    cat_cardinalities=None,
-    last_layer_query_idx=[-1],  # it makes the model faster and does NOT affect its output
-    d_out=6,
-)
+    model =rtdl.FTTransformer.make_baseline(
+        n_num_features=X_train.shape[1],
+        cat_cardinalities=None,
+        last_layer_query_idx=[-1],
+        d_token=192,  # 192,
+        n_blocks=int(n_block),  # 3,
+        ffn_d_hidden=int(ffn_d_hidden),
+        attention_dropout=attention_dropout,  # 0.2,
+        ffn_dropout=ffn_dropout,  # 0.1,
+        residual_dropout=residual_dropout,
+        d_out=y_train.shape[1])
     model.to(device)
     optimizer = (
         model.make_default_optimizer()
@@ -191,37 +143,33 @@ def model_cv(**kwargs):
             )
 
     @torch.no_grad()
-    def evaluate(part):
+    def evaluate(X, y):
+
         model.eval()
         prediction = []
-        for batch in zero.iter_batches(X[part], 1024):
-            prediction.append(apply_model(batch))
+        for batch in zero.iter_batches(X, 1024):
+            # batch.to(device)
+            prediction.append(model(batch, None))
         prediction = torch.cat(prediction).squeeze(1).cpu().numpy()
-        target = y[part].cpu().numpy()
+        target = y.cpu().numpy()
 
-        if task_type == 'binclass':
-            prediction = np.round(scipy.special.expit(prediction))
-            score = sklearn.metrics.accuracy_score(target, prediction)
-        elif task_type == 'multiclass':
-            prediction = prediction.argmax(1)
-            score = sklearn.metrics.accuracy_score(target, prediction)
-        else:
-            assert task_type == 'regression'
-            score = sklearn.metrics.mean_squared_error(target, prediction)
+        score = sklearn.metrics.mean_squared_error(target, prediction)
+
         return score
 
-    batch_size = 256
+    batch_size = 1024
     train_loader = zero.data.IndexLoader(len(X['train']), batch_size, device=device)
 
     # Create a progress tracker for early stopping
     # Docs: https://yura52.github.io/zero/reference/api/zero.ProgressTracker.html
 
-    progress = zero.ProgressTracker(patience=100)
+    progress = zero.ProgressTracker(patience=patience)
     start_train = time.time()
 
     report_frequency = len(X['train']) // batch_size // 5
     start_train = time.time()
-    for epoch in range(1, n_epochs + 1):
+
+    for epoch in range(1, max_epochs + 1):
         for iteration, batch_idx in enumerate(train_loader):
             model.train()
             optimizer.zero_grad()
@@ -233,38 +181,66 @@ def model_cv(**kwargs):
             if iteration % report_frequency == 0:
                 print(f'(epoch) {epoch} (batch) {iteration} (loss) {loss.item():.4f}')
 
-        val_score = evaluate('val')
-        test_score = evaluate('test')
-        print(f'Epoch {epoch:03d} | Validation score: {val_score:.4f} | Test score: {test_score:.4f}', end='')
-    train_time = time.time() - start_train
+        val_score = evaluate(X['val'], y['val'])
 
-    start_pred = time.time()
-    test_score = evaluate('test')
-    test_time = time.time() - start_pred
+        if epoch % 10 == 0:
+            test_score = evaluate(X['test'], y['test'])
+            print(
+                f'Epoch {epoch:03d} | Validation score: {val_score:.4f} | Test score: {test_score:.4f} | {time.time() - start:.1f}s',
+            )
+        progress.update(-val_score)
+        if progress.success:
+            torch.save({'epoch': epoch,
+                        'model_state_dict': model.state_dict(),
+                        'optimizer_state_dict': optimizer.state_dict(),
+                        'loss': loss, },
+                       checkpoint_path)
 
-    data_record["trainning_time_consume(s)"].append(train_time)
-    data_record["test_time_consume(s)"].append(test_time)
+        if progress.fail or epoch == max_epochs:
+            data_record["trainning_time_consume(s)"].append(time.time() - start_train)
+            checkpoint = torch.load(checkpoint_path)
+            model.load_state_dict(checkpoint['model_state_dict'])
+            optimizer.load_state_dict(checkpoint['optimizer_state_dict'])
+            epoch = checkpoint['epoch']
+            loss = checkpoint['loss']
+            val_score = evaluate(X['val'], y['val'])
+
+            start_test=time.time()
+            test_score = evaluate(X['test'], y['test'])
+            data_record["test_time_consume(s)"].append(time.time() - start_test)
+
+            print('Checkpoint recovered:')
+            print(
+                f'Epoch {epoch:03d} | Validation score: {val_score:.4f} | Test score: {test_score:.4f} | {time.time() - start:.1f}s',
+                end='')
+            break
+    data_record["epochs"].append(epoch)
+
     return -test_score
 
+from sklearn.model_selection import train_test_split
 
 def run_bayes_optimize(num_of_iteration=10, data_index=2):
     BO_root = "." + os.sep + "BO_result_data" + os.sep
-    global X_train, y_train, X_test, y_test, Material_ID
+    global X_train, y_train, X_val, y_val, X_test, y_test, Material_ID
     X_train, y_train, X_test, y_test, Material_ID = relate_data[data_index]
-    print(X_train.shape)
-    print(model_save_path + get_related_path(Material_ID).replace(".csv", ".json"))
+    preprocess = sklearn.preprocessing.StandardScaler().fit(X_train)
+
+    X_train = preprocess.transform(X_train)
+    print(X_train)
+    X_test = preprocess.transform(X_test)
+
+    X_train, X_val, y_train, y_val = train_test_split(X_train, y_train, test_size=0.25, random_state=4)
 
     rf_bo = BayesianOptimization(
         model_cv,
         {
-            "n_d": [32, 128],
-            "n_a":[32,512],
-            "n_steps":[1,5],
-            "gamma":[0.5,2],
-            "lambda_sparse":[0.1,1],
-            "n_independent":[1.5,4.5],
-            "n_shared":[0.5,2.5]
-
+            "d_token": [128, 256],
+            "n_blocks": [2, 5],
+            "ffn_d_hidden": [200, 400],
+            "attention_dropout": [0.1, 0.4],  # 0.2,
+            "ffn_dropout": [0.01, 0.2],  # 0.1,
+            "residual_dropout": [0.00, 0.05]
         }
     )
 
@@ -273,8 +249,7 @@ def run_bayes_optimize(num_of_iteration=10, data_index=2):
     #save data
     result_data_root = "." + os.sep + "BO_result_data" + os.sep
     routing_data_root = "." + os.sep + "BO_training_routing" + os.sep
-    pd.DataFrame(data_record)
-    routing_data_root + get_related_path(Material_ID)
+
     if save_data:
         if os.path.exists(saved_root + result_data_root + get_related_path(Material_ID)):
             pd.concat([pd.DataFrame(rf_bo.res),pd.read_csv(saved_root + result_data_root + get_related_path(Material_ID),index_col=0,comment="#")],ignore_index=True).to_csv(saved_root + result_data_root + get_related_path(Material_ID))
@@ -299,7 +274,7 @@ def run_bayes_optimize(num_of_iteration=10, data_index=2):
             f.close()
     data_record["trainning_time_consume(s)"].clear()
     data_record["test_time_consume(s)"].clear()
-
+    data_record["epochs"].clear()
 
 def run_Grid_search(num_of_iteration):
     print(num_of_iteration)
@@ -310,16 +285,11 @@ if __name__ == "__main__":
     rank = comm.Get_rank()
     size = comm.Get_size()
 
-    start, end = get_range(mix_index)
-
-    product_index = list(itertools.product(data_set_index, list(range(start, end))))
-    print(product_index)
-    print("total size", len(product_index))
     for index in range(rank, len(data_set_index), size):
         data_index = data_set_index[index]
         print(data_index)
 
-        model_save_path = "." + os.sep + "saved_model" + os.sep + "mini_dataset_mixture" + os.sep + f"mini_data_{data_index}" + os.sep
+        model_save_path = "." + os.sep + "saved_model" + os.sep + "mini_dataset_mixture_"+device + os.sep + f"mini_data_{data_index}" + os.sep
         mini_data_path = ".." + os.sep + "data" + os.sep + data_root + f"mini_data_{data_index}" + os.sep
         saved_root = "." + os.sep + "mini_cleaned_data_mixture_"+device + os.sep + f"mini_data_{data_index}" + os.sep
         All_ID = ['Methane', 'Ethane', 'Propane', 'N-Butane', 'N-Pentane', 'N-Hexane', 'Heptane']
@@ -329,4 +299,4 @@ if __name__ == "__main__":
         # relate_data.set_collector(collector)
         relate_data.set_batch_size(128)
         relate_data.set_collector("VF")
-        run_bayes_optimize(1, 2)
+        run_bayes_optimize(5, 2)

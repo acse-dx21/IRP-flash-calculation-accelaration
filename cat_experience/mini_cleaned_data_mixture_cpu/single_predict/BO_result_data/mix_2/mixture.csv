@@ -1,0 +1,12 @@
+,target,params
+0,-1.0,"{'bagging_temperature': 0.2793682529223036, 'depth': 6.183756163485953, 'l2_leaf_reg': 3.645113287224468, 'leaf_estimation_iterations': 3.384468473152566, 'learning_rate': 0.34062716297717066}"
+1,-1.0,"{'bagging_temperature': 0.12063299300325925, 'depth': 5.618142522847144, 'l2_leaf_reg': 6.878575225538438, 'leaf_estimation_iterations': 19.058395954791617, 'learning_rate': 0.4521404970960881}"
+2,-1.0,"{'bagging_temperature': 0.46333271208206306, 'depth': 14.639649641597396, 'l2_leaf_reg': 8.730218500821994, 'leaf_estimation_iterations': 16.757736867742103, 'learning_rate': 0.13486683803266084}"
+3,-1.0,"{'bagging_temperature': 0.3975754618428815, 'depth': 4.231209199411509, 'l2_leaf_reg': 5.778940373416444, 'leaf_estimation_iterations': 4.454158530033096, 'learning_rate': 0.4056327295880582}"
+4,-1.0,"{'bagging_temperature': 0.48022374220434694, 'depth': 11.7241663533041, 'l2_leaf_reg': 7.856201455117957, 'leaf_estimation_iterations': 4.659129933914576, 'learning_rate': 0.20149326176246257}"
+5,-1.0,"{'bagging_temperature': 0.21709075934706268, 'depth': 5.674146733203305, 'l2_leaf_reg': 3.39510175368192, 'leaf_estimation_iterations': 13.368116731402177, 'learning_rate': 0.3573638005820778}"
+6,-1.0,"{'bagging_temperature': 0.4818797249489062, 'depth': 11.653917733666752, 'l2_leaf_reg': 4.589014768167209, 'leaf_estimation_iterations': 11.711768545457893, 'learning_rate': 0.3032139584723953}"
+7,-1.0,"{'bagging_temperature': 0.14894172073254472, 'depth': 8.078844263103779, 'l2_leaf_reg': 1.2069334454528537, 'leaf_estimation_iterations': 4.307957475421173, 'learning_rate': 0.1283225518949494}"
+8,-1.0,"{'bagging_temperature': 0.27495997125760707, 'depth': 15.190735830542376, 'l2_leaf_reg': 6.017513638502141, 'leaf_estimation_iterations': 9.1093617957784, 'learning_rate': 0.26785275855404217}"
+9,-1.0,"{'bagging_temperature': 0.3723833772423869, 'depth': 2.0853447847714466, 'l2_leaf_reg': 9.3278933539703, 'leaf_estimation_iterations': 19.75879596604865, 'learning_rate': 0.1810118199500716}"
+# cpu

@@ -4,26 +4,51 @@ sys.path.append("..")
 from data import generate_data
 import pandas as pd
 from mpi4py import MPI
-
+import itertools
 from sklearn.model_selection import GridSearchCV
 import time
 import os
-from xgboost import XGBRegressor
-data_size=3000
-data_num = 2
-mini_data_path = ".." + os.sep + "data" + os.sep + f"mini_cleaned_data_{data_num}" + os.sep
-saved_root = "." + os.sep + f"mini_data_{data_num}" + os.sep
-All_ID = ['Methane', 'Ethane', 'Propane', 'N-Butane', 'N-Pentane', 'N-Hexane', 'Heptane']
-# saved_root="."+os.sep+"complete_dataset"+os.sep  #for complete dataset
-relate_data = generate_data.multicsv_data_generater()
-# relate_data = generate_data.multicsv_data_generater()
-model_save_path = "." + os.sep + "saved_model" + os.sep+f"mini_dataset_{data_num}"+os.sep
-save = True
-X_train = 0
-y_train = 0
-X_test = 0
-y_test = 0
-material_ID = 0
+from pytorch_tabnet.tab_model import TabNetRegressor
+import torch.optim as optim
+
+data_set_index = [0,1,2, 3]
+mix_index = "all"
+device = "cuda"
+data_root = "." + os.sep + "mini_cleaned_data" + os.sep
+save_model = False
+save_data = False
+from torch.optim.lr_scheduler import ReduceLROnPlateau
+
+
+def get_related_path(Material_ID):
+    print(Material_ID)
+    print(type(Material_ID))
+    if isinstance(Material_ID, list):
+        return "mix_" + str(len(Material_ID[0])) + os.sep + "mixture.csv"
+    else:
+        return "mix_" + str(len(Material_ID)) + os.sep + str(Material_ID) + ".csv"
+    print("func:get_related_path  problem")
+    raise RuntimeError
+
+
+def get_range(mix_index):
+    """
+    use to fine target mixture
+    :param mix_index: "all" or int range from 1-7
+    :return:
+    """
+    if (mix_index == "all"):
+        return 0, 127
+    assert mix_index > 0
+    start = 0
+    end = comb(7, 1)
+
+    for i in range(1, mix_index):
+        start += comb(7, i)
+        end += comb(7, i + 1)
+
+    return int(start), int(end)
+
 
 param_grid = [
     # try combinations of hyperparameters
@@ -38,7 +63,7 @@ param_grid = [
 
 def grid_i(X_train, y_train):
     # train across 3 folds
-    grid_search = GridSearchCV(XGBRegressor(objective='reg:squarederror', n_jobs=3, random_state=42),
+    grid_search = GridSearchCV(TabNetRegressor(objective='reg:squarederror', n_jobs=3, random_state=42),
                                param_grid,
                                cv=3,
                                scoring='neg_mean_squared_error',
@@ -70,30 +95,7 @@ from sklearn.metrics import mean_squared_error
 
 #
 
-time_record = {"load_time_consume(s)": [], "test_time_consume(s)": [],"data_size":[]}
-result_record = {"loss_dataset_1": [], "loss_dataset_2": [],"data_size":[]}
-
-def model_cv(X_train, y_train, X_test, y_test,model_path):
-    print(data_size, X_train.shape)
-    start_train = time.time()
-    model_instance = XGBRegressor()
-    model_instance.load_model(model_path)
-    train_time = time.time() - start_train
-
-    start_pred = time.time()
-    pred = model_instance.predict(X_train)
-    test_time = time.time() - start_pred
-
-    time_record["load_time_consume(s)"].append(train_time)
-    time_record["test_time_consume(s)"].append(test_time)
-    time_record["data_size"].append(data_size)
-
-    result_record["loss_dataset_1"].append(-mean_squared_error(pred, y_train))
-    result_record["loss_dataset_2"].append(-mean_squared_error(model_instance.predict(X_test), y_test))
-    result_record["data_size"].append(data_size)
-
-
-
+data_record = {"trainning_time_consume(s)": [], "test_time_consume(s)": [], "epochs": []}
 
 import argparse
 # print(a)
@@ -101,7 +103,7 @@ from mpi4py import MPI
 
 
 def grid_i(X_train, y_train):
-    grid_search = GridSearchCV(XGBRegressor(objective='reg:squarederror', n_jobs=1, random_state=42),
+    grid_search = GridSearchCV(TabNetRegressor(objective='reg:squarederror', n_jobs=1, random_state=42),
                                param_grid,
                                cv=3,
                                scoring='neg_mean_squared_error',
@@ -115,34 +117,110 @@ def grid_i(X_train, y_train):
     return grid_search
 
 
-def get_related_path(Material_ID):
-    return "mix_" + str(len(Material_ID)) + os.sep + str(Material_ID) + ".csv"
+import sklearn
+from sklearn.model_selection import KFold
+import numpy as np
 
-def run_bayes_optimize(num_of_iteration=10, data_index=10):
 
-    global X_train, y_train, X_test, y_test, Material_ID,data_size
+def model_cv(**kwargs):
+    n_d = kwargs["n_d"] if "n_d" in kwargs.keys() else 64
+    n_a = kwargs["n_a"] if "n_a" in kwargs.keys() else 128
+    n_steps = kwargs["n_steps"] if "n_steps" in kwargs.keys() else 1
+    gamma = kwargs["gamma"] if "gamma" in kwargs.keys() else 1.3
+    lambda_sparse = kwargs["lambda_sparse"] if "lambda_sparse" in kwargs.keys() else 0
+    n_independent = kwargs["n_independent"] if "n_independent" in kwargs.keys() else 2
+    n_shared = kwargs["n_shared"] if "n_shared" in kwargs.keys() else 1
+    print(n_d)
+    train_time = []
+    test_time = []
+    MSE_loss = []
+
+
+    epochs = 1000
+
+    if True:
+        model_instance = TabNetRegressor()
+        model_instance.load_model(model_save_path + get_related_path(Material_ID).replace(".csv", ".zip"))
+        start_train = time.time()
+
+        train_time.append(time.time() - start_train)
+        start_pred = time.time()
+        pred = model_instance.predict(X_test)
+        test_time.append(time.time() - start_pred)
+        MSE_loss.append(mean_squared_error(pred, y_test))
+        print(MSE_loss[-1])
+
+    loss=np.mean(MSE_loss)
+    if save_model:
+        model_instance.save_model(model_save_path + get_related_path(Material_ID).replace(".csv", ""))
+
+    print("test_time", test_time)
+    data_record["trainning_time_consume(s)"].append(np.mean(train_time))
+    data_record["test_time_consume(s)"].append(np.mean(test_time))
+    data_record["epochs"].append(epochs)
+
+    return -loss
+
+from sklearn.model_selection import train_test_split
+
+def run_bayes_optimize(num_of_iteration=10, data_index=2):
+    BO_root = "." + os.sep + "BO_result_data" + os.sep
+    global X_train, y_train,X_val,y_val, X_test, y_test, Material_ID
     X_train, y_train, X_test, y_test, Material_ID = relate_data[data_index]
 
-    global model_save_path
+    X_train, X_val, y_train, y_val = train_test_split(X_train, y_train, test_size=0.25, random_state=4)
+    print("train_shape",X_train.shape,"val_shape",X_val.shape)
+    print(model_save_path + get_related_path(Material_ID).replace(".csv", ".json"))
 
-    model_path=model_save_path+get_related_path(Material_ID).replace(".csv",".json")
-    for data_size in range(3000,40000,1000):
-        print(data_size,X_train.shape)
-        print(time_record)
-        model_cv(X_train[:data_size], y_train[:data_size], X_test[:int(data_size/2)], y_test[:int(data_size/2)],model_path)
+    rf_bo = BayesianOptimization(
+        model_cv,
+        {
+            "n_d": [32, 128],
+            "n_a": [32, 512],
+            "n_steps": [1, 5],
+            "gamma": [0.5, 2],
+            "lambda_sparse": [0.1, 1],
+            "n_independent": [1.5, 4.5],
+            "n_shared": [0.5, 2.5]
 
-    result_data_root = "." + os.sep + "result_data" + os.sep
-    routing_data_root = "." + os.sep + "training_routing" + os.sep
+        }
+    )
 
-    if (save):
-        pd.DataFrame(time_record).to_csv(saved_root + routing_data_root + get_related_path(Material_ID))
-        pd.DataFrame(result_record).to_csv(saved_root + result_data_root + get_related_path(Material_ID))
-    time_record["load_time_consume(s)"].clear()
-    time_record["test_time_consume(s)"].clear()
-    time_record["data_size"].clear()
-    result_record["loss_dataset_1"].clear()
-    result_record["loss_dataset_2"].clear()
-    result_record["data_size"].clear()
+    rf_bo.maximize(init_points=5, n_iter=num_of_iteration)
+
+    # save data
+    result_data_root = "." + os.sep + "BO_result_data" + os.sep
+    routing_data_root = "." + os.sep + "BO_training_routing" + os.sep
+    pd.DataFrame(data_record)
+    routing_data_root + get_related_path(Material_ID)
+    if save_data:
+        if os.path.exists(saved_root + result_data_root + get_related_path(Material_ID)):
+            pd.concat([pd.DataFrame(rf_bo.res),
+                       pd.read_csv(saved_root + result_data_root + get_related_path(Material_ID), index_col=0,
+                                   comment="#")], ignore_index=True).to_csv(
+                saved_root + result_data_root + get_related_path(Material_ID))
+            f = open(saved_root + result_data_root + get_related_path(Material_ID), "a+")
+            f.write(f"# {device}")
+            f.close()
+            pd.concat([pd.DataFrame(data_record),
+                       pd.read_csv(saved_root + routing_data_root + get_related_path(Material_ID), index_col=0,
+                                   comment="#")], ignore_index=True).to_csv(
+                saved_root + routing_data_root + get_related_path(Material_ID))
+            f = open(saved_root + routing_data_root + get_related_path(Material_ID), "a+")
+            f.write(f"# {device}")
+            f.close()
+        else:
+            pd.DataFrame(rf_bo.res).to_csv(saved_root + result_data_root + get_related_path(Material_ID))
+            f = open(saved_root + result_data_root + get_related_path(Material_ID), "a+")
+            f.write(f"# {device}")
+            f.close()
+            pd.DataFrame(data_record).to_csv(saved_root + routing_data_root + get_related_path(Material_ID))
+            f = open(saved_root + routing_data_root + get_related_path(Material_ID), "a+")
+            f.write(f"# {device}")
+            f.close()
+    data_record["trainning_time_consume(s)"].clear()
+    data_record["test_time_consume(s)"].clear()
+    data_record["epochs"].clear()
 
 
 def run_Grid_search(num_of_iteration):
@@ -153,36 +231,24 @@ if __name__ == "__main__":
     comm = MPI.COMM_WORLD
     rank = comm.Get_rank()
     size = comm.Get_size()
-    stratigy = "BO"
 
-    parser = argparse.ArgumentParser(description='bayes optimazation(--BO) or grid_search(--GS) ')
-    parser.add_argument('--BO', type=int, help='Bayes optimize with number of iteration')
-    parser.add_argument('--GS', type=bool, help='type use')
+    start, end = get_range(mix_index)
 
-    args = parser.parse_args()
+    product_index = list(itertools.product(data_set_index, list(range(start, end))))
+    print(product_index)
+    print("total size", len(product_index))
+    for index in range(rank, len(data_set_index), size):
+        data_index = data_set_index[index]
+        print(data_index)
 
-    if args.BO is not None or stratigy == "BO":
-
-        for i in range(rank+92 , 127, size):
-            run_bayes_optimize(55, i)
-    # elif args.GS is not None or stratigy == "GS":
-    #     run_Grid_search(args.GS)
-
-    # all_data = generate_data.multicsv_data_generater(data_path)
-    #
-    # for i in range(len(all_data)-rank-1,-1,-size):
-    #
-    #
-    #     X_train, y_train, X_test, y_test, Material_ID = all_data[i]
-    #     print(Material_ID, check_IDexist(Material_ID, result_path))
-    #     print(Material_ID, check_IDexist(Material_ID, result_path))
-    #     if not check_IDexist(Material_ID, result_path):
-    #         Intermediate_path = "mix_" + str(len(Material_ID)) + os.sep
-    #         print(Material_ID)
-    #         grid_search_i = grid_i(X_train, y_train)
-    #
-    #         print(f"best parameters: {grid_search_i.best_params_}")
-    #         print(
-    #             f"best score:      {-grid_search_i.best_score_:0.5f} (+/-{grid_search_i.cv_results_['std_test_score'][grid_search_i.best_index_]:0.5f})")
-    #         results_dfi = pd.DataFrame(grid_search_i.cv_results_)
-    #         results_dfi.to_csv(result_path + Intermediate_path + str(Material_ID) + ".csv")
+        model_save_path = "." + os.sep + "saved_model" + os.sep + "mini_dataset_mixture_" + device + os.sep + f"mini_data_{data_index}" + os.sep
+        mini_data_path = ".." + os.sep + "data" + os.sep + data_root + f"mini_data_{data_index}" + os.sep
+        saved_root = "." + os.sep + "mini_cleaned_data_mixture_" + device + os.sep + f"mini_data_{data_index}" + os.sep
+        All_ID = ['Methane', 'Ethane', 'Propane', 'N-Butane', 'N-Pentane', 'N-Hexane', 'Heptane']
+        relate_data = generate_data.mixture_generater(mini_data_path)
+        # collector=generate_data.collector()
+        # collector.set_collect_method("VF")
+        # relate_data.set_collector(collector)
+        relate_data.set_batch_size(128)
+        relate_data.set_collector("VF")
+        run_bayes_optimize(1, 2)

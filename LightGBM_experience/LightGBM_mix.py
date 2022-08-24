@@ -11,7 +11,7 @@ import time
 import os
 import itertools
 from lightgbm import LGBMRegressor
-data_set_index = [0,1,2,3, 4, 5]
+data_set_index = [0,1,2,3]
 mix_index="all"
 device = "cpu"
 data_root = "." + os.sep + "mini_cleaned_data" + os.sep
@@ -31,67 +31,6 @@ def get_related_path(Material_ID):
     print("func:get_related_path  problem")
     raise RuntimeError
 
-
-def get_range(mix_index):
-    """
-    use to fine target mixture
-    :param mix_index: "all" or int range from 1-7
-    :return:
-    """
-    if(mix_index=="all"):
-        return 0,127
-    assert mix_index>0
-    start=0
-    end=comb(7,1)
-
-    for i in range(1,mix_index):
-        start+=comb(7,i)
-        end+=comb(7,i+1)
-
-    return int(start),int(end)
-
-param_grid = [
-    # try combinations of hyperparameters
-    {'subsample': [0.2, 0.6, 1.0],
-     'learning_rate': [0.01, 0.05, 0.1],
-     'n_estimators': [300, 400, 500],
-     'max_depth': [3, 5, 10],
-     'colsample_bytree': [0.6],
-     'reg_lambda': [10]}
-]
-
-
-def grid_i(X_train, y_train):
-    # train across 3 folds
-    grid_search = GridSearchCV(LGBMRegressor(objective='reg:squarederror', n_jobs=3, random_state=42),
-                               param_grid,
-                               cv=3,
-                               scoring='neg_mean_squared_error',
-                               return_train_score=True,
-                               verbose=1,
-                               n_jobs=2)
-
-    start = time.time()
-    grid_search.fit(X_train, y_train)
-    print("Run time = ", time.time() - start)
-    return grid_search
-
-
-
-
-# @Misc{,
-#     author = {Fernando Nogueira},
-#     title = {{Bayesian Optimization}: Open source constrained global optimization tool for {Python}},
-#     year = {2014--},
-#     url = " https://github.com/fmfn/BayesianOptimization"
-# }
-# import os
-#
-# data_path = ".." + os.sep + "cleaned_data" + os.sep
-# result_path = "." + os.sep + "result_data" + os.sep
-#
-#
-
 from bayes_opt import BayesianOptimization
 from sklearn.metrics import mean_squared_error
 #
@@ -108,17 +47,18 @@ def model_cv(**kwargs):
     colsample_bytree = kwargs["colsample_bytree"] if "colsample_bytree" in kwargs.keys() else 0.8
     reg_lambda = kwargs["reg_lambda"] if "reg_lambda" in kwargs.keys() else 15
 
+    lgbm_fit_params = {
+        'early_stopping_rounds': 100,
+        'eval_set': [(X_val, y_val)],
+    }
+
+    print("train_shape",X_train.shape,"val_shape",X_val.shape,"test_shape",X_test.shape)
     train_time = []
     test_time = []
     MSE_loss = []
-
-    X = np.concatenate([X_train, X_test])
-    y = np.concatenate([y_train, y_test])
-    print("totalsize", X.shape)
-    kf = KFold(n_splits=4, shuffle=True, random_state=12346)
-    for train_index, test_index in kf.split(X):
-        print("train_size", train_index.shape, "test_size", test_index.shape)
-        model_instance = MultiOutputRegressor(LGBMRegressor(
+    patience=100
+    if True:
+        model_instances = [LGBMRegressor(
             subsample=subsample,
             learning_rate=learning_rate, # float
             n_estimators=int(n_estimators),
@@ -126,18 +66,22 @@ def model_cv(**kwargs):
         colsample_bytree=colsample_bytree,
         reg_lambda=reg_lambda,
             n_jobs=1)
-        )
+         for i in range(y_val.shape[-1])]
         start_train = time.time()
-        model_instance.fit(X[train_index], y[train_index])
+
+        for i, model_instance in enumerate(model_instances):
+            model_instance.fit(X_train, y_train[...,i],None,early_stopping_rounds= 100,eval_set= [(X_val, y_val[...,i])],verbose=10)
+
         train_time.append(time.time() - start_train)
         start_pred = time.time()
-        pred = model_instance.predict(X[test_index])
+        pred = np.array([model_instance.predict(X_test) for model_instance in model_instances]).T
         test_time.append(time.time() - start_pred)
 
-        MSE_loss.append(mean_squared_error(pred, y[test_index]))
+        MSE_loss.append(mean_squared_error(pred, y_test))
     loss = np.mean(MSE_loss)
     if save_model:
-        model_instance.save_model(model_save_path + get_related_path(Material_ID).replace(".csv", ""))
+        for i, model_instance in enumerate(model_instances):
+            model_instance.save_model(model_save_path + get_related_path(Material_ID).replace(".csv", "")+str(i))
 
     print("test_time", test_time)
     data_record["trainning_time_consume(s)"].append(np.mean(train_time))
@@ -148,29 +92,24 @@ def model_cv(**kwargs):
 import argparse
 # print(a)
 from mpi4py import MPI
-
-
-
-
-def grid_i(X_train, y_train):
-    grid_search = GridSearchCV(model(objective='reg:squarederror', n_jobs=1, random_state=42),
-                               param_grid,
-                               cv=3,
-                               scoring='neg_mean_squared_error',
-                               return_train_score=True,
-                               verbose=1,
-                               n_jobs=2)
-
-    start = time.time()
-    grid_search.fit(X_train, y_train)
-    print("Run time = ", time.time() - start)
-    return grid_search
-
-
+from sklearn.model_selection import train_test_split
+import sklearn
 def run_bayes_optimize(num_of_iteration=10,data_index=10):
     BO_root="."+os.sep+"BO_result_data"+os.sep
-    global X_train, y_train, X_test, y_test, Material_ID
+
+    global X_train, y_train,X_val, y_val, X_test, y_test, Material_ID
     X_train, y_train, X_test, y_test, Material_ID = relate_data[data_index]
+
+    preprocess = sklearn.preprocessing.StandardScaler().fit(X_train)
+
+    X_train = preprocess.transform(X_train)
+    print(X_train)
+    X_test = preprocess.transform(X_test)
+
+
+    X_train, X_val, y_train, y_val = train_test_split(X_train, y_train, test_size=0.25, random_state=4)
+    print("train_shape",X_train.shape,"val_shape",X_val.shape)
+
     rf_bo = BayesianOptimization(
             model_cv,
         {'subsample': [0.2, 1.0],
@@ -221,12 +160,6 @@ if __name__ == "__main__":
     rank = comm.Get_rank()
     size = comm.Get_size()
 
-
-    start,end = get_range(mix_index)
-
-    product_index = list(itertools.product(data_set_index, list(range(start,end))))
-    print(product_index)
-    print("total size",len(product_index))
     for index in range(rank, len(data_set_index), size):
         data_index=data_set_index[index]
         print(data_index)

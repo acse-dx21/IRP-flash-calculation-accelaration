@@ -183,7 +183,6 @@ def model_cv(**kwargs):
         reg_lambda=reg_lambda,
         predictor="gpu_predictor",
         n_jobs=1
-
     ).fit(X_train, y_train)
 
     train_time = time.time() - start_train

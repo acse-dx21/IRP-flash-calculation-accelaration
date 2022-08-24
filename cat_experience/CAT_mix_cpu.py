@@ -8,13 +8,14 @@ import itertools
 from sklearn.model_selection import GridSearchCV
 import time
 import os
+from xgboost import XGBRegressor
 from catboost import CatBoostRegressor
 from sklearn.multioutput import MultiOutputRegressor
-data_set_index = [1,2,3,3]
+data_set_index = [0,1,2,3,]
 mix_index="all"
 device = "cpu"
 data_root = "." + os.sep + "mini_cleaned_data" + os.sep
-save_model=False
+save_model=True
 save_data=True
 def get_related_path(Material_ID):
     print(Material_ID)
@@ -56,34 +57,8 @@ param_grid = [
 ]
 
 
-def grid_i(X_train, y_train):
-    # train across 3 folds
-    grid_search = GridSearchCV(XGBRegressor(objective='reg:squarederror', n_jobs=3, random_state=42),
-                               param_grid,
-                               cv=3,
-                               scoring='neg_mean_squared_error',
-                               return_train_score=True,
-                               verbose=1,
-                               n_jobs=2)
-
-    start = time.time()
-    grid_search.fit(X_train, y_train)
-    print("Run time = ", time.time() - start)
-    return grid_search
 
 
-# @Misc{,
-#     author = {Fernando Nogueira},
-#     title = {{Bayesian Optimization}: Open source constrained global optimization tool for {Python}},
-#     year = {2014--},
-#     url = " https://github.com/fmfn/BayesianOptimization"
-# }
-# import os
-#
-# data_path = ".." + os.sep + "cleaned_data" + os.sep
-# result_path = "." + os.sep + "result_data" + os.sep
-#
-#
 
 from bayes_opt import BayesianOptimization
 from sklearn.metrics import mean_squared_error
@@ -108,59 +83,78 @@ def grid_i(X_train, y_train):
                                scoring='neg_mean_squared_error',
                                return_train_score=True,
                                verbose=1,
-                               n_jobs=2)
+                               n_jobs=2,task_type="GPU",)
 
     start = time.time()
     grid_search.fit(X_train, y_train)
     print("Run time = ", time.time() - start)
     return grid_search
-
+from sklearn.model_selection import KFold
+import numpy as np
 def model_cv(**kwargs):
-    subsample = kwargs["subsample"] if "subsample" in kwargs.keys() else 0.5
-    learning_rate = kwargs["learning_rate"] if "learning_rate" in kwargs.keys() else 0.05
-    n_estimators = kwargs["n_estimators"] if "n_estimators" in kwargs.keys() else 400
-    max_depth = kwargs["min_samples_split"] if "min_samples_split" in kwargs.keys() else 12
-    colsample_bytree = kwargs["colsample_bytree"] if "colsample_bytree" in kwargs.keys() else 0.8
-    reg_lambda = kwargs["reg_lambda"] if "reg_lambda" in kwargs.keys() else 15
-    start_train = time.time()
-    model_instance = MultiOutputRegressor(CatBoostRegressor(iterations=2,
-                          depth=2,
-                          learning_rate=1,
-                          loss_function='RMSE')).fit(X_train, y_train)
 
-    train_time = time.time() - start_train
+    train_time = []
+    test_time = []
+    MSE_loss = []
+    patience=100
+    max_iteration=1000
+    print("train_shape", X_train.shape, "val_shape", X_val.shape, "test_shape", X_test.shape)
+
+    if True:
+        model_instances = [CatBoostRegressor(iterations=max_iteration,
+                                             l2_leaf_reg=kwargs['l2_leaf_reg'],
+                                             depth=int(kwargs['depth']),
+                                             learning_rate=kwargs['learning_rate'],
+                                             bagging_temperature=kwargs['bagging_temperature'],
+                                             eval_metric='RMSE',
+                                             loss_function='RMSE', task_type="CPU",
+                                             leaf_estimation_iterations=int(kwargs['leaf_estimation_iterations'])) for i in range(y_val.shape[-1])]
+
+        start_train = time.time()
+        for i, model_instance in enumerate(model_instances):
+            model_instance.fit(X_train, y_train[..., i], early_stopping_rounds=100,
+                               eval_set=[(X_val, y_val[..., i])], verbose=10)
+
+        train_time.append(time.time() - start_train)
+        start_pred = time.time()
+        pred = np.array([model_instance.predict(X_test) for model_instance in model_instances]).T
+        test_time.append(time.time() - start_pred)
+
+        MSE_loss.append(mean_squared_error(pred, y_test))
+    loss = np.mean(MSE_loss)
     if save_model:
-        model_instance.save_model(model_save_path+get_related_path(Material_ID).replace(".csv",".json"))
-    start_pred = time.time()
-    pred = model_instance.predict(X_test)
-    test_time = time.time() - start_pred
-    print("test time",test_time)
+        for i, model_instance in enumerate(model_instances):
+            model_instance.save_model(model_save_path + get_related_path(Material_ID).replace(".csv", "") + str(i))
 
-    data_record["trainning_time_consume(s)"].append(train_time)
-    data_record["test_time_consume(s)"].append(test_time)
+    print("test_time", test_time)
+    data_record["trainning_time_consume(s)"].append(np.mean(train_time))
+    data_record["test_time_consume(s)"].append(np.mean(test_time))
 
-    return -mean_squared_error(pred, y_test)
+    return -loss
 
+
+
+from sklearn.model_selection import train_test_split
 
 def run_bayes_optimize(num_of_iteration=10, data_index=2):
     BO_root = "." + os.sep + "BO_result_data" + os.sep
-    global X_train, y_train, X_test, y_test, Material_ID
+    global X_train, y_train,X_val,y_val, X_test, y_test, Material_ID
     X_train, y_train, X_test, y_test, Material_ID = relate_data[data_index]
 
+    X_train, X_val, y_train, y_val = train_test_split(X_train, y_train, test_size=0.25, random_state=4)
+    print("train_size",X_train.shape,"test_size",X_test.shape)
     print(model_save_path+get_related_path(Material_ID).replace(".csv",".json"))
 
     rf_bo = BayesianOptimization(
         model_cv,
-        {'subsample': [0.2, 1.0],
-         'learning_rate': [0.01, 0.1],
-         'n_estimators': [300, 500],
-         'max_depth': [3, 10],
-         'colsample_bytree': [0.6, 0.99],
-         'reg_lambda': [10, 30]}
+        {   'l2_leaf_reg':[1,10],
+        "learning_rate": [0.05,0.5],
+        "depth":[2,16],
+         "bagging_temperature" : [0.1,0.5],
+        'leaf_estimation_iterations':[1,20]}
     )
 
-    rf_bo.maximize(n_iter=num_of_iteration)
-
+    rf_bo.maximize(init_points=5,n_iter=num_of_iteration)
     result_data_root = "." + os.sep + "BO_result_data" + os.sep
     routing_data_root = "." + os.sep + "BO_training_routing" + os.sep
     pd.DataFrame(data_record)
@@ -222,4 +216,4 @@ if __name__ == "__main__":
         # relate_data.set_collector(collector)
         relate_data.set_batch_size(128)
         relate_data.set_collector("VF")
-        run_bayes_optimize(10, 2)
+        run_bayes_optimize(5, 2)

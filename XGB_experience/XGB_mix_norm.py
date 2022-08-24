@@ -216,15 +216,21 @@ def model_cv(**kwargs):
     return -loss
 
 
-
+from sklearn.model_selection import train_test_split
+import sklearn
 def run_bayes_optimize(num_of_iteration=10, data_index=2):
     BO_root = "." + os.sep + "BO_result_data" + os.sep
-    global X_train, y_train, X_test, y_test, Material_ID
+    global X_train, y_train,X_val, y_val, X_test, y_test, Material_ID
     X_train, y_train, X_test, y_test, Material_ID = relate_data[data_index]
 
+    preprocess = sklearn.preprocessing.StandardScaler().fit(X_train)
+
+    X_train = preprocess.transform(X_train)
+    print(X_train)
+    X_test = preprocess.transform(X_test)
 
 
-
+    X_train, X_val, y_train, y_val = train_test_split(X_train, y_train, test_size=0.25, random_state=4)
 
     print(X_train.shape)
     print(y_train.shape)

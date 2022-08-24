@@ -11,7 +11,7 @@ import os
 from pytorch_tabnet.tab_model import TabNetRegressor
 import torch.optim as optim
 
-data_set_index = [0,2]
+data_set_index = [2]
 mix_index = "all"
 device = "cpu"
 data_root = "." + os.sep + "mini_cleaned_data" + os.sep
@@ -119,6 +119,8 @@ def grid_i(X_train, y_train):
 from sklearn.model_selection import KFold
 import numpy as np
 
+
+
 def model_cv(**kwargs):
     n_d = kwargs["n_d"] if "n_d" in kwargs.keys() else 64
     n_a = kwargs["n_a"] if "n_a" in kwargs.keys() else 128
@@ -141,6 +143,7 @@ def model_cv(**kwargs):
     y = np.concatenate([y_train, y_test])
     print("totalsize", X.shape)
     kf = KFold(n_splits=4, shuffle=True, random_state=12346)
+
     for train_index, test_index in kf.split(X):
         print("train_size", train_index.shape, "test_size", test_index.shape)
         model_instance = TabNetRegressor(
@@ -169,6 +172,9 @@ def model_cv(**kwargs):
         test_time.append(time.time() - start_pred)
 
         MSE_loss.append(mean_squared_error(pred, y[test_index]))
+
+        break
+
     loss = np.mean(MSE_loss)
     if save_model:
         model_instance.save_model(model_save_path + get_related_path(Material_ID).replace(".csv", ""))
@@ -176,6 +182,7 @@ def model_cv(**kwargs):
     print("test_time", test_time)
     data_record["trainning_time_consume(s)"].append(np.mean(train_time))
     data_record["test_time_consume(s)"].append(np.mean(test_time))
+    data_record["epochs"].append(epochs)
 
     return -loss
 
@@ -194,9 +201,6 @@ def run_bayes_optimize(num_of_iteration=10, data_index=2):
             "n_a":[32,512],
             "n_steps":[1,5],
             "gamma":[0.5,2],
-            "lambda_sparse":[0.1,1],
-            "n_independent":[1.5,4.5],
-            "n_shared":[0.5,2.5]
 
         }
     )

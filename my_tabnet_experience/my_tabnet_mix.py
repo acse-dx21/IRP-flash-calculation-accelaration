@@ -12,12 +12,12 @@ from model import ArtificialNN
 import torch.optim as optim
 import numpy as np
 
-data_set_index = [0, 1, 2, 3, 4, 5]
+data_set_index = [0]
 mix_index = "all"
 device = "cuda"
 data_root = "." + os.sep + "mini_cleaned_data" + os.sep
 save_model = False
-save_data = True
+save_data = False
 from torch.optim.lr_scheduler import ReduceLROnPlateau
 
 
@@ -90,31 +90,31 @@ def model_cv(**kwargs):
 
     kwargs["input_dim"] = X_train.shape[-1]
     kwargs["output_dim"] = y_train.shape[-1]
-    epochs=150
+    epochs=250
 
-    model_instance = ArtificialNN.Neural_Model_Sklearn_style(ArtificialNN.my_tabnet, kwargs)
-    model_instance.set_device(device)
+
     start_train = time.time()
     train_time = []
     test_time = []
     MSE_loss = []
 
-    X = np.concatenate([X_train, X_test])
-    y = np.concatenate([y_train, y_test])
-    print("totalsize", X.shape)
-    kf = KFold(n_splits=4, shuffle=True, random_state=12346)
-    for train_index, test_index in kf.split(X):
-        print("train_size", train_index.shape, "test_size", test_index.shape)
+
+    if True:
+
         model_instance = ArtificialNN.Neural_Model_Sklearn_style(ArtificialNN.my_tabnet, kwargs)
+        model_instance.set_device(device)
         start_train = time.time()
-        model_instance.fit(X[train_index], y[train_index])
+        model_instance.fit(X_train, y_train,eval_set=[(X_val,y_val)])
         train_time.append(time.time() - start_train)
         start_pred = time.time()
-        pred = model_instance.predict(X[test_index])
+        pred = model_instance.predict(X_test)
         test_time.append(time.time() - start_pred)
 
-        MSE_loss.append(mean_squared_error(pred, y[test_index]))
+        MSE_loss.append(mean_squared_error(pred, y_test))
+
     loss = np.mean(MSE_loss)
+    print(loss)
+    print(model_instance.score(X_test,y_test))
     if save_model:
         model_instance.save_model(model_save_path + get_related_path(Material_ID).replace(".csv", ""))
 
@@ -124,13 +124,21 @@ def model_cv(**kwargs):
 
     return -loss
 
+import sklearn
+from sklearn.model_selection import train_test_split
 
 def run_bayes_optimize(num_of_iteration=10, data_index=2):
     BO_root = "." + os.sep + "BO_result_data" + os.sep
-    global X_train, y_train, X_test, y_test, Material_ID
+    global X_train, y_train, X_val, y_val, X_test, y_test, Material_ID
     X_train, y_train, X_test, y_test, Material_ID = relate_data[data_index]
+    preprocess = sklearn.preprocessing.StandardScaler().fit(X_train)
+    print(X_test)
+    #normalize it
+    X_train = preprocess.transform(X_train)
 
-    print(model_save_path + get_related_path(Material_ID).replace(".csv", ".json"))
+    X_test = preprocess.transform(X_test)
+    print(X_test)
+    X_train, X_val, y_train, y_val = train_test_split(X_train, y_train, test_size=0.25, random_state=4)
 
     rf_bo = BayesianOptimization(
         model_cv,

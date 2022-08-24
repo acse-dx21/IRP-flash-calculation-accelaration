@@ -6,7 +6,7 @@ import sys
 sys.path.append("..")
 import numpy as np
 import sklearn.metrics as metrics
-
+import zero
 class ANN(nn.Module):
     name = "neural_network"
 
@@ -97,95 +97,95 @@ class Mass_Balence_loss(nn.Module):
 import torch.nn.functional as F
 
 
-class OneD_CNN(nn.Module):
-    def __init__(self, num_features, num_targets, hidden_size):
-        super(OneD_CNN, self).__init__()
-        cha_1 = 256
-        cha_2 = 512
-        cha_3 = 512
-
-        cha_1_reshape = int(hidden_size / cha_1)
-        cha_po_1 = int(hidden_size / cha_1 / 2)
-        cha_po_2 = int(hidden_size / cha_1 / 2 / 2) * cha_3
-
-        self.cha_1 = cha_1
-        self.cha_2 = cha_2
-        self.cha_3 = cha_3
-        self.cha_1_reshape = cha_1_reshape
-        self.cha_po_1 = cha_po_1
-        self.cha_po_2 = cha_po_2
-
-        self.batch_norm1 = nn.BatchNorm1d(num_features)
-        self.dropout1 = nn.Dropout(0.1)
-        self.dense1 = nn.utils.weight_norm(nn.Linear(num_features, hidden_size))
-
-        self.batch_norm_c1 = nn.BatchNorm1d(cha_1)
-        self.dropout_c1 = nn.Dropout(0.1)
-        self.conv1 = nn.utils.weight_norm(nn.Conv1d(cha_1, cha_2, kernel_size=1, stride=1, padding=2, bias=False),
-                                          dim=None)
-
-        self.ave_po_c1 = nn.AdaptiveAvgPool1d(output_size=cha_po_1)
-
-        self.batch_norm_c2 = nn.BatchNorm1d(cha_2)
-        self.dropout_c2 = nn.Dropout(0.1)
-        self.conv2 = nn.utils.weight_norm(nn.Conv1d(cha_2, cha_2, kernel_size=3, stride=1, padding=1, bias=True),
-                                          dim=None)
-
-        self.batch_norm_c2_1 = nn.BatchNorm1d(cha_2)
-        self.dropout_c2_1 = nn.Dropout(0.3)
-        self.conv2_1 = nn.utils.weight_norm(nn.Conv1d(cha_2, cha_2, kernel_size=3, stride=1, padding=1, bias=True),
-                                            dim=None)
-
-        self.batch_norm_c2_2 = nn.BatchNorm1d(cha_2)
-        self.dropout_c2_2 = nn.Dropout(0.2)
-        self.conv2_2 = nn.utils.weight_norm(nn.Conv1d(cha_2, cha_3, kernel_size=5, stride=1, padding=2, bias=True),
-                                            dim=None)
-
-        self.max_po_c2 = nn.MaxPool1d(kernel_size=4, stride=2, padding=1)
-
-        self.flt = nn.Flatten()
-
-        self.batch_norm3 = nn.BatchNorm1d(cha_po_2)
-        self.dropout3 = nn.Dropout(0.2)
-        self.dense3 = nn.utils.weight_norm(nn.Linear(cha_po_2, num_targets))
-
-    def forward(self, x):
-        x = self.batch_norm1(x)
-        x = self.dropout1(x)
-        x = F.celu(self.dense1(x), alpha=0.06)
-
-        x = x.reshape(x.shape[0], self.cha_1,
-                      self.cha_1_reshape)
-
-        x = self.batch_norm_c1(x)
-        x = self.dropout_c1(x)
-        x = F.relu(self.conv1(x))
-
-        x = self.ave_po_c1(x)
-
-        x = self.batch_norm_c2(x)
-        x = self.dropout_c2(x)
-        x = F.relu(self.conv2(x))
-        x_s = x
-
-        x = self.batch_norm_c2_1(x)
-        x = self.dropout_c2_1(x)
-        x = F.relu(self.conv2_1(x))
-
-        x = self.batch_norm_c2_2(x)
-        x = self.dropout_c2_2(x)
-        x = F.relu(self.conv2_2(x))
-        x = x * x_s
-
-        x = self.max_po_c2(x)
-
-        x = self.flt(x)
-
-        x = self.batch_norm3(x)
-        x = self.dropout3(x)
-        x = self.dense3(x)
-
-        return x
+# class OneD_CNN(nn.Module):
+#     def __init__(self, num_features, num_targets, hidden_size):
+#         super(OneD_CNN, self).__init__()
+#         cha_1 = 256
+#         cha_2 = 512
+#         cha_3 = 512
+#
+#         cha_1_reshape = int(hidden_size / cha_1)
+#         cha_po_1 = int(hidden_size / cha_1 / 2)
+#         cha_po_2 = int(hidden_size / cha_1 / 2 / 2) * cha_3
+#
+#         self.cha_1 = cha_1
+#         self.cha_2 = cha_2
+#         self.cha_3 = cha_3
+#         self.cha_1_reshape = cha_1_reshape
+#         self.cha_po_1 = cha_po_1
+#         self.cha_po_2 = cha_po_2
+#
+#         self.batch_norm1 = nn.BatchNorm1d(num_features)
+#         self.dropout1 = nn.Dropout(0.1)
+#         self.dense1 = nn.utils.weight_norm(nn.Linear(num_features, hidden_size))
+#
+#         self.batch_norm_c1 = nn.BatchNorm1d(cha_1)
+#         self.dropout_c1 = nn.Dropout(0.1)
+#         self.conv1 = nn.utils.weight_norm(nn.Conv1d(cha_1, cha_2, kernel_size=1, stride=1, padding=2, bias=False),
+#                                           dim=None)
+#
+#         self.ave_po_c1 = nn.AdaptiveAvgPool1d(output_size=cha_po_1)
+#
+#         self.batch_norm_c2 = nn.BatchNorm1d(cha_2)
+#         self.dropout_c2 = nn.Dropout(0.1)
+#         self.conv2 = nn.utils.weight_norm(nn.Conv1d(cha_2, cha_2, kernel_size=3, stride=1, padding=1, bias=True),
+#                                           dim=None)
+#
+#         self.batch_norm_c2_1 = nn.BatchNorm1d(cha_2)
+#         self.dropout_c2_1 = nn.Dropout(0.3)
+#         self.conv2_1 = nn.utils.weight_norm(nn.Conv1d(cha_2, cha_2, kernel_size=3, stride=1, padding=1, bias=True),
+#                                             dim=None)
+#
+#         self.batch_norm_c2_2 = nn.BatchNorm1d(cha_2)
+#         self.dropout_c2_2 = nn.Dropout(0.2)
+#         self.conv2_2 = nn.utils.weight_norm(nn.Conv1d(cha_2, cha_3, kernel_size=5, stride=1, padding=2, bias=True),
+#                                             dim=None)
+#
+#         self.max_po_c2 = nn.MaxPool1d(kernel_size=4, stride=2, padding=1)
+#
+#         self.flt = nn.Flatten()
+#
+#         self.batch_norm3 = nn.BatchNorm1d(cha_po_2)
+#         self.dropout3 = nn.Dropout(0.2)
+#         self.dense3 = nn.utils.weight_norm(nn.Linear(cha_po_2, num_targets))
+#
+#     def forward(self, x):
+#         x = self.batch_norm1(x)
+#         x = self.dropout1(x)
+#         x = F.celu(self.dense1(x), alpha=0.06)
+#
+#         x = x.reshape(x.shape[0], self.cha_1,
+#                       self.cha_1_reshape)
+#
+#         x = self.batch_norm_c1(x)
+#         x = self.dropout_c1(x)
+#         x = F.relu(self.conv1(x))
+#
+#         x = self.ave_po_c1(x)
+#
+#         x = self.batch_norm_c2(x)
+#         x = self.dropout_c2(x)
+#         x = F.relu(self.conv2(x))
+#         x_s = x
+#
+#         x = self.batch_norm_c2_1(x)
+#         x = self.dropout_c2_1(x)
+#         x = F.relu(self.conv2_1(x))
+#
+#         x = self.batch_norm_c2_2(x)
+#         x = self.dropout_c2_2(x)
+#         x = F.relu(self.conv2_2(x))
+#         x = x * x_s
+#
+#         x = self.max_po_c2(x)
+#
+#         x = self.flt(x)
+#
+#         x = self.batch_norm3(x)
+#         x = self.dropout3(x)
+#         x = self.dense3(x)
+#
+#         return x
 
 
 from torch.utils.data import TensorDataset, DataLoader
@@ -434,11 +434,18 @@ class Neural_Model_Sklearn_style():
 
         self.continues_predict_data = {}
 
-    def fit(self, train, target, epoch=15, batch_size=128, my_criterion=None, optimizer=None):
+    def fit(self, train, target, max_epochs=100, batch_size=128, eval_set=None, patience=10, verbose=10, my_criterion=None, optimizer=None,mission=0):
         if my_criterion:
             criterion = my_criterion
         else:
             criterion=nn.MSELoss()
+
+        if eval_set:
+            assert isinstance(eval_set, list)
+            assert isinstance(eval_set[0], tuple)
+
+        checkpoint_path=f"temp_model{mission}.pt"
+        progress = zero.ProgressTracker(patience=patience)
         self.model.to(self.device)
         self.model.train()
         print(self.device)
@@ -450,12 +457,12 @@ class Neural_Model_Sklearn_style():
             optimizer.zero_grad()
         train_loss_record = []
         train_time_record = []
+        val_loss_record = {}
         start = time.time()
         cnt=0
-        for i in range(epoch):
+        for epoch in range(max_epochs):
+            loss_to_mean=0
             for x, y in Data_loader:
-                loss_to_mean = []
-                time_record = []
                 x, y = x.to(self.device), y.to(self.device)
                 y_pred = self.model(x)
                 optimizer.zero_grad()
@@ -464,19 +471,52 @@ class Neural_Model_Sklearn_style():
                 # else:
                 loss = criterion(y_pred, y)
                 loss.backward()
-                loss_to_mean.append(loss.item())
+                loss_to_mean+=loss.item()*y.shape[0]
                 optimizer.step()
+            loss_eval=0
+            for eval_loader in eval_set:
+                eval_cnt=0
 
-            train_loss_record.append(np.mean(loss_to_mean))
+                x_eval, y_eval = eval_loader
+                loss_eval=self.score(x_eval, y_eval)
+                val_loss_record[eval_cnt]=loss_eval
+                eval_cnt+=1
+
+
+            train_loss_record.append(loss_to_mean/target.shape[0])
             train_time_record.append(time.time() - start)
-            if(len(train_loss_record)>10 and train_loss_record[-1]>train_loss_record[-2]):
-                cnt+=1
-            else:
-                cnt=0
+            if not epoch % verbose:
+                print("epoch ",epoch," loss",train_loss_record[-1],"|",end=" " )
+                if eval_set:
+                        evl_result=[]
+                        for key,itm in val_loss_record.items():
+                            print(f"val_{key}_mse", itm,end=" ")
+                            evl_result.append(itm)
+                print()
 
-            if cnt==3:
-                break
+            if eval_set:
+                progress.update(-np.mean(evl_result))
+                if progress.success:
+                    torch.save({'epoch': epoch,
+                                'model_state_dict': self.model.state_dict(),
+                                'optimizer_state_dict': optimizer.state_dict(),
+                                'loss': train_loss_record[-1], },
+                               checkpoint_path)
 
+                if progress.fail or epoch == max_epochs:
+
+                    checkpoint = torch.load(checkpoint_path)
+                    self.model.load_state_dict(checkpoint['model_state_dict'])
+                    optimizer.load_state_dict(checkpoint['optimizer_state_dict'])
+                    epoch = checkpoint['epoch']
+                    loss = checkpoint['loss']
+                    val_score = self.score(x_eval, y_eval)
+
+                    print('Checkpoint recovered:')
+                    print(
+                        f'Epoch {epoch:03d} | Validation score: {val_score:.4f} |  {time.time() - start:.1f}s',
+                        end='')
+                    break
         # record each epoch
         self.data_record["trainning_time_consume(s)"] = train_time_record
         self.data_record["train_loss_record"] = train_loss_record
@@ -490,16 +530,15 @@ class Neural_Model_Sklearn_style():
             TensorDataset(torch.from_numpy(train.astype(np.float32)), torch.from_numpy(target.astype(np.float32))),
             batch_size=batch_size, shuffle=True)
         start = time.time()
-        test_time_record = []
-        test_loss_record = []
+        test_loss_record = 0
         for x, y in Test_loader:
             x, y = x.to(self.device), y.to(self.device)
             y_pred = self.model(x)
             # loss = self.criterion(y_pred, y,x[:,-self.material_num:])
             loss = criterion(y_pred, y)
-            test_loss_record.append(loss.cpu().item())
+            test_loss_record+=loss.cpu().item()*y.shape[0]
 
-        loss = np.mean(test_loss_record)
+        loss = test_loss_record/train.shape[0]
         # one_batch(128)
         self.data_record["test_loss_record"] = loss
         self.data_record["test_time_consume(s)"] = time.time() - start

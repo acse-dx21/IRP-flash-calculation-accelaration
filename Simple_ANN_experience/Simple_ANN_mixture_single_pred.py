@@ -32,47 +32,41 @@ from itertools import combinations
 from scipy.special import comb, perm
 from sklearn.model_selection import GridSearchCV
 import time
-data_set_index = [0]
-mix_index = "all"
+
+data_set_index = [0,1,2, 3]
+mix_index="all"
 device = "cuda"
 data_root = "." + os.sep + "mini_cleaned_data" + os.sep
-save_model = True
-save_data = True
-from torch.optim.lr_scheduler import ReduceLROnPlateau
-
-
-def get_related_path(Material_ID):
-    print(Material_ID)
-    print(type(Material_ID))
-    if isinstance(Material_ID, list):
-        return "mix_" + str(len(Material_ID[0])) + os.sep + "mixture.csv"
-    else:
-        return "mix_" + str(len(Material_ID)) + os.sep + str(Material_ID) + ".csv"
-    print("func:get_related_path  problem")
-    raise RuntimeError
-
-
+save_data=True
+save_model=False
 def get_range(mix_index):
     """
     use to fine target mixture
     :param mix_index: "all" or int range from 1-7
     :return:
     """
-    if (mix_index == "all"):
-        return 0, 127
-    assert mix_index > 0
-    start = 0
-    end = comb(7, 1)
+    if(mix_index=="all"):
+        return 0,127
+    assert mix_index>0
+    start=0
+    end=comb(7,1)
 
-    for i in range(1, mix_index):
-        start += comb(7, i)
-        end += comb(7, i + 1)
+    for i in range(1,mix_index):
+        start+=comb(7,i)
+        end+=comb(7,i+1)
 
-    return int(start), int(end)
+    return int(start),int(end)
 
+
+
+
+X_train=0
+y_train=0
+X_test=0
+y_test=0
+Material_ID = 0
 
 param_grid = [
-    # try combinations of hyperparameters
     {'subsample': [0.2, 0.6, 1.0],
      'learning_rate': [0.01, 0.05, 0.1],
      'n_estimators': [300, 400, 500],
@@ -82,100 +76,83 @@ param_grid = [
 ]
 
 
-def grid_i(X_train, y_train):
-    # train across 3 folds
-    grid_search = GridSearchCV(TabNetRegressor(objective='reg:squarederror', n_jobs=3, random_state=42),
-                               param_grid,
-                               cv=3,
-                               scoring='neg_mean_squared_error',
-                               return_train_score=True,
-                               verbose=1,
-                               n_jobs=2)
-
-    start = time.time()
-    grid_search.fit(X_train, y_train)
-    print("Run time = ", time.time() - start)
-    return grid_search
 
 
-# @Misc{,
-#     author = {Fernando Nogueira},
-#     title = {{Bayesian Optimization}: Open source constrained global optimization tool for {Python}},
-#     year = {2014--},
-#     url = " https://github.com/fmfn/BayesianOptimization"
-# }
-# import os
-#
-# data_path = ".." + os.sep + "cleaned_data" + os.sep
-# result_path = "." + os.sep + "result_data" + os.sep
-#
-#
+from model.train import check_IDexist
+from tool.log import log
 
-from bayes_opt import BayesianOptimization
-from sklearn.metrics import mean_squared_error
+import os
 
-#
+data_path = ".." + os.sep +"data"+os.sep+"mini_cleaned_data" + os.sep
+result_path = "." + os.sep + "MSELoss_data" + os.sep
 
-data_record = {'trainning_time_consume(s)':[],"test_time_consume(s)": []}
 
-import argparse
-# print(a)
 from mpi4py import MPI
 
 
-def grid_i(X_train, y_train):
-    grid_search = GridSearchCV(TabNetRegressor(objective='reg:squarederror', n_jobs=1, random_state=42),
-                               param_grid,
-                               cv=3,
-                               scoring='neg_mean_squared_error',
-                               return_train_score=True,
-                               verbose=1,
-                               n_jobs=2)
 
-    start = time.time()
-    grid_search.fit(X_train, y_train)
-    print("Run time = ", time.time() - start)
-    return grid_search
+# model=ArtificialNN.Neural_Model_Sklearn_style(ArtificialNN.simple_ANN,{"material":Material_ID})
+# model.fit(Data_loader=train_loader,epoch=10)
+# print(model.get_data)
+# model.score(test_loader)
+# print(model.get_data)
+
+def get_related_path(Material_ID):
+    if isinstance(Material_ID,list):
+        return "mix_"+str(len(Material_ID[0]))+os.sep+"mixture.csv"
+    return "mix_"+str(len(Material_ID))+os.sep+str(Material_ID)+".csv"
 
 
+from sklearn.model_selection import KFold
+import numpy as np
+from bayes_opt import BayesianOptimization
+data_record = {"test_time_consume(s)": []}
 def model_cv(**kwargs):
     kwargs["Nodes_per_layer"] = int(kwargs["Nodes_per_layer"])
     kwargs["deepth"] = int(kwargs["deepth"])
     kwargs["material"]=Material_ID[0]
     model_instance = ArtificialNN.Neural_Model_Sklearn_style(ArtificialNN.simple_ANN,kwargs)
     model_instance.set_device(device)
-    print(model_instance)
-    # record_data
-    start_train = time.time()
-    model_instance.fit(X_train,y_train,epoch=10)
-    train_time = time.time() - start_train
 
-    score=model_instance.score(X_test,y_test)
+    print()
+    print("train_shape",X_train.shape,"val_shape",X_val.shape)
+    if True:
+
+        model_instance = ArtificialNN.Neural_Model_Sklearn_style(ArtificialNN.simple_ANN, kwargs)
+        model_instance.set_device(device)
+        start_train = time.time()
+        model_instance.fit(X_train, y_train,max_epochs=1000,patience=100,eval_set=[(X_val,y_val)])
+
 
     for i in range(100):
         start_pred = time.time()
         pred = model_instance.predict(np.array([X_test[i,:]]))
         test_time = time.time() - start_pred
+        data_record["test_time_consume(s)"].append(test_time)
 
-
-    data_record["trainning_time_consume(s)"].append(train_time)
-    data_record["test_time_consume(s)"].append(test_time)
-
-    epoch_root="."+os.sep+"BO_epoch_routing"+os.sep
-    pd.DataFrame(model_instance.data_record).to_csv(saved_root+epoch_root + get_related_path(Material_ID))
-
-    f = open(saved_root+epoch_root + get_related_path(Material_ID), "a+")
-    f.write(f"# {device}")
-    f.close()
     return -1
 
+import argparse
+# print(a)
+from mpi4py import MPI
 
-def run_bayes_optimize(num_of_iteration=10, data_index=2):
-    BO_root = "." + os.sep + "BO_result_data" + os.sep
-    global X_train, y_train, X_test, y_test, Material_ID
+import sklearn
+
+def run_bayes_optimize(num_of_iteration=1,data_index=2):
+
+    BO_root="."+os.sep+"BO_result_data"+os.sep
+    BO_routing =  "." + os.sep + "BO_training_routing" + os.sep
+
+    global X_train, y_train, X_val, y_val, X_test, y_test, Material_ID
     X_train, y_train, X_test, y_test, Material_ID = relate_data[data_index]
+    preprocess = sklearn.preprocessing.StandardScaler().fit(X_train)
+    print(X_test)
+    #normalize it
+    X_train = preprocess.transform(X_train)
 
-    print(model_save_path + get_related_path(Material_ID).replace(".csv", ".json"))
+    X_test = preprocess.transform(X_test)
+    print(X_test)
+    X_train, X_val, y_train, y_val = train_test_split(X_train, y_train, test_size=0.25, random_state=4)
 
     rf_bo = BayesianOptimization(
             model_cv,
@@ -183,16 +160,18 @@ def run_bayes_optimize(num_of_iteration=10, data_index=2):
          "deepth": (2,  6)}
         )
 
-    rf_bo.maximize(init_points=5,n_iter=num_of_iteration)
+    rf_bo.maximize(init_points=1,n_iter=num_of_iteration)
 
-    #save data
     result_data_root = "." + os.sep + "BO_result_data" + os.sep
     routing_data_root = "." + os.sep + "BO_training_routing" + os.sep
     pd.DataFrame(data_record)
     routing_data_root + get_related_path(Material_ID)
     if save_data:
         if os.path.exists(saved_root + result_data_root + get_related_path(Material_ID)):
-            pd.concat([pd.DataFrame(rf_bo.res),pd.read_csv(saved_root + result_data_root + get_related_path(Material_ID),index_col=0,comment="#")],ignore_index=True).to_csv(saved_root + result_data_root + get_related_path(Material_ID))
+            pd.concat([pd.DataFrame(rf_bo.res),
+                       pd.read_csv(saved_root + result_data_root + get_related_path(Material_ID), index_col=0,
+                                   comment="#")], ignore_index=True).to_csv(
+                saved_root + result_data_root + get_related_path(Material_ID))
             f = open(saved_root + result_data_root + get_related_path(Material_ID), "a+")
             f.write(f"# {device}")
             f.close()
@@ -212,11 +191,8 @@ def run_bayes_optimize(num_of_iteration=10, data_index=2):
             f = open(saved_root + routing_data_root + get_related_path(Material_ID), "a+")
             f.write(f"# {device}")
             f.close()
-    data_record["test_time_consume(s)"].clear()
-    data_record["trainning_time_consume(s)"].clear()
 
-def run_Grid_search(num_of_iteration):
-    print(num_of_iteration)
+    data_record["test_time_consume(s)"].clear()
 
 
 if __name__ == "__main__":
@@ -224,18 +200,12 @@ if __name__ == "__main__":
     rank = comm.Get_rank()
     size = comm.Get_size()
 
-    start, end = get_range(mix_index)
-
-    product_index = list(itertools.product(data_set_index, list(range(start, end))))
-    print(product_index)
-    print("total size", len(product_index))
     for index in range(rank, len(data_set_index), size):
-        data_index = data_set_index[index]
+        data_index=data_set_index[index]
         print(data_index)
-
-        model_save_path = "." + os.sep + "saved_model" + os.sep + "mini_dataset_mixture_"+device + os.sep + f"mini_data_{data_index}" + os.sep
-        mini_data_path = ".." + os.sep + "data" + os.sep + data_root + f"mini_data_{data_index}" + os.sep
-        saved_root = "." + os.sep + "mini_cleaned_data_mixture_"+device + os.sep + f"single_predict" + os.sep
+        model_save_path = "." + os.sep + "saved_model" + os.sep + "mini_dataset_mixture" + os.sep + f"mini_data_{data_index}" + os.sep
+        mini_data_path = ".." + os.sep + "data" + os.sep + data_root+ f"mini_data_{data_index}" + os.sep
+        saved_root = "." + os.sep + "mini_cleaned_data_mixture_" + device + os.sep + f"single_predict" + os.sep
         All_ID = ['Methane', 'Ethane', 'Propane', 'N-Butane', 'N-Pentane', 'N-Hexane', 'Heptane']
         relate_data = generate_data.mixture_generater(mini_data_path)
         # collector=generate_data.collector()
@@ -243,4 +213,7 @@ if __name__ == "__main__":
         # relate_data.set_collector(collector)
         relate_data.set_batch_size(128)
         relate_data.set_collector("VF")
+
+
         run_bayes_optimize(1, 2)
+

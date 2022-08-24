@@ -147,16 +147,22 @@ import argparse
 # print(a)
 from mpi4py import MPI
 
-
+import sklearn
 
 def run_bayes_optimize(num_of_iteration=1,mix=2):
 
     BO_root="."+os.sep+"BO_result_data"+os.sep
     BO_routing =  "." + os.sep + "BO_training_routing" + os.sep
 
-    global X_train, y_train, X_test, y_test, Material_ID
-
+    global X_train, y_train, X_val, y_val, X_test, y_test, Material_ID
     X_train, y_train, X_test, y_test, Material_ID = relate_data[mix]
+    preprocess = sklearn.preprocessing.StandardScaler().fit(X_train)
+
+    X_train = preprocess.transform(X_train)
+    print(X_train)
+    X_test = preprocess.transform(X_test)
+    X_train, X_val, y_train, y_val = train_test_split(X_train, y_train, test_size=0.25, random_state=4)
+
     rf_bo = BayesianOptimization(
             model_cv,
         {'Nodes_per_layer': (100, 1000),
