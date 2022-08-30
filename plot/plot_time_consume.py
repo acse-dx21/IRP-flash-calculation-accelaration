@@ -46,7 +46,7 @@ class line_bar_plot_from_csv_norm2:
         self.data = []
         self.fig, self.ax = plt.subplots()
         self.colors = ['pink', 'lightgreen', 'lightblue']
-        self.comment=["norm","postprocessed","noPreprocess"]
+        self.comment=["norm","postprocessed"]
         self.cnt=0
 
     def collect_file_path(self, root):
@@ -72,7 +72,7 @@ class line_bar_plot_from_csv_norm2:
         for i in self.comment:
             if i in root:
                 comment+="_"+i
-        if "cuda" in root or "gpu" in root:
+        if "cuda" in root or "gpu" in root or "norm" in root:
                 comment+="_gpu"
         if "cpu" in root or "CPU" in root:
                 comment+="_cpu"
@@ -168,7 +168,7 @@ class line_bar_plot_from_csv_norm2:
         plt.xlabel(x)
         plt.yscale("log")
 
-        # plt.xscale("log")
+        plt.xscale("log")
 
     def plot_bar(self,x,y,hue):
 
@@ -205,11 +205,11 @@ data_num = 1
 
 final_root="BO_training_routing"
 
-tab_root11=f"..\\tabnet_experience\\mini_cleaned_data_mixture_cpu\\mini_data_0\\{final_root}\\"
-tab_root12=f"..\\tabnet_experience\\mini_cleaned_data_mixture_cpu\\mini_data_1\\{final_root}\\"
-tab_root13=f"..\\tabnet_experience\\mini_cleaned_data_mixture_cpu\\mini_data_2\\{final_root}\\"
-tab_root14=f"..\\tabnet_experience\\mini_cleaned_data_mixture_cpu\\mini_data_3\\{final_root}\\"
-tab_root15=f"..\\tabnet_experience\\mini_cleaned_data_mixture_cpu\\single_predict\\{final_root}\\"
+tab_root11=f"..\\tabnet_experience\\mini_cleaned_data_mixture_cuda\\mini_data_0\\{final_root}\\"
+tab_root12=f"..\\tabnet_experience\\mini_cleaned_data_mixture_cuda\\mini_data_1\\{final_root}\\"
+tab_root13=f"..\\tabnet_experience\\mini_cleaned_data_mixture_cuda\\mini_data_2\\{final_root}\\"
+tab_root14=f"..\\tabnet_experience\\mini_cleaned_data_mixture_cuda\\mini_data_3\\{final_root}\\"
+tab_root15=f"..\\tabnet_experience\\mini_cleaned_data_mixture_cuda\\single_predict\\{final_root}\\"
 
 tab_root1=f"..\\tabnet_experience\\mini_cleaned_data_mixture_cuda_noPreprocess\\mini_data_0\\{final_root}\\"
 tab_root2=f"..\\tabnet_experience\\mini_cleaned_data_mixture_cuda_noPreprocess\\mini_data_1\\{final_root}\\"
@@ -218,11 +218,7 @@ tab_root4=f"..\\tabnet_experience\\mini_cleaned_data_mixture_cuda_noPreprocess\\
 tab_root5=f"..\\tabnet_experience\\mini_cleaned_data_mixture_cuda_noPreprocess\\single_predict\\{final_root}\\"
 
 # root2 = f"..\\tabnet_experience\\mini_cleaned_data_mixture_cuda\\mini_data_0\\BO_result_data\\"
-XGB_root5=f"..\\XGB_experience\\mini_cleaned_data_mixture_cuda_noPreprocess\\mini_data_0\\{final_root}\\"
-XGB_root6=f"..\\XGB_experience\\mini_cleaned_data_mixture_cuda_noPreprocess\\mini_data_1\\{final_root}\\"
-XGB_root7=f"..\\XGB_experience\\mini_cleaned_data_mixture_cuda_noPreprocess\\mini_data_2\\{final_root}\\"
-XGB_root8=f"..\\XGB_experience\\mini_cleaned_data_mixture_cuda_noPreprocess\\mini_data_3\\{final_root}\\"
-XGB_root9=f"..\\XGB_experience\\mini_cleaned_data_mixture_cuda_noPreprocess\\single_predict\\{final_root}\\"
+
 # root4=f"..\\Simple_ANN_experience\\mini_cleaned_data\\mini_data_{data_num}\\BO_result_data\\"
 
 LGBM_root9=f"..\\LightGBM_experience\\mini_cleaned_data_mixture_cpu\\mini_data_0\\{final_root}\\"
@@ -231,16 +227,37 @@ LGBM_root11=f"..\\LightGBM_experience\\mini_cleaned_data_mixture_cpu\\mini_data_
 LGBM_root12=f"..\\LightGBM_experience\\mini_cleaned_data_mixture_cpu\\mini_data_3\\{final_root}\\"
 LGBM_root13=f"..\\LightGBM_experience\\mini_cleaned_data_mixture_cpu\\single_predict\\{final_root}\\"
 
+
+LGBM_root4=f"..\\LightGBM_experience\\mini_cleaned_data_mixture_cpu_noPreprocess\\mini_data_0\\{final_root}\\"
+LGBM_root0=f"..\\LightGBM_experience\\mini_cleaned_data_mixture_cpu_noPreprocess\\mini_data_1\\{final_root}\\"
+LGBM_root1=f"..\\LightGBM_experience\\mini_cleaned_data_mixture_cpu_noPreprocess\\mini_data_2\\{final_root}\\"
+LGBM_root2=f"..\\LightGBM_experience\\mini_cleaned_data_mixture_cpu_noPreprocess\\mini_data_3\\{final_root}\\"
+LGBM_root3=f"..\\LightGBM_experience\\mini_cleaned_data_mixture_cpu_noPreprocess\\single_predict\\{final_root}\\"
+
+XGB_root5=f"..\\XGB_experience\\mini_cleaned_data_mixture_cuda_noPreprocess\\mini_data_0\\{final_root}\\"
+XGB_root6=f"..\\XGB_experience\\mini_cleaned_data_mixture_cuda_noPreprocess\\mini_data_1\\{final_root}\\"
+XGB_root7=f"..\\XGB_experience\\mini_cleaned_data_mixture_cuda_noPreprocess\\mini_data_2\\{final_root}\\"
+XGB_root8=f"..\\XGB_experience\\mini_cleaned_data_mixture_cuda_noPreprocess\\mini_data_3\\{final_root}\\"
+XGB_root9=f"..\\XGB_experience\\mini_cleaned_data_mixture_cuda_noPreprocess\\single_predict\\{final_root}\\"
+
 XGB_root13=f"..\\XGB_experience\\mini_cleaned_data_mixture_cpu\\mini_data_0\\{final_root}\\"
 XGB_root14=f"..\\XGB_experience\\mini_cleaned_data_mixture_cpu\\mini_data_1\\{final_root}\\"
 XGB_root15=f"..\\XGB_experience\\mini_cleaned_data_mixture_cpu\\mini_data_2\\{final_root}\\"
 XGB_root16=f"..\\XGB_experience\\mini_cleaned_data_mixture_cpu\\mini_data_3\\{final_root}\\"
 XGB_root17=f"..\\XGB_experience\\mini_cleaned_data_mixture_cpu\\single_predict\\{final_root}\\"
 
+XGB_root33=f"..\\XGB_experience\\mini_cleaned_data_mixture_cuda\\mini_data_0\\{final_root}\\"
+XGB_root34=f"..\\XGB_experience\\mini_cleaned_data_mixture_cuda\\mini_data_1\\{final_root}\\"
+XGB_root35=f"..\\XGB_experience\\mini_cleaned_data_mixture_cuda\\mini_data_2\\{final_root}\\"
+XGB_root36=f"..\\XGB_experience\\mini_cleaned_data_mixture_cuda\\mini_data_3\\{final_root}\\"
+XGB_root37=f"..\\XGB_experience\\mini_cleaned_data_mixture_cuda\\single_predict\\{final_root}\\"
+
 XGB_root20=f"..\\XGB_experience\\mini_cleaned_data_mixture_norm\\mini_data_0\\{final_root}\\"
 XGB_root21=f"..\\XGB_experience\\mini_cleaned_data_mixture_norm\\mini_data_1\\{final_root}\\"
 XGB_root22=f"..\\XGB_experience\\mini_cleaned_data_mixture_norm\\mini_data_2\\{final_root}\\"
 XGB_root23=f"..\\XGB_experience\\mini_cleaned_data_mixture_norm\\mini_data_3\\{final_root}\\"
+
+
 
 
 CAT_root20=f"..\\cat_experience\\mini_cleaned_data_mixture_cpu\\mini_data_0\\{final_root}\\"
@@ -249,18 +266,23 @@ CAT_root22=f"..\\cat_experience\\mini_cleaned_data_mixture_cpu\\mini_data_2\\{fi
 CAT_root23=f"..\\cat_experience\\mini_cleaned_data_mixture_cpu\\mini_data_3\\{final_root}\\"
 CAT_root24=f"..\\cat_experience\\mini_cleaned_data_mixture_cpu\\single_predict\\{final_root}\\"
 
-ANN_root13=f"..\\Simple_ANN_experience\\mini_cleaned_data_mixture_cuda\\mini_data_0\\{final_root}\\"
-ANN_root14=f"..\\Simple_ANN_experience\\mini_cleaned_data_mixture_cuda\\mini_data_1\\{final_root}\\"
-ANN_root15=f"..\\Simple_ANN_experience\\mini_cleaned_data_mixture_cuda\\mini_data_2\\{final_root}\\"
-ANN_root16=f"..\\Simple_ANN_experience\\mini_cleaned_data_mixture_cuda\\mini_data_3\\{final_root}\\"
-ANN_root17=f"..\\Simple_ANN_experience\\mini_cleaned_data_mixture_cuda\\single_predict\\{final_root}\\"
+ANN_root13=f"..\\Simple_ANN_experience\\mini_cleaned_data_mixture_cuda_noPreprocess\\mini_data_0\\{final_root}\\"
+ANN_root14=f"..\\Simple_ANN_experience\\mini_cleaned_data_mixture_cuda_noPreprocess\\mini_data_1\\{final_root}\\"
+ANN_root15=f"..\\Simple_ANN_experience\\mini_cleaned_data_mixture_cuda_noPreprocess\\mini_data_2\\{final_root}\\"
+ANN_root16=f"..\\Simple_ANN_experience\\mini_cleaned_data_mixture_cuda_noPreprocess\\mini_data_3\\{final_root}\\"
+ANN_root17=f"..\\Simple_ANN_experience\\mini_cleaned_data_mixture_cuda_noPreprocess\\single_predict\\{final_root}\\"
 
-ANN_root3=f"..\\Simple_ANN_experience\\mini_cleaned_data_mixture_cpu\\mini_data_0\\{final_root}\\"
-ANN_root4=f"..\\Simple_ANN_experience\\mini_cleaned_data_mixture_cpu\\mini_data_1\\{final_root}\\"
-ANN_root5=f"..\\Simple_ANN_experience\\mini_cleaned_data_mixture_cpu\\mini_data_2\\{final_root}\\"
-ANN_root6=f"..\\Simple_ANN_experience\\mini_cleaned_data_mixture_cpu\\mini_data_3\\{final_root}\\"
-# ANN_root7=f"..\\Simple_ANN_experience\\mini_cleaned_data_mixture_cpu\\single_predict\\{final_root}\\"
+ANN_root3=f"..\\Simple_ANN_experience\\mini_cleaned_data_mixture_cuda\\mini_data_0\\{final_root}\\"
+ANN_root4=f"..\\Simple_ANN_experience\\mini_cleaned_data_mixture_cuda\\mini_data_1\\{final_root}\\"
+ANN_root5=f"..\\Simple_ANN_experience\\mini_cleaned_data_mixture_cuda\\mini_data_2\\{final_root}\\"
+ANN_root6=f"..\\Simple_ANN_experience\\mini_cleaned_data_mixture_cuda\\mini_data_3\\{final_root}\\"
+ANN_root7=f"..\\Simple_ANN_experience\\mini_cleaned_data_mixture_cuda\\single_predict\\{final_root}\\"
 
+ANN_root23=f"..\\Simple_ANN_experience\\mini_cleaned_data_mixture_cpu_noPreprocess\\mini_data_0\\{final_root}\\"
+ANN_root24=f"..\\Simple_ANN_experience\\mini_cleaned_data_mixture_cpu_noPreprocess\\mini_data_1\\{final_root}\\"
+ANN_root25=f"..\\Simple_ANN_experience\\mini_cleaned_data_mixture_cpu_noPreprocess\\mini_data_2\\{final_root}\\"
+ANN_root26=f"..\\Simple_ANN_experience\\mini_cleaned_data_mixture_cpu_noPreprocess\\mini_data_3\\{final_root}\\"
+ANN_root27=f"..\\Simple_ANN_experience\\mini_cleaned_data_mixture_cpu_noPreprocess\\single_predict\\{final_root}\\"
 
 RF_root13=f"..\\RF_experience\\mini_cleaned_data_mixture_cpu\\mini_data_0\\{final_root}\\"
 RF_root14=f"..\\RF_experience\\mini_cleaned_data_mixture_cpu\\mini_data_1\\{final_root}\\"
@@ -273,22 +295,33 @@ FT_root2=f"..\\FT-transformer\\mini_cleaned_data_mixture_cuda\\mini_data_1\\{fin
 FT_root3=f"..\\FT-transformer\\mini_cleaned_data_mixture_cuda\\mini_data_2\\{final_root}\\"
 FT_root4=f"..\\FT-transformer\\mini_cleaned_data_mixture_cuda\\mini_data_3\\{final_root}\\"
 
+
+FT_root21=f"..\\FT-transformer\\mini_cleaned_data_mixture_cpu\\mini_data_0\\{final_root}\\"
+FT_root22=f"..\\FT-transformer\\mini_cleaned_data_mixture_cpu\\mini_data_1\\{final_root}\\"
+FT_root23=f"..\\FT-transformer\\mini_cleaned_data_mixture_cpu\\mini_data_2\\{final_root}\\"
+FT_root24=f"..\\FT-transformer\\mini_cleaned_data_mixture_cpu\\mini_data_3\\{final_root}\\"
+
+FT_root11=f"..\\FT-transformer\\mini_cleaned_data_mixture_cuda_noPreprocess\\mini_data_0\\{final_root}\\"
+FT_root12=f"..\\FT-transformer\\mini_cleaned_data_mixture_cuda_noPreprocess\\mini_data_1\\{final_root}\\"
+FT_root13=f"..\\FT-transformer\\mini_cleaned_data_mixture_cuda_noPreprocess\\mini_data_2\\{final_root}\\"
+FT_root14=f"..\\FT-transformer\\mini_cleaned_data_mixture_cuda_noPreprocess\\mini_data_3\\{final_root}\\"
+
 roots=[]
 
 # tabnet cpu
+if final_root=="BO_training_routing":
+    roots.append(tab_root15)
+roots.append(tab_root11)
+roots.append(tab_root12)
+roots.append(tab_root13)
+roots.append(tab_root14)
+# tabnet gpu
 # if final_root=="BO_training_routing":
 #     roots.append(tab_root5)
-# roots.append(tab_root11)
-# roots.append(tab_root12)
-# roots.append(tab_root13)
-# roots.append(tab_root14)
-# tabnet gpu
-if final_root=="BO_training_routing":
-    roots.append(tab_root5)
-roots.append(tab_root1)
-roots.append(tab_root2)
-roots.append(tab_root3)
-roots.append(tab_root4)
+# roots.append(tab_root1)
+# roots.append(tab_root2)
+# roots.append(tab_root3)
+# roots.append(tab_root4)
 
 
 #LGBM cpu
@@ -299,21 +332,37 @@ roots.append(LGBM_root10)
 roots.append(LGBM_root11)
 roots.append(LGBM_root12)
 
+#LGBM cpu
+# if final_root=="BO_training_routing":
+#     roots.append(LGBM_root3)
+# roots.append(LGBM_root4)
+# roots.append(LGBM_root0)
+# roots.append(LGBM_root1)
+# roots.append(LGBM_root2)
+
+#xgb cpu
+# if final_root=="BO_training_routing":
+#     roots.append(XGB_root17)
+# roots.append(XGB_root13)
+# roots.append(XGB_root14)
+# roots.append(XGB_root15)
+# roots.append(XGB_root16)
+
 # xgb gpu
 if final_root=="BO_training_routing":
-    roots.append(XGB_root9)
-roots.append(XGB_root5)
+    roots.append(XGB_root5)
 roots.append(XGB_root6)
 roots.append(XGB_root7)
 roots.append(XGB_root8)
+roots.append(XGB_root9)
 
-#xgb cpu
-if final_root=="BO_training_routing":
-    roots.append(XGB_root17)
-roots.append(XGB_root13)
-roots.append(XGB_root14)
-roots.append(XGB_root15)
-roots.append(XGB_root16)
+#no pre
+# if final_root=="BO_training_routing":
+#     roots.append(XGB_root9)
+# roots.append(XGB_root5)
+# roots.append(XGB_root6)
+# roots.append(XGB_root7)
+# roots.append(XGB_root8)
 
 # xgb norm
 roots.append(XGB_root20)
@@ -322,20 +371,34 @@ roots.append(XGB_root22)
 roots.append(XGB_root23)
 
 # cat cpu
-if final_root=="BO_training_routing":
-    roots.append(CAT_root24)
-roots.append(CAT_root20)
-roots.append(CAT_root21)
-roots.append(CAT_root22)
-roots.append(CAT_root23)
+# if final_root=="BO_training_routing":
+#     roots.append(CAT_root24)
+# roots.append(CAT_root20)
+# roots.append(CAT_root21)
+# roots.append(CAT_root22)
+# roots.append(CAT_root23)
 
 # #ANN gpu
+# if final_root=="BO_training_routing":
+#     roots.append(ANN_root17)
+# roots.append(ANN_root13)
+# roots.append(ANN_root14)
+# roots.append(ANN_root15)
+# roots.append(ANN_root16)
+
 if final_root=="BO_training_routing":
-    roots.append(ANN_root17)
-roots.append(ANN_root13)
-roots.append(ANN_root14)
-roots.append(ANN_root15)
-roots.append(ANN_root16)
+    roots.append(ANN_root7)
+roots.append(ANN_root3)
+roots.append(ANN_root4)
+roots.append(ANN_root5)
+roots.append(ANN_root6)
+
+# if final_root=="BO_training_routing":
+#     roots.append(ANN_root27)
+# roots.append(ANN_root23)
+# roots.append(ANN_root24)
+# roots.append(ANN_root25)
+# roots.append(ANN_root26)
 
 #ANN cpu
 # if final_root=="BO_training_routing":
@@ -344,6 +407,17 @@ roots.append(FT_root1)
 roots.append(FT_root2)
 roots.append(FT_root3)
 roots.append(FT_root4)
+
+roots.append(FT_root21)
+roots.append(FT_root22)
+roots.append(FT_root23)
+roots.append(FT_root24)
+
+#no pre
+# roots.append(FT_root11)
+# roots.append(FT_root12)
+# roots.append(FT_root13)
+# roots.append(FT_root14)
 
 #RF cpu
 # if final_root=="BO_training_routing":

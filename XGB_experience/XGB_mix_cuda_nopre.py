@@ -26,24 +26,8 @@ def get_related_path(Material_ID):
     print("func:get_related_path  problem")
     raise RuntimeError
 
-
-# @Misc{,
-#     author = {Fernando Nogueira},
-#     title = {{Bayesian Optimization}: Open source constrained global optimization tool for {Python}},
-#     year = {2014--},
-#     url = " https://github.com/fmfn/BayesianOptimization"
-# }
-# import os
-#
-# data_path = ".." + os.sep + "cleaned_data" + os.sep
-# result_path = "." + os.sep + "result_data" + os.sep
-#
-#
-
 from bayes_opt import BayesianOptimization
 from sklearn.metrics import mean_squared_error
-
-#
 
 data_record = {"trainning_time_consume(s)": [], "test_time_consume(s)": []}
 

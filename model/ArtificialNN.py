@@ -474,13 +474,14 @@ class Neural_Model_Sklearn_style():
                 loss_to_mean+=loss.item()*y.shape[0]
                 optimizer.step()
             loss_eval=0
-            for eval_loader in eval_set:
-                eval_cnt=0
+            if eval_set:
+                for eval_loader in eval_set:
+                    eval_cnt=0
 
-                x_eval, y_eval = eval_loader
-                loss_eval=self.score(x_eval, y_eval)
-                val_loss_record[eval_cnt]=loss_eval
-                eval_cnt+=1
+                    x_eval, y_eval = eval_loader
+                    loss_eval=self.score(x_eval, y_eval)
+                    val_loss_record[eval_cnt]=loss_eval
+                    eval_cnt+=1
 
 
             train_loss_record.append(loss_to_mean/target.shape[0])
@@ -549,6 +550,7 @@ class Neural_Model_Sklearn_style():
         return "Model prepared on " + self.device
 
     def predict(self, x):
+        self.model.eval()
         return self.model(torch.tensor(x.astype(np.float32)).to(self.device)).detach().cpu().numpy()
 
     def continues_predict(self, data, Ts, Ps):
@@ -600,3 +602,10 @@ class Neural_Model_Sklearn_style():
 
     def set_device(self, device):
         self.device = device
+
+    def save_model(self,path):
+        torch.save(self.model.state_dict(), path)
+
+    def load_model(self,path):
+        self.model.load_state_dict(torch.load(path))
+        self.model.to(self.device)

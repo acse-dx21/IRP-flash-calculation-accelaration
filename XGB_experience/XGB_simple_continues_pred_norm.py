@@ -26,39 +26,6 @@ def get_related_path(Material_ID):
     print("func:get_related_path  problem")
     raise RuntimeError
 
-param_grid = [
-    # try combinations of hyperparameters
-    {'subsample': [0.2, 0.6, 1.0],
-     'learning_rate': [0.01, 0.05, 0.1],
-     'n_estimators': [300, 400, 500],
-     'max_depth': [3, 5, 10],
-     'colsample_bytree': [0.6],
-     'reg_lambda': [10]}
-]
-
-
-def grid_i(X_train, y_train):
-    # train across 3 folds
-    grid_search = GridSearchCV(XGBRegressor(objective='reg:squarederror', n_jobs=3, random_state=42),
-                               param_grid,
-                               cv=3,
-                               scoring='neg_mean_squared_error',
-                               return_train_score=True,
-                               verbose=1,
-                               n_jobs=2)
-
-    start = time.time()
-    grid_search.fit(X_train, y_train)
-    print("Run time = ", time.time() - start)
-    return grid_search
-
-
-# @Misc{,
-#     author = {Fernando Nogueira},
-#     title = {{Bayesian Optimization}: Open source constrained global optimization tool for {Python}},
-#     year = {2014--},
-#     url = " https://github.com/fmfn/BayesianOptimization"
-# }
 
 from bayes_opt import BayesianOptimization
 from sklearn.metrics import mean_squared_error

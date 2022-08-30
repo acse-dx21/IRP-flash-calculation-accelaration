@@ -26,34 +26,11 @@ def get_related_path(Material_ID):
     print("func:get_related_path  problem")
     raise RuntimeError
 
-
-
-# @Misc{,
-#     author = {Fernando Nogueira},
-#     title = {{Bayesian Optimization}: Open source constrained global optimization tool for {Python}},
-#     year = {2014--},
-#     url = " https://github.com/fmfn/BayesianOptimization"
-# }
-# import os
-#
-# data_path = ".." + os.sep + "cleaned_data" + os.sep
-# result_path = "." + os.sep + "result_data" + os.sep
-#
-#
-
 from bayes_opt import BayesianOptimization
 from sklearn.metrics import mean_squared_error
 
-#
-
 data_record = {"trainning_time_consume(s)": [], "test_time_consume(s)": []}
 
-
-
-
-
-import argparse
-# print(a)
 from mpi4py import MPI
 
 
@@ -96,12 +73,17 @@ def model_cv(**kwargs):
 
     return -loss
 from sklearn.model_selection import train_test_split
-
+import sklearn
 def run_bayes_optimize(num_of_iteration=10, data_index=2):
     BO_root = "." + os.sep + "BO_result_data" + os.sep
     global X_train, y_train,X_val, y_val, X_test, y_test, Material_ID
     X_train, y_train, X_test, y_test, Material_ID = relate_data[data_index]
+    preprocess = sklearn.preprocessing.StandardScaler().fit(X_train)
+    print(X_test)
+    # normalize it
+    X_train = preprocess.transform(X_train)
 
+    X_test = preprocess.transform(X_test)
     X_train, X_val, y_train, y_val = train_test_split(X_train, y_train, test_size=0.25, random_state=4)
 
     rf_bo = BayesianOptimization(

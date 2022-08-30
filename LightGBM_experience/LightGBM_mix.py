@@ -174,24 +174,4 @@ if __name__ == "__main__":
         # relate_data.set_collector(collector)
         relate_data.set_batch_size(128)
         relate_data.set_collector("VF")
-        run_bayes_optimize(1, 2)
-
-    # all_data = generate_data.multicsv_data_generater(data_path)
-    #
-    # for i in range(len(all_data)-rank-1,-1,-size):
-    #
-    #
-    #     X_train, y_train, X_test, y_test, Material_ID = all_data[i]
-    #     print(Material_ID, check_IDexist(Material_ID, result_path))
-    #     print(Material_ID, check_IDexist(Material_ID, result_path))
-    #     if not check_IDexist(Material_ID, result_path):
-    #         Intermediate_path = "mix_" + str(len(Material_ID)) + os.sep
-    #         print(Material_ID)
-    #         grid_search_i = grid_i(X_train, y_train)
-    #
-    #         print(f"best parameters: {grid_search_i.best_params_}")
-    #         print(
-    #             f"best score:      {-grid_search_i.best_score_:0.5f} (+/-{grid_search_i.cv_results_['std_test_score'][grid_search_i.best_index_]:0.5f})")
-    #         results_dfi = pd.DataFrame(grid_search_i.cv_results_)
-    #         results_dfi.to_csv(result_path + Intermediate_path + str(Material_ID) + ".csv")
-
+        run_bayes_optimize(10, 2)

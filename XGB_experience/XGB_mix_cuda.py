@@ -150,7 +150,7 @@ def run_bayes_optimize(num_of_iteration=10, data_index=2):
          'reg_lambda': [10, 30]}
     )
 
-    rf_bo.maximize(init_points=4,n_iter=num_of_iteration)
+    rf_bo.maximize(n_iter=num_of_iteration)
     result_data_root = "." + os.sep + "BO_result_data" + os.sep
     routing_data_root = "." + os.sep + "BO_training_routing" + os.sep
     pd.DataFrame(data_record)
@@ -206,4 +206,4 @@ if __name__ == "__main__":
         # relate_data.set_collector(collector)
         relate_data.set_batch_size(128)
         relate_data.set_collector("VF")
-        run_bayes_optimize(1, 2)
+        run_bayes_optimize(5, 2)

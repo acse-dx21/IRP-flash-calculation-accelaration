@@ -75,30 +75,30 @@ from torch.utils.data import TensorDataset,DataLoader
 import torch
 # modls=stacking_model("test")
 # print()
-num = 200
-data = np.ones((num, 14)) + np.random.randn(num, 14) * 10
-target = np.ones((num, 10)) + np.random.randn(num, 10) * 0.1
-
-
-import xgboost
-import lightgbm
-from sklearn.multioutput import MultiOutputRegressor
-from sklearn.metrics import mean_squared_error
-from sklearn.ensemble import RandomForestRegressor
-import ArtificialNN
-stak_model=stacking_model("test")
-model1=xgboost.XGBRegressor()
-model2=RandomForestRegressor()
-model3=ArtificialNN.Neural_Model_Sklearn_style(ArtificialNN.ANN,{"input_num":10,"output_num":10})
-
-
-stak_model.add_model(model1)
-stak_model.add_model(model2)
-stak_model.add_model(model3)
-stak_model.fit(data,target)
-print(stak_model.score(data,target))
-print(stak_model.predict(data))
-print(target)
-print(stak_model.data_record)
+# num = 200
+# data = np.ones((num, 14)) + np.random.randn(num, 14) * 10
+# target = np.ones((num, 10)) + np.random.randn(num, 10) * 0.1
+#
+#
+# import xgboost
+# import lightgbm
+# from sklearn.multioutput import MultiOutputRegressor
+# from sklearn.metrics import mean_squared_error
+# from sklearn.ensemble import RandomForestRegressor
+# import ArtificialNN
+# stak_model=stacking_model("test")
+# model1=xgboost.XGBRegressor()
+# model2=RandomForestRegressor()
+# model3=ArtificialNN.Neural_Model_Sklearn_style(ArtificialNN.ANN,{"input_num":10,"output_num":10})
+#
+#
+# stak_model.add_model(model1)
+# stak_model.add_model(model2)
+# stak_model.add_model(model3)
+# stak_model.fit(data,target)
+# print(stak_model.score(data,target))
+# print(stak_model.predict(data))
+# print(target)
+# print(stak_model.data_record)
 
 

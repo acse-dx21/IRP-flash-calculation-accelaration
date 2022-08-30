@@ -21,6 +21,7 @@ bool_shulfle = True
 
 class flashdata_modified(Dataset):
     """
+    look better, but have the same function as flashdata bellow
     dataset of output: phase component of
     """
 
@@ -36,7 +37,7 @@ class flashdata_modified(Dataset):
         example:
         >>> constants, properties = ChemicalConstantsPackage.from_IDs(['methane', 'ethane', 'nitrogen'])
         >>> a=flashdata(constants,properties,{"T":[177.5,120.0],"P":[1e5,2e5]},[[.25, 0.7, .05],[.25, 0.7, .05]],"Vapor_Liquid")
-        >>> train_loader = DataLoader(a, shuffle=True,batch_size=1,collate_fn=collate_VL)
+        >>> train_loader = DataLoader(a, shuffle=True,batch_size=1,collate_fn=collector(return_type="NParray"))
         >>> a[0]
         EquilibriumState(T=177.5, P=100000.0, zs=[0.25, 0.7, 0.05], betas=[0.9701227587661881, 0.029877241233811858], gas=<CEOSGas, T=177.5 K, P=100000 Pa>, liquids=[CEOSLiquid(eos_class=PRMIX, eos_kwargs={"Pcs": [4599000.0, 4872000.0, 3394387.5], "Tcs": [190.564, 305.32, 126.2], "omegas": [0.008, 0.098, 0.04], "kijs": [[0.0, -0.0059, 0.0289], [-0.0059, 0.0, 0.0533], [0.0289, 0.0533, 0.0]]}, HeatCapacityGases=[HeatCapacityGas(CASRN="74-82-8", MW=16.04246, similarity_variable=0.3116728980468083, extrapolation="linear", method="TRCIG"), HeatCapacityGas(CASRN="74-84-0", MW=30.06904, similarity_variable=0.26605438683775734, extrapolation="linear", method="TRCIG"), HeatCapacityGas(CASRN="7727-37-9", MW=28.0134, similarity_variable=0.07139440410660612, extrapolation="linear", method="TRCIG")], T=177.5, P=100000.0, zs=[0.009522975422008546, 0.9902824411636479, 0.00019458341434332182])], solids=[])
         '''
@@ -95,7 +96,7 @@ class flashdata(Dataset):
         example:
         >>> constants, properties = ChemicalConstantsPackage.from_IDs(['methane', 'ethane', 'nitrogen'])
         >>> a=flashdata(constants,properties,{"T":[177.5,120.0],"P":[1e5,2e5]},[[.25, 0.7, .05],[.25, 0.7, .05]],"Vapor_Liquid")
-        >>> train_loader = DataLoader(a, shuffle=True,batch_size=1,collate_fn=collate_VL)
+        >>> train_loader = DataLoader(a, shuffle=True,batch_size=1,collate_fn=collector(return_type="NParray"))
         >>> a[0]
         EquilibriumState(T=177.5, P=100000.0, zs=[0.25, 0.7, 0.05], betas=[0.9701227587661881, 0.029877241233811858], gas=<CEOSGas, T=177.5 K, P=100000 Pa>, liquids=[CEOSLiquid(eos_class=PRMIX, eos_kwargs={"Pcs": [4599000.0, 4872000.0, 3394387.5], "Tcs": [190.564, 305.32, 126.2], "omegas": [0.008, 0.098, 0.04], "kijs": [[0.0, -0.0059, 0.0289], [-0.0059, 0.0, 0.0533], [0.0289, 0.0533, 0.0]]}, HeatCapacityGases=[HeatCapacityGas(CASRN="74-82-8", MW=16.04246, similarity_variable=0.3116728980468083, extrapolation="linear", method="TRCIG"), HeatCapacityGas(CASRN="74-84-0", MW=30.06904, similarity_variable=0.26605438683775734, extrapolation="linear", method="TRCIG"), HeatCapacityGas(CASRN="7727-37-9", MW=28.0134, similarity_variable=0.07139440410660612, extrapolation="linear", method="TRCIG")], T=177.5, P=100000.0, zs=[0.009522975422008546, 0.9902824411636479, 0.00019458341434332182])], solids=[])
         '''
@@ -278,7 +279,7 @@ class collector:
             raise RuntimeError
 
     # init here
-    def __init__(self, return_type="NParray", collect_method=_collect_material0.__get__(object)):
+    def __init__(self, return_type="NParray", collect_method=_collect_gas_liq_phase.__get__(object)):
         if return_type == "NParray":
             self.cast = np.array
         elif return_type == "tensor":
@@ -522,7 +523,7 @@ class multicsv_data_generater:
         self.category = {}
 
         self.collector = collector()
-        self.collector.set_collect_method("material0")
+
         cnt = -1
         self.return_type = return_type
         # store all the dictionary path of every picture, and the corresponding label of it
@@ -654,7 +655,7 @@ class mixture_generater:
         self.category = {}
 
         self.collector = collector()
-        self.collector.set_collect_method("material0")
+
         cnt = -1
         self.return_type = return_type
         # store all the dictionary path of every picture, and the corresponding label of it

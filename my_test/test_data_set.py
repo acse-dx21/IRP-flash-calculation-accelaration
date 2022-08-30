@@ -109,18 +109,22 @@ def test_collect_VL():
     data1 = generate_data.flashdata(constants, properties, {"T": [110.0, 120.0], "P": [1e5, 2e5]},
                                     [[.25, 0.7, .05], [.25, 0.7, .05]], "Vapor_Liquid")
     train_loader = DataLoader(data1, shuffle=False,
-                              batch_size=2, collate_fn=generate_data.collate_VL)
+                              batch_size=2, collate_fn=generate_data.collector(return_type="NParray"))
+
+    print(next(iter(train_loader)))
+    print(next(iter(train_loader))[0])
+    print(next(iter(train_loader))[1])
 
     assert list(next(iter(train_loader))[1].shape) == [2, 8]
     assert list(next(iter(train_loader))[0].shape) == [2, 14]
-    print(next(iter(train_loader))[1])
+
 
     dic = dict(T=[168.2961], P=[179736.4561])
     zs = [[0.8975495883390227, 0.06624433417431613, 0.03620607748666118]]
     data2 = generate_data.flashdata(constants, properties, dic,
                                     zs, "Vapor_Liquid")
     train_loader = DataLoader(data2, shuffle=False,
-                              batch_size=2, collate_fn=generate_data.collate_VL)
+                              batch_size=2, collate_fn=generate_data.collector(return_type="NParray"))
 
     assert list(next(iter(train_loader))[1].shape)[1] == 8
     assert list(next(iter(train_loader))[0].shape)[1] == 14
@@ -128,7 +132,7 @@ def test_collect_VL():
     data3 = generate_data.flashdata(constants, properties, dic,
                                     zs, "Vapor_Liquid")
     train_loader = DataLoader(data3, shuffle=False,
-                              batch_size=2, collate_fn=generate_data.collate_VL_NParray)
+                              batch_size=2, collate_fn=generate_data.collector(return_type="NParray"))
 
     assert isinstance(next(iter(train_loader))[1], np.ndarray)
     assert list(next(iter(train_loader))[1].shape)[1] == 8

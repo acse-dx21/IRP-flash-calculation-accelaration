@@ -1,0 +1,490 @@
+import matplotlib.pyplot as plt
+import seaborn as sns
+import numpy as np
+import os
+import pandas as pd
+
+path1 = "E:\Ic document\IRP-Accelerating-flash-calculation-through-deep-learn\Simple_ANN_experience\My_Mass_Balance_loss_data"
+path2 = "E:\Ic document\IRP-Accelerating-flash-calculation-through-deep-learn\Simple_ANN_experience\MSELoss_data"
+import matplotlib.pyplot as plt
+import pandas as pd
+import seaborn as sns
+
+datasize = {"single_predict": 1, "mini_data_0": 6300, "mini_data_1": 63000, "mini_data_2": 126000, "mini_data_3": 189000}
+meaningfull_word = {"target": "MSELoss", "test_time_consume(s)": "test_time_consume(s)"}
+
+
+def cross_plot(path1, path2):
+    files1 = os.listdir(path1)
+    files2 = os.listdir(path2)
+
+    label1 = "My_Mass_Balance_loss"
+    label2 = "MSELoss"
+
+    length = len(files1)
+    plt.figure(dpi=800)
+    plt.figure(figsize=(30, 24))
+    for i in range(len(files1)):
+        data_i = pd.read_csv(path1 + os.sep + files1[i], comment="#")
+        data_j = pd.read_csv(path2 + os.sep + files2[i], comment="#")
+
+        plt.subplot(3, int(length / 3), i + 1)
+        plt.plot(data_i["epoch"].tolist(), data_i["loss"].tolist(), label=label1)
+        plt.plot(data_j["epoch"].tolist(), data_j["loss"].tolist(), label=label2)
+        plt.xlabel("epoch")
+        plt.ylabel("loss")
+        plt.legend()
+        plt.title(files1[i])
+
+    plt.show()
+
+
+import matplotlib.ticker as ticker
+
+
+class line_bar_plot_from_csv_norm2:
+    def __init__(self, name):
+        self.name = name
+        self.data = []
+        self.fig, self.ax = plt.subplots()
+        self.colors = ['pink', 'lightgreen', 'lightblue']
+        self.comment = ["norm", "postprocessed", "noPreprocess"]
+        self.cnt = 0
+
+    def collect_file_path(self, root):
+        collected_file = []
+        for root, _, files in os.walk(root):
+            for file in files:
+                collected_file.append(os.path.join(root, file))
+
+        return collected_file
+
+    def _collect_data(self, path, target):
+        # print(path,pd.read_csv(path, index_col=0,comment="#")[target].abs().min())
+        return pd.read_csv(path, index_col=0, comment="#")[target].abs()
+
+    def _collect_all_data(self, path, target):
+        # print(path,pd.read_csv(path, index_col=0,comment="#")[target].abs().min())
+        return pd.read_csv(path, index_col=0, comment="#")[target].abs()
+
+    def structed_add_files(self, root, target, norm=None):
+        """
+        add Dataframe files,with key = mix_i and values= dataframe(comb(materials datas))
+        :param root:
+        :return:data {c_i:
+        """
+        comment = " "
+
+        for i in self.comment:
+            if i in root:
+                comment += "_" + i
+        if "cuda" in root or "gpu" in root:
+            comment += "_gpu"
+        if "cpu" in root or "CPU" in root:
+            comment += "_cpu"
+        cnt = 0
+        # comment += str(self.cnt)
+        data_in_this_model = []
+        for roots, dir, files in os.walk(root):
+            sigle_material_data = []
+
+            for file in files:
+                print(roots, file)
+
+                for data in datasize.keys():
+                    if data in roots:
+                        target_size = datasize[data]
+                if norm is not None and norm != "min":
+                    reformed_data = {target: self._collect_data(os.path.join(roots, file), target) * 1000
+                                             / self._collect_data(os.path.join(roots, file), norm)}
+
+                elif norm == "min":
+                    reformed_data = {target: [self._collect_data(os.path.join(roots, file), target).min()]}
+                    reformed_data = {**reformed_data,
+                                     **{"mixture": roots.split(os.sep)[-1], "material": file.replace(".csv", ""),
+                                        "model": root.split(os.sep)[1].replace("experience", "") + comment,
+                                        "data_size": target_size}}
+                else:
+                    reformed_data = {target: self._collect_data(os.path.join(roots, file), target)}
+                    reformed_data = {**reformed_data,
+                                     **{"mixture": roots.split(os.sep)[-1], "material": file.replace(".csv", ""),
+                                        "model": root.split(os.sep)[1].replace("experience", "") + comment,
+                                        "data_size": target_size}}
+
+                sigle_material_data.append(pd.DataFrame(reformed_data))
+
+            try:
+
+                data_in_this_model.append(pd.concat(sigle_material_data, axis=0, ignore_index=True))
+
+            except:
+                pass
+            cnt += 1
+            # print(root)
+
+        if (len(data_in_this_model) > 1):
+            self.data.append(pd.concat(data_in_this_model, axis=0, ignore_index=True))
+        elif (len(data_in_this_model) == 1):
+            self.data.append(*data_in_this_model)
+
+        self.cnt += 1
+        return self.data
+
+    def plot(self):
+
+        data_rearrange = []
+        position = []
+        fig, ax = plt.subplots()  # 子图
+        # print(self.data[0]["mix_"+str(1)])
+        for i in range(7):
+            for j in range(len(self.data)):
+                try:
+                    data_rearrange.append(self.data[j]["C_" + str(i)].dropna(axis=0, how="any").to_numpy())
+                    position.append(j * 0.1 + i)
+                except:
+                    pass
+        print(position)
+        print(len(data_rearrange[0]))
+        ax.boxplot(data_rearrange, positions=position, patch_artist=True, label="")
+
+    def plot_box(self, x, y):
+
+        multi_model_data = pd.concat(self.data, axis=0, ignore_index=True)
+
+        multi_model_data = multi_model_data.loc[multi_model_data["mixture"] == "mix_2"]
+        sns.catplot(x=x, y=y,
+                    hue="model",
+                    data=multi_model_data, kind="box", height=6, ci=96, margin_titles=True,
+                    aspect=1.7)
+
+        plt.ylabel(meaningfull_word[y])
+        plt.xlabel(x)
+
+    def plot_line(self, x, y):
+
+        multi_model_data = pd.concat(self.data, axis=0, ignore_index=True)
+        print(multi_model_data)
+        multi_model_data = multi_model_data.loc[multi_model_data["mixture"] == "mix_2"]
+        sns.lineplot(data=multi_model_data, x=x, y=y, hue="model", style="model", markers=True, dashes=False)
+        plt.ylabel(meaningfull_word[y])
+        plt.xlabel(x)
+        plt.yscale("log")
+
+        # plt.xscale("log")
+
+    def plot_bar(self, x, y, hue):
+
+        multi_model_data = pd.concat(self.data, axis=0, ignore_index=True)
+        print(multi_model_data)
+        multi_model_data = multi_model_data.loc[multi_model_data["mixture"] == "mix_2"]
+        sns.barplot(data=multi_model_data, x=x, y=y, hue=hue, )
+
+        plt.ylabel(meaningfull_word[y])
+        plt.xlabel(x)
+        # plt.yscale("log")
+        plt.xticks(rotation=-10)
+        # plt.xscale("log")
+
+    def plot_files(self, root):
+        files = self.collect_file(root)
+        cnt = 0
+        collect = {}
+        for file in files:
+            data = self._collect_data(file)
+            cnt += 1
+            collect[cnt] = data
+        return pd.DataFrame(collect)
+
+    def plot_bubble(self, x, y):
+        result=[]
+        half=int(len(self.data)/2)
+        for i in range(half):
+            data=pd.merge(self.data[i], self.data[half + i], left_index=True, right_index=True)
+            data["std"]=np.std(data['target'].to_numpy())
+            data["mean_target"] = np.mean(data['target'].to_numpy())
+            data["mean_time"] = np.mean(data['test_time_consume(s)'].to_numpy())
+            result.append(data)
+        result=pd.concat(result)
+        print(result)
+        sns.scatterplot(data=result, x="mean_target", y="mean_time",hue="model_y",s=8000*result['std'])
+
+    def compute_x(self,pd):
+        return np.mean(pd['test_time_consume(s)'].to_numpy())
+    def compute_y(self,pd):
+        return np.mean(pd['target'].to_numpy())
+
+
+    def compute_std(self,pd):
+        return np.std(pd['target'].to_numpy())
+
+
+    def plot_bubble(self, x, y):
+        result = {}
+        target_size=189000
+        for pdd in self.data:
+            if pdd["data_size"][0]==target_size:
+                title=pdd["model"][0]
+                temp ={}
+
+                if "test_time_consume(s)" in pdd.columns:
+                    temp["mean_test_time_consume(s)"] = self.compute_x(pdd)
+
+                if "target" in pdd.columns:
+                    temp["target"] = self.compute_y(pdd)
+                    temp["std"] = self.compute_std(pdd)
+                print(title)
+                if title in result.keys():
+                    result[title]={**result[title], **temp}
+                else:
+                    result[title]=temp
+
+        pd.DataFrame(result).T.to_csv(f"test{target_size}.csv")
+
+
+
+
+
+a = line_bar_plot_from_csv_norm2("test")
+# file="..\\XGB_experience\\BO_result_data\\mix_3\\('Ethane', 'N-Butane', 'N-Pentane').csv"
+# root1="..\\Simple_ANN_experience\\BO_result_data\\"
+# root2="..\\XGB_experience\\BO_result_data\\"
+# root3="..\\LightGBM_experience\\BO_result_data\\"
+data_num = 1
+
+# root1 = f"..\\1dcnn_experience\\mini_cleaned_data_mixture\\mini_data_{data_num}\\BO_training_routing\\"
+
+final_root2 = "BO_training_routing"
+final_root = "BO_result_data"
+
+tab_root11 = f"..\\tabnet_experience\\mini_cleaned_data_mixture_cuda\\mini_data_0\\{final_root}\\"
+tab_root12 = f"..\\tabnet_experience\\mini_cleaned_data_mixture_cuda\\mini_data_1\\{final_root}\\"
+tab_root13 = f"..\\tabnet_experience\\mini_cleaned_data_mixture_cuda\\mini_data_2\\{final_root}\\"
+tab_root14 = f"..\\tabnet_experience\\mini_cleaned_data_mixture_cuda\\mini_data_3\\{final_root}\\"
+tab_root15 = f"..\\tabnet_experience\\mini_cleaned_data_mixture_cuda\\single_predict\\{final_root}\\"
+
+tab_root1 = f"..\\tabnet_experience\\mini_cleaned_data_mixture_cpu\\mini_data_0\\{final_root}\\"
+tab_root2 = f"..\\tabnet_experience\\mini_cleaned_data_mixture_cpu\\mini_data_1\\{final_root}\\"
+tab_root3 = f"..\\tabnet_experience\\mini_cleaned_data_mixture_cpu\\mini_data_2\\{final_root}\\"
+tab_root4 = f"..\\tabnet_experience\\mini_cleaned_data_mixture_cpu\\mini_data_3\\{final_root}\\"
+tab_root5 = f"..\\tabnet_experience\\mini_cleaned_data_mixture_cpu\\single_predict\\{final_root}\\"
+
+# root2 = f"..\\tabnet_experience\\mini_cleaned_data_mixture_cuda\\mini_data_0\\BO_result_data\\"
+
+# root4=f"..\\Simple_ANN_experience\\mini_cleaned_data\\mini_data_{data_num}\\BO_result_data\\"
+
+LGBM_root9 = f"..\\LightGBM_experience\\mini_cleaned_data_mixture_cpu\\mini_data_0\\{final_root}\\"
+LGBM_root10 = f"..\\LightGBM_experience\\mini_cleaned_data_mixture_cpu\\mini_data_1\\{final_root}\\"
+LGBM_root11 = f"..\\LightGBM_experience\\mini_cleaned_data_mixture_cpu\\mini_data_2\\{final_root}\\"
+LGBM_root12 = f"..\\LightGBM_experience\\mini_cleaned_data_mixture_cpu\\mini_data_3\\{final_root}\\"
+LGBM_root13 = f"..\\LightGBM_experience\\mini_cleaned_data_mixture_cpu\\single_predict\\{final_root}\\"
+
+# LGBM_root4 = f"..\\LightGBM_experience\\mini_cleaned_data_mixture_cpu\\mini_data_0\\{final_root}\\"
+# LGBM_root0 = f"..\\LightGBM_experience\\mini_cleaned_data_mixture_cpu\\mini_data_1\\{final_root}\\"
+# LGBM_root1 = f"..\\LightGBM_experience\\mini_cleaned_data_mixture_cpu\\mini_data_2\\{final_root}\\"
+# LGBM_root2 = f"..\\LightGBM_experience\\mini_cleaned_data_mixture_cpu\\mini_data_3\\{final_root}\\"
+# LGBM_root3 = f"..\\LightGBM_experience\\mini_cleaned_data_mixture_cpu\\single_predict\\{final_root}\\"
+
+
+XGB_root13 = f"..\\XGB_experience\\mini_cleaned_data_mixture_cpu\\mini_data_0\\{final_root}\\"
+XGB_root14 = f"..\\XGB_experience\\mini_cleaned_data_mixture_cpu\\mini_data_1\\{final_root}\\"
+XGB_root15 = f"..\\XGB_experience\\mini_cleaned_data_mixture_cpu\\mini_data_2\\{final_root}\\"
+XGB_root16 = f"..\\XGB_experience\\mini_cleaned_data_mixture_cpu\\mini_data_3\\{final_root}\\"
+XGB_root17 = f"..\\XGB_experience\\mini_cleaned_data_mixture_cpu\\single_predict\\{final_root}\\"
+
+XGB_root33 = f"..\\XGB_experience\\mini_cleaned_data_mixture_cuda\\mini_data_0\\{final_root}\\"
+XGB_root34 = f"..\\XGB_experience\\mini_cleaned_data_mixture_cuda\\mini_data_1\\{final_root}\\"
+XGB_root35 = f"..\\XGB_experience\\mini_cleaned_data_mixture_cuda\\mini_data_2\\{final_root}\\"
+XGB_root36 = f"..\\XGB_experience\\mini_cleaned_data_mixture_cuda\\mini_data_3\\{final_root}\\"
+XGB_root37 = f"..\\XGB_experience\\mini_cleaned_data_mixture_cuda\\single_predict\\{final_root}\\"
+
+XGB_root20 = f"..\\XGB_experience\\mini_cleaned_data_mixture_norm\\mini_data_0\\{final_root}\\"
+XGB_root21 = f"..\\XGB_experience\\mini_cleaned_data_mixture_norm\\mini_data_1\\{final_root}\\"
+XGB_root22 = f"..\\XGB_experience\\mini_cleaned_data_mixture_norm\\mini_data_2\\{final_root}\\"
+XGB_root23 = f"..\\XGB_experience\\mini_cleaned_data_mixture_norm\\mini_data_3\\{final_root}\\"
+
+CAT_root20 = f"..\\cat_experience\\mini_cleaned_data_mixture_cpu\\mini_data_0\\{final_root}\\"
+CAT_root21 = f"..\\cat_experience\\mini_cleaned_data_mixture_cpu\\mini_data_1\\{final_root}\\"
+CAT_root22 = f"..\\cat_experience\\mini_cleaned_data_mixture_cpu\\mini_data_2\\{final_root}\\"
+CAT_root23 = f"..\\cat_experience\\mini_cleaned_data_mixture_cpu\\mini_data_3\\{final_root}\\"
+CAT_root24 = f"..\\cat_experience\\mini_cleaned_data_mixture_cpu\\single_predict\\{final_root}\\"
+
+ANN_root13 = f"..\\Simple_ANN_experience\\mini_cleaned_data_mixture_cpu\\mini_data_0\\{final_root}\\"
+ANN_root14 = f"..\\Simple_ANN_experience\\mini_cleaned_data_mixture_cpu\\mini_data_1\\{final_root}\\"
+ANN_root15 = f"..\\Simple_ANN_experience\\mini_cleaned_data_mixture_cpu\\mini_data_2\\{final_root}\\"
+ANN_root16 = f"..\\Simple_ANN_experience\\mini_cleaned_data_mixture_cpu\\mini_data_3\\{final_root}\\"
+ANN_root17 = f"..\\Simple_ANN_experience\\mini_cleaned_data_mixture_cpu\\single_predict\\{final_root}\\"
+
+ANN_root3 = f"..\\Simple_ANN_experience\\mini_cleaned_data_mixture_cuda\\mini_data_0\\{final_root}\\"
+ANN_root4 = f"..\\Simple_ANN_experience\\mini_cleaned_data_mixture_cuda\\mini_data_1\\{final_root}\\"
+ANN_root5 = f"..\\Simple_ANN_experience\\mini_cleaned_data_mixture_cuda\\mini_data_2\\{final_root}\\"
+ANN_root6 = f"..\\Simple_ANN_experience\\mini_cleaned_data_mixture_cuda\\mini_data_3\\{final_root}\\"
+ANN_root7 = f"..\\Simple_ANN_experience\\mini_cleaned_data_mixture_cuda\\single_predict\\{final_root}\\"
+
+RF_root13 = f"..\\RF_experience\\mini_cleaned_data_mixture_cpu\\mini_data_0\\{final_root}\\"
+RF_root14 = f"..\\RF_experience\\mini_cleaned_data_mixture_cpu\\mini_data_1\\{final_root}\\"
+RF_root15 = f"..\\RF_experience\\mini_cleaned_data_mixture_cpu\\mini_data_2\\{final_root}\\"
+RF_root16 = f"..\\RF_experience\\mini_cleaned_data_mixture_cpu\\mini_data_3\\{final_root}\\"
+RF_root17 = f"..\\RF_experience\\mini_cleaned_data_mixture_cpu\\single_predict\\{final_root}\\"
+
+RF_root115 = f"..\\RF_experience\\mini_cleaned_data_mixture_cpu\\mini_data_2\\{final_root2}\\"
+
+FT_root1 = f"..\\FT-transformer\\mini_cleaned_data_mixture_cuda\\mini_data_0\\{final_root}\\"
+FT_root2 = f"..\\FT-transformer\\mini_cleaned_data_mixture_cuda\\mini_data_1\\{final_root}\\"
+FT_root3 = f"..\\FT-transformer\\mini_cleaned_data_mixture_cuda\\mini_data_2\\{final_root}\\"
+FT_root4 = f"..\\FT-transformer\\mini_cleaned_data_mixture_cuda\\mini_data_3\\{final_root}\\"
+
+# FT_root11 = f"..\\FT-transformer\\mini_cleaned_data_mixture_cpu\\mini_data_0\\{final_root}\\"
+# FT_root12 = f"..\\FT-transformer\\mini_cleaned_data_mixture_cuda_noPreprocess\\mini_data_1\\{final_root}\\"
+# FT_root13 = f"..\\FT-transformer\\mini_cleaned_data_mixture_cuda_noPreprocess\\mini_data_2\\{final_root}\\"
+# FT_root14 = f"..\\FT-transformer\\mini_cleaned_data_mixture_cuda_noPreprocess\\mini_data_3\\{final_root}\\"
+
+# FT_root111=f"..\\FT-transformer\\mini_cleaned_data_mixture_cuda_noPreprocess\\mini_data_0\\{final_root2}\\"
+# FT_root112=f"..\\FT-transformer\\mini_cleaned_data_mixture_cuda_noPreprocess\\mini_data_1\\{final_root2}\\"
+FT_root113 = f"..\\FT-transformer\\mini_cleaned_data_mixture_cuda_noPreprocess\\mini_data_2\\{final_root2}\\"
+# FT_root114=f"..\\FT-transformer\\mini_cleaned_data_mixture_cuda_noPreprocess\\mini_data_3\\{final_root2}\\"
+roots = []
+
+# tabnet cpu
+# if final_root=="BO_training_routing":
+#     roots.append(tab_root15)
+roots.append(tab_root11)
+roots.append(tab_root12)
+roots.append(tab_root13)
+roots.append(tab_root14)
+# # tabnet gpu
+# if final_root=="BO_training_routing":
+#     roots.append(tab_root5)
+# roots.append(tab_root1)
+# roots.append(tab_root2)
+# roots.append(tab_root3)
+# roots.append(tab_root4)
+# #
+#
+# #LGBM cpu
+# if final_root=="BO_training_routing":
+#     roots.append(LGBM_root13)
+roots.append(LGBM_root9)
+roots.append(LGBM_root10)
+roots.append(LGBM_root11)
+roots.append(LGBM_root12)
+#
+# #LGBM cpu
+# if final_root=="BO_training_routing":
+#     roots.append(LGBM_root3)
+# roots.append(LGBM_root4)
+# roots.append(LGBM_root0)
+# roots.append(LGBM_root1)
+# roots.append(LGBM_root2)
+# #
+# #xgb cpu
+# if final_root=="BO_training_routing":
+#     roots.append(XGB_root17)
+roots.append(XGB_root13)
+roots.append(XGB_root14)
+roots.append(XGB_root15)
+roots.append(XGB_root16)
+#
+# # xgb gpu
+# if final_root=="BO_training_routing":
+#     roots.append(XGB_root37)
+roots.append(XGB_root33)
+roots.append(XGB_root34)
+roots.append(XGB_root35)
+roots.append(XGB_root36)
+#
+#
+# if final_root=="BO_training_routing":
+#     roots.append(XGB_root9)
+# roots.append(XGB_root5)
+# roots.append(XGB_root6)
+# roots.append(XGB_root7)
+# roots.append(XGB_root8)
+#
+# # xgb norm
+roots.append(XGB_root20)
+roots.append(XGB_root21)
+roots.append(XGB_root22)
+roots.append(XGB_root23)
+#
+# # cat cpu
+# # if final_root=="BO_training_routing":
+# #     roots.append(CAT_root24)
+roots.append(CAT_root20)
+roots.append(CAT_root21)
+roots.append(CAT_root22)
+roots.append(CAT_root23)
+#
+# # #ANN gpu
+# if final_root=="BO_training_routing":
+#     roots.append(ANN_root17)
+roots.append(ANN_root13)
+roots.append(ANN_root14)
+roots.append(ANN_root15)
+roots.append(ANN_root16)
+#
+# if final_root=="BO_training_routing":
+#     roots.append(ANN_root7)
+roots.append(ANN_root3)
+roots.append(ANN_root4)
+roots.append(ANN_root5)
+roots.append(ANN_root6)
+#
+# #ANN cpu
+# # if final_root=="BO_training_routing":
+# #     roots.append(ANN_root17)
+roots.append(FT_root1)
+roots.append(FT_root2)
+roots.append(FT_root3)
+roots.append(FT_root4)
+
+# roots.append(FT_root11)
+# roots.append(FT_root12)
+# roots.append(FT_root13)
+# roots.append(FT_root14)
+
+roots1 = []
+# roots1.append(FT_root111)
+# roots1.append(FT_root112)
+# roots1.append(FT_root113)
+# roots1.append(FT_root114)
+# RF cpu
+# if final_root=="BO_training_routing":
+#     roots.append(RF_root17)
+roots.append(RF_root13)
+roots.append(RF_root14)
+roots.append(RF_root15)
+roots.append(RF_root16)
+# roots1.append(RF_root115)
+
+for i in roots:
+    roots1.append(i.replace(final_root,final_root2))
+
+print(roots1)
+
+# if final_root=="BO_training_routing":
+#     roots.append(tab_root15)
+#     roots.append(tab_root5)
+#     # roots.append(XGB_root17)
+#     roots.append(LGBM_root13)
+#     roots.append(XGB_root9)
+#     roots.append(ANN_root17)
+#     roots.append(RF_root17)
+
+def multi_plot(roots, target):
+    for root in roots:
+        a.structed_add_files(root, "target", )
+
+    for root in roots1:
+        a.structed_add_files(root, "test_time_consume(s)", )
+
+    ax = a.plot_bubble("test_time_consume(s)", "target")
+    # ax = a.plot_bar("model",target,"data_size")
+
+
+multi_plot(roots, "test_time_consume(s)")
+# multi_plot(roots,"target")
+
+
+plt.title("time_prediction")
+# plt.ylabel(target)
+plt.show()

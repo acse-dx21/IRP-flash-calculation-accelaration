@@ -1,0 +1,11 @@
+,target,mixture_x,material_x,model_x,data_size_x,test_time_consume(s),mixture_y,material_y,model_y,data_size_y
+0,0.0133232371881604,mix_2,mixture,FT-transformer _noPreprocess_gpu,42000,0.8100266456604004,mix_2,mixture,FT-transformer _noPreprocess_gpu,42000
+1,0.1199950575828552,mix_2,mixture,FT-transformer _noPreprocess_gpu,42000,0.7105157375335693,mix_2,mixture,FT-transformer _noPreprocess_gpu,42000
+2,0.0476841777563095,mix_2,mixture,FT-transformer _noPreprocess_gpu,42000,0.4860522747039795,mix_2,mixture,FT-transformer _noPreprocess_gpu,42000
+3,0.134318321943283,mix_2,mixture,FT-transformer _noPreprocess_gpu,42000,0.2910003662109375,mix_2,mixture,FT-transformer _noPreprocess_gpu,42000
+4,0.006883718073368,mix_2,mixture,FT-transformer _noPreprocess_gpu,42000,0.4330387115478515,mix_2,mixture,FT-transformer _noPreprocess_gpu,42000
+5,0.1327597051858902,mix_2,mixture,FT-transformer _noPreprocess_gpu,42000,0.6745271682739258,mix_2,mixture,FT-transformer _noPreprocess_gpu,42000
+6,0.0494574606418609,mix_2,mixture,FT-transformer _noPreprocess_gpu,42000,0.4889671802520752,mix_2,mixture,FT-transformer _noPreprocess_gpu,42000
+7,0.1331833451986313,mix_2,mixture,FT-transformer _noPreprocess_gpu,42000,0.5229973793029785,mix_2,mixture,FT-transformer _noPreprocess_gpu,42000
+8,0.0041768169030547,mix_2,mixture,FT-transformer _noPreprocess_gpu,42000,0.4069998264312744,mix_2,mixture,FT-transformer _noPreprocess_gpu,42000
+9,0.0101818544790148,mix_2,mixture,FT-transformer _noPreprocess_gpu,42000,0.4760313034057617,mix_2,mixture,FT-transformer _noPreprocess_gpu,42000

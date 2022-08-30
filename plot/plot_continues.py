@@ -246,7 +246,7 @@ FT_root1 = f"..\\FT-transformer\\mini_cleaned_data_mixture_cuda\\mini_data_2\\{f
 roots = []
 roots.append(tab_root11)
 
-roots.append(tab_root12)
+# roots.append(tab_root12)
 
 roots.append(LGBM_root9)
 
@@ -283,6 +283,6 @@ multi_plot(roots, "target")
 # multi_plot(roots,"target")
 
 
-plt.title("continues_predition")
+plt.title("Continues_Predictions")
 plt.xlabel("epoch")
 plt.show()

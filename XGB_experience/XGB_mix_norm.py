@@ -12,13 +12,13 @@ import os
 from xgboost import XGBRegressor
 import xgboost as xgb
 
-data_set_index = [0]
+data_set_index = [0,1,2,3]
 
 mix_index = "all"
 device = "cuda"
 data_root = "." + os.sep + "mini_cleaned_data" + os.sep
 save_model = False
-save_data = False
+save_data = True
 
 
 def get_related_path(Material_ID):
@@ -32,69 +32,9 @@ def get_related_path(Material_ID):
     raise RuntimeError
 
 
-def get_range(mix_index):
-    """
-    use to fine target mixture
-    :param mix_index: "all" or int range from 1-7
-    :return:
-    """
-    if (mix_index == "all"):
-        return 0, 127
-    assert mix_index > 0
-    start = 0
-    end = comb(7, 1)
-
-    for i in range(1, mix_index):
-        start += comb(7, i)
-        end += comb(7, i + 1)
-
-    return int(start), int(end)
-
-
-param_grid = [
-    # try combinations of hyperparameters
-    {'subsample': [0.2, 0.6, 1.0],
-     'learning_rate': [0.01, 0.05, 0.1],
-     'n_estimators': [300, 400, 500],
-     'max_depth': [3, 5, 10],
-     'colsample_bytree': [0.6],
-     'reg_lambda': [10]}
-]
-
-
-def grid_i(X_train, y_train):
-    # train across 3 folds
-    grid_search = GridSearchCV(XGBRegressor(objective='reg:squarederror', n_jobs=3, random_state=42),
-                               param_grid,
-                               cv=3,
-                               scoring='neg_mean_squared_error',
-                               return_train_score=True,
-                               verbose=1,
-                               n_jobs=2)
-
-    start = time.time()
-    grid_search.fit(X_train, y_train)
-    print("Run time = ", time.time() - start)
-    return grid_search
-
-
-# @Misc{,
-#     author = {Fernando Nogueira},
-#     title = {{Bayesian Optimization}: Open source constrained global optimization tool for {Python}},
-#     year = {2014--},
-#     url = " https://github.com/fmfn/BayesianOptimization"
-# }
-# import os
-#
-# data_path = ".." + os.sep + "cleaned_data" + os.sep
-# result_path = "." + os.sep + "result_data" + os.sep
-#
-#
-
 from bayes_opt import BayesianOptimization
 from sklearn.metrics import mean_squared_error
 
-#
 
 data_record = {"trainning_time_consume(s)": [], "test_time_consume(s)": []}
 from sklearn.preprocessing import normalize
@@ -145,47 +85,26 @@ import argparse
 # print(a)
 from mpi4py import MPI
 
-
-def grid_i(X_train, y_train):
-    grid_search = GridSearchCV(XGBRegressor(objective='reg:squarederror', n_jobs=1, random_state=42),
-                               param_grid,
-                               cv=3,
-                               scoring='neg_mean_squared_error',
-                               return_train_score=True,
-                               verbose=1,
-                               n_jobs=2)
-
-    start = time.time()
-    grid_search.fit(X_train, y_train)
-    print("Run time = ", time.time() - start)
-    return grid_search
-
 from sklearn.model_selection import KFold
 import numpy as np
 
 
 def model_cv(**kwargs):
-    subsample = kwargs["subsample"] if "subsample" in kwargs.keys() else 0.922
-    learning_rate = kwargs["learning_rate"] if "learning_rate" in kwargs.keys() else 0.074
-    n_estimators = kwargs["n_estimators"] if "n_estimators" in kwargs.keys() else 500
-    max_depth = kwargs["max_depth"] if "max_depth" in kwargs.keys() else 3
+    subsample = kwargs["subsample"] if "subsample" in kwargs.keys() else 0.5
+    learning_rate = kwargs["learning_rate"] if "learning_rate" in kwargs.keys() else 0.05
+    n_estimators = kwargs["n_estimators"] if "n_estimators" in kwargs.keys() else 400
+    max_depth = kwargs["min_samples_split"] if "min_samples_split" in kwargs.keys() else 12
     colsample_bytree = kwargs["colsample_bytree"] if "colsample_bytree" in kwargs.keys() else 0.8
     reg_lambda = kwargs["reg_lambda"] if "reg_lambda" in kwargs.keys() else 15
-    drop_rata=kwargs["drop_rata"] if "drop_rata" in kwargs.keys() else 0.5
-
-
 
     train_time = []
     test_time = []
     MSE_loss = []
+    patience=100
 
-    X = np.concatenate([X_train, X_test])
-    y = np.concatenate([y_train, y_test])
-    print("totalsize",X.shape)
-    epochs = 250
-    kf = KFold(n_splits=4, shuffle=True, random_state=12346)
-    for train_index, test_index in kf.split(X):
-        print("train_size", train_index.shape, "test_size", test_index.shape)
+    print("train_shape",X_train.shape,"val_shape",X_val.shape,"test_shape",X_test.shape)
+    if True:
+
         model_instance = XGBRegressor(
             tree_method="gpu_hist",
             subsample=subsample,
@@ -198,13 +117,13 @@ def model_cv(**kwargs):
             n_jobs=1
         )
         start_train = time.time()
-        model_instance.fit(X[train_index], y[train_index])
+        model_instance.fit(X_train, y_train,eval_set=[(X_val,y_val)],early_stopping_rounds=patience)
         train_time.append(time.time() - start_train)
         start_pred = time.time()
-        pred = model_instance.predict(X[test_index])
+        pred = model_instance.predict(X_test)
         test_time.append(time.time() - start_pred)
-        print("before_reg",mean_squared_error(pred, y[test_index]),"after_reg",mean_squared_error(normalization(pred), y[test_index]))
-        MSE_loss.append(mean_squared_error(normalization(pred), y[test_index]))
+        print("before_reg",mean_squared_error(pred, y_test),"after_reg",mean_squared_error(normalization(pred), y_test))
+        MSE_loss.append(mean_squared_error(normalization(pred), y_test))
     loss=np.mean(MSE_loss)
     if save_model:
         model_instance.save_model(model_save_path + get_related_path(Material_ID).replace(".csv", ""))
@@ -223,11 +142,6 @@ def run_bayes_optimize(num_of_iteration=10, data_index=2):
     global X_train, y_train,X_val, y_val, X_test, y_test, Material_ID
     X_train, y_train, X_test, y_test, Material_ID = relate_data[data_index]
 
-    preprocess = sklearn.preprocessing.StandardScaler().fit(X_train)
-
-    X_train = preprocess.transform(X_train)
-    print(X_train)
-    X_test = preprocess.transform(X_test)
 
 
     X_train, X_val, y_train, y_val = train_test_split(X_train, y_train, test_size=0.25, random_state=4)
@@ -252,6 +166,8 @@ def run_bayes_optimize(num_of_iteration=10, data_index=2):
     routing_data_root = "." + os.sep + "BO_training_routing" + os.sep
     pd.DataFrame(data_record)
     routing_data_root + get_related_path(Material_ID)
+
+    #save data
     if save_data:
         if os.path.exists(saved_root + result_data_root + get_related_path(Material_ID)):
             pd.concat([pd.DataFrame(rf_bo.res),
@@ -290,17 +206,12 @@ if __name__ == "__main__":
     rank = comm.Get_rank()
     size = comm.Get_size()
 
-    start, end = get_range(mix_index)
-
-    product_index = list(itertools.product(data_set_index, list(range(start, end))))
-    print(product_index)
-    print("total size", len(product_index))
     for index in range(rank, len(data_set_index), size):
         data_index = data_set_index[index]
         print(data_index)
 
         model_save_path = "." + os.sep + "saved_model" + os.sep + "mini_dataset_mixture" + os.sep + f"mini_data_{data_index}" + os.sep
-        mini_data_path = ".." + os.sep + "data" + os.sep + data_root + f"mini_data_{data_index}" + os.sep
+        mini_data_path = ".." + os.sep + "data" + os.sep + data_root + f"mini_data_{data_index}" + os.sep #the training\testing data come from
         saved_root = "." + os.sep + "mini_cleaned_data_mixture_" + device + os.sep + f"mini_data_{data_index}" + os.sep
         All_ID = ['Methane', 'Ethane', 'Propane', 'N-Butane', 'N-Pentane', 'N-Hexane', 'Heptane']
         relate_data = generate_data.mixture_generater(mini_data_path)

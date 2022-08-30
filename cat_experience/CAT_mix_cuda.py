@@ -13,9 +13,9 @@ from catboost import CatBoostRegressor
 from sklearn.multioutput import MultiOutputRegressor
 data_set_index = [0,1,2,3,]
 mix_index="all"
-device = "GPU"
+device = "no_device"
 data_root = "." + os.sep + "mini_cleaned_data" + os.sep
-save_model=True
+save_model=False
 save_data=True
 def get_related_path(Material_ID):
     print(Material_ID)
@@ -92,7 +92,7 @@ def model_cv(**kwargs):
                                                                 learning_rate=kwargs['learning_rate'],
                                            bagging_temperature=kwargs['bagging_temperature'],
                                                             eval_metric='RMSE',
-                                                                loss_function='RMSE',task_type=device,leaf_estimation_iterations=int(kwargs['leaf_estimation_iterations'])) for i in range(y_val.shape[-1])]
+                                                                loss_function='RMSE',task_type="GPU",leaf_estimation_iterations=int(kwargs['leaf_estimation_iterations'])) for i in range(y_val.shape[-1])]
 
         start_train = time.time()
         for i, model_instance in enumerate(model_instances):
@@ -121,11 +121,17 @@ def model_cv(**kwargs):
 
 
 from sklearn.model_selection import train_test_split
-
+import sklearn
 def run_bayes_optimize(num_of_iteration=10, data_index=2):
     BO_root = "." + os.sep + "BO_result_data" + os.sep
     global X_train, y_train,X_val,y_val, X_test, y_test, Material_ID
     X_train, y_train, X_test, y_test, Material_ID = relate_data[data_index]
+    preprocess = sklearn.preprocessing.StandardScaler().fit(X_train)
+
+    print("before_stardralization", X_test)
+    X_train = preprocess.transform(X_train)
+    X_test = preprocess.transform(X_test)
+    print("after_stardralization",X_test)
 
     X_train, X_val, y_train, y_val = train_test_split(X_train, y_train, test_size=0.25, random_state=4)
     print("train_size",X_train.shape,"test_size",X_test.shape)

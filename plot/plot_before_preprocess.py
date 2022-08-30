@@ -9,7 +9,7 @@ path2 = "E:\Ic document\IRP-Accelerating-flash-calculation-through-deep-learn\Si
 import matplotlib.pyplot as plt
 import pandas as pd
 import seaborn as sns
-datasize={"single_predict":1,"mini_data_0":2100,"mini_data_1":21000,"mini_data_2":42000,"mini_data_3":63000}
+datasize={"single_predict":1,"mini_data_0":6300,"mini_data_1":63000,"mini_data_2":126000,"mini_data_3":189000}
 meaningfull_word={"target":"MSELoss","test_time_consume(s)":"test_time_consume(s)"}
 
 
@@ -379,7 +379,7 @@ multi_plot(roots,"target")
 # multi_plot(roots,"target")
 
 
-
+plt.xlabel("training_data_siza")
 
 
 # plt.ylabel(target)

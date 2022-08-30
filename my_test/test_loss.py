@@ -1,13 +1,13 @@
 import sys
 sys.path.append("..")
-from model import loss_function
+from model import my_loss_function
 import torch
 import numpy as np
 
 
 
 def test_MB_Loss():
-    criterian = loss_function.My_Mass_Balance_loss(1, 1)
+    criterian = my_loss_function.My_Mass_Balance_loss(1, 1)
     y_pred = torch.tensor([[0.2, 0.2, 0.6, 0.1, 0.1, 0.1, 0.9, 0.1]], requires_grad=True)
     y_real = torch.tensor([[0.1, 0.3, 0.6, 0, 0, 0, 1, 0]])
     original_fraction = torch.tensor([[0.1, 0.3, 0.6]])

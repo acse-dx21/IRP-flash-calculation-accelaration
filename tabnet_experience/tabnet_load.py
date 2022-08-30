@@ -31,65 +31,6 @@ def get_related_path(Material_ID):
     raise RuntimeError
 
 
-def get_range(mix_index):
-    """
-    use to fine target mixture
-    :param mix_index: "all" or int range from 1-7
-    :return:
-    """
-    if (mix_index == "all"):
-        return 0, 127
-    assert mix_index > 0
-    start = 0
-    end = comb(7, 1)
-
-    for i in range(1, mix_index):
-        start += comb(7, i)
-        end += comb(7, i + 1)
-
-    return int(start), int(end)
-
-
-param_grid = [
-    # try combinations of hyperparameters
-    {'subsample': [0.2, 0.6, 1.0],
-     'learning_rate': [0.01, 0.05, 0.1],
-     'n_estimators': [300, 400, 500],
-     'max_depth': [3, 5, 10],
-     'colsample_bytree': [0.6],
-     'reg_lambda': [10]}
-]
-
-
-def grid_i(X_train, y_train):
-    # train across 3 folds
-    grid_search = GridSearchCV(TabNetRegressor(objective='reg:squarederror', n_jobs=3, random_state=42),
-                               param_grid,
-                               cv=3,
-                               scoring='neg_mean_squared_error',
-                               return_train_score=True,
-                               verbose=1,
-                               n_jobs=2)
-
-    start = time.time()
-    grid_search.fit(X_train, y_train)
-    print("Run time = ", time.time() - start)
-    return grid_search
-
-
-# @Misc{,
-#     author = {Fernando Nogueira},
-#     title = {{Bayesian Optimization}: Open source constrained global optimization tool for {Python}},
-#     year = {2014--},
-#     url = " https://github.com/fmfn/BayesianOptimization"
-# }
-# import os
-#
-# data_path = ".." + os.sep + "cleaned_data" + os.sep
-# result_path = "." + os.sep + "result_data" + os.sep
-#
-#
-
 from bayes_opt import BayesianOptimization
 from sklearn.metrics import mean_squared_error
 
@@ -232,11 +173,6 @@ if __name__ == "__main__":
     rank = comm.Get_rank()
     size = comm.Get_size()
 
-    start, end = get_range(mix_index)
-
-    product_index = list(itertools.product(data_set_index, list(range(start, end))))
-    print(product_index)
-    print("total size", len(product_index))
     for index in range(rank, len(data_set_index), size):
         data_index = data_set_index[index]
         print(data_index)

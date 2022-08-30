@@ -22,7 +22,7 @@ import torch.nn as nn
 import numpy as np
 import torch.nn.functional as F
 import zero
-data_set_index = [0,1,2,3]
+data_set_index = [2]
 mix_index = "all"
 device = "cuda"
 data_root = "." + os.sep + "mini_cleaned_data" + os.sep
@@ -244,7 +244,7 @@ def run_bayes_optimize(num_of_iteration=10, data_index=2):
         }
     )
 
-    rf_bo.maximize(init_points=5,n_iter=num_of_iteration)
+    rf_bo.maximize(init_points=2,n_iter=num_of_iteration)
 
     #save data
     result_data_root = "." + os.sep + "BO_result_data" + os.sep
@@ -299,4 +299,4 @@ if __name__ == "__main__":
         # relate_data.set_collector(collector)
         relate_data.set_batch_size(128)
         relate_data.set_collector("VF")
-        run_bayes_optimize(5, 2)
+        run_bayes_optimize(1, 2)

@@ -288,7 +288,7 @@ if __name__ == "__main__":
 
         model_save_path = "." + os.sep + "saved_model" + os.sep + "mini_dataset_mixture_"+device + os.sep + f"mini_data_{data_index}" + os.sep
         mini_data_path = ".." + os.sep + "data" + os.sep + data_root + f"mini_data_{data_index}" + os.sep
-        saved_root = "." + os.sep + "mini_cleaned_data_mixture_"+device+"noPreprocess" + os.sep + f"mini_data_{data_index}" + os.sep
+        saved_root = "." + os.sep + "mini_cleaned_data_mixture_"+device+"_noPreprocess" + os.sep + f"mini_data_{data_index}" + os.sep
         All_ID = ['Methane', 'Ethane', 'Propane', 'N-Butane', 'N-Pentane', 'N-Hexane', 'Heptane']
         relate_data = generate_data.mixture_generater(mini_data_path)
         # collector=generate_data.collector()

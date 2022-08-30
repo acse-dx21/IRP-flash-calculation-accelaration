@@ -16,7 +16,7 @@ def test_log():
     #test
     read_back=pd.read_csv("test_log.csv")["test"]
     for i in range(10):
-        assert read_back.loc[i]==i
+        assert eval(read_back.loc[i])==i
 
 
 

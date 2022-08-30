@@ -26,68 +26,11 @@ import time
 from pytorch_tabnet.tab_model import TabNetRegressor
 import torch.optim as optim
 
-data_set_index = [2,]
+data_set_index = [0,]
 mix_index="all"
 device = "cuda"
 data_root = "." + os.sep + "mini_cleaned_data" + os.sep
 save_data=False
-def get_range(mix_index):
-    """
-    use to fine target mixture
-    :param mix_index: "all" or int range from 1-7
-    :return:
-    """
-    if(mix_index=="all"):
-        return 0,127
-    assert mix_index>0
-    start=0
-    end=comb(7,1)
-
-    for i in range(1,mix_index):
-        start+=comb(7,i)
-        end+=comb(7,i+1)
-
-    return int(start),int(end)
-
-
-
-
-X_train=0
-y_train=0
-X_test=0
-y_test=0
-Material_ID = 0
-
-param_grid = [
-    {'subsample': [0.2, 0.6, 1.0],
-     'learning_rate': [0.01, 0.05, 0.1],
-     'n_estimators': [300, 400, 500],
-     'max_depth': [3, 5, 10],
-     'colsample_bytree': [0.6],
-     'reg_lambda': [10]}
-]
-
-
-
-
-from model.train import check_IDexist
-from tool.log import log
-
-import os
-
-data_path = ".." + os.sep +"data"+os.sep+"mini_cleaned_data" + os.sep
-result_path = "." + os.sep + "MSELoss_data" + os.sep
-
-
-from mpi4py import MPI
-
-
-
-# model=ArtificialNN.Neural_Model_Sklearn_style(ArtificialNN.simple_ANN,{"material":Material_ID})
-# model.fit(Data_loader=train_loader,epoch=10)
-# print(model.get_data)
-# model.score(test_loader)
-# print(model.get_data)
 
 def get_related_path(Material_ID):
     if isinstance(Material_ID,list):
@@ -164,9 +107,6 @@ if __name__ == "__main__":
     comm = MPI.COMM_WORLD
     rank = comm.Get_rank()
     size = comm.Get_size()
-
-
-    start,end = get_range(mix_index)
 
 
     for index in range(rank, len(data_set_index), size):

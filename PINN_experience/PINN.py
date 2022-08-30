@@ -23,17 +23,7 @@ data_root = "." + os.sep + "mini_cleaned_data" + os.sep
 save_model = False
 save_data = False
 
-param_grid = [
-    {'subsample': [0.2, 0.6, 1.0],
-     'learning_rate': [0.01, 0.05, 0.1],
-     'n_estimators': [300, 400, 500],
-     'max_depth': [3, 5, 10],
-     'colsample_bytree': [0.6],
-     'reg_lambda': [10]}
-]
 
-from model.train import check_IDexist
-from tool.log import log
 
 import os
 

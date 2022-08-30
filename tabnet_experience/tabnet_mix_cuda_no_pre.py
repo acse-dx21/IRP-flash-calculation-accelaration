@@ -165,9 +165,6 @@ def run_bayes_optimize(num_of_iteration=10, data_index=2):
     data_record["epochs"].clear()
 
 
-def run_Grid_search(num_of_iteration):
-    print(num_of_iteration)
-
 
 if __name__ == "__main__":
     comm = MPI.COMM_WORLD
