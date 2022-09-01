@@ -48,7 +48,7 @@ class line_bar_plot_from_csv_norm2:
         self.data = []
         self.fig, self.ax = plt.subplots()
         self.colors = ['pink', 'lightgreen', 'lightblue']
-        self.comment = ["norm", "noPreprocess"]
+        self.comment = ["norm",]
         self.meaningful_word = {"norm": "norm", "noPreprocess": "no_standarlization"}
         self.cnt = 0
 

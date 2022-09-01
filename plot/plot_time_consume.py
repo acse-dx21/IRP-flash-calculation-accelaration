@@ -168,7 +168,7 @@ class line_bar_plot_from_csv_norm2:
         plt.xlabel(x)
         plt.yscale("log")
 
-        plt.xscale("log")
+        # plt.xscale("log")
 
     def plot_bar(self,x,y,hue):
 
@@ -221,11 +221,11 @@ tab_root5=f"..\\tabnet_experience\\mini_cleaned_data_mixture_cuda_noPreprocess\\
 
 # root4=f"..\\Simple_ANN_experience\\mini_cleaned_data\\mini_data_{data_num}\\BO_result_data\\"
 
-LGBM_root9=f"..\\LightGBM_experience\\mini_cleaned_data_mixture_cpu\\mini_data_0\\{final_root}\\"
-LGBM_root10=f"..\\LightGBM_experience\\mini_cleaned_data_mixture_cpu\\mini_data_1\\{final_root}\\"
-LGBM_root11=f"..\\LightGBM_experience\\mini_cleaned_data_mixture_cpu\\mini_data_2\\{final_root}\\"
-LGBM_root12=f"..\\LightGBM_experience\\mini_cleaned_data_mixture_cpu\\mini_data_3\\{final_root}\\"
-LGBM_root13=f"..\\LightGBM_experience\\mini_cleaned_data_mixture_cpu\\single_predict\\{final_root}\\"
+LGBM_root9=f"..\\LightGBM_experience\\mini_cleaned_data_mixture_cuda\\mini_data_0\\{final_root}\\"
+LGBM_root10=f"..\\LightGBM_experience\\mini_cleaned_data_mixture_cuda\\mini_data_1\\{final_root}\\"
+LGBM_root11=f"..\\LightGBM_experience\\mini_cleaned_data_mixture_cuda\\mini_data_2\\{final_root}\\"
+LGBM_root12=f"..\\LightGBM_experience\\mini_cleaned_data_mixture_cuda\\mini_data_3\\{final_root}\\"
+LGBM_root13=f"..\\LightGBM_experience\\mini_cleaned_data_mixture_cuda\\single_predict\\{final_root}\\"
 
 
 LGBM_root4=f"..\\LightGBM_experience\\mini_cleaned_data_mixture_cpu_noPreprocess\\mini_data_0\\{final_root}\\"
