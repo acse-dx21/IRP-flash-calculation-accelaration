@@ -444,6 +444,6 @@ multi_plot(roots,"test_time_consume(s)")
 
 
 
-plt.title("time_prediction")
+plt.title("device_time_prediction")
 # plt.ylabel(target)
 plt.show()

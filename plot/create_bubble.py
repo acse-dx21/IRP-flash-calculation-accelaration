@@ -238,7 +238,7 @@ class line_bar_plot_from_csv_norm2:
                 else:
                     result[title]=temp
 
-        pd.DataFrame(result).T.to_csv(f"test{target_size}.csv")
+        pd.DataFrame(result).T.to_csv(f"model_bubble{target_size}.csv")
 
 
 
