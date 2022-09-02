@@ -284,5 +284,5 @@ multi_plot(roots, "target")
 
 
 plt.title("Continues_Predictions")
-plt.xlabel("epoch")
+plt.xlabel("iteration")
 plt.show()

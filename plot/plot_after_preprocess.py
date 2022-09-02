@@ -379,7 +379,7 @@ multi_plot(roots,"target")
 # multi_plot(roots,"target")
 
 
-plt.xlabel("training_data_siza")
+plt.xlabel("training_data_size")
 
 
 

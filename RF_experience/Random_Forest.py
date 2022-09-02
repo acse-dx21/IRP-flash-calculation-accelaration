@@ -10,7 +10,7 @@ import time
 import os
 
 from sklearn.ensemble import RandomForestRegressor
-data_set_index = [0,1,2,3]
+data_set_index = [3]
 mix_index="all"
 device = "cpu"
 data_root = "." + os.sep + "mini_cleaned_data" + os.sep
@@ -47,9 +47,7 @@ def model_cv(**kwargs):
     X = np.concatenate([X_train, X_test])
     y = np.concatenate([y_train, y_test])
     print("totalsize", X.shape)
-    kf = KFold(n_splits=4, shuffle=True, random_state=12346)
-    for train_index, test_index in kf.split(X):
-        print("train_size", train_index.shape, "test_size", test_index.shape)
+    if True:
         model_instance = RandomForestRegressor(
             n_estimators=int(kwargs['n_estimators']),
 
@@ -58,13 +56,13 @@ def model_cv(**kwargs):
             max_depth=int(kwargs['max_depth'])
         )
         start_train = time.time()
-        model_instance.fit(X[train_index], y[train_index])
+        model_instance.fit(X_train, y_train)
         train_time.append(time.time() - start_train)
         start_pred = time.time()
-        pred = model_instance.predict(X[test_index])
+        pred = model_instance.predict(X_test)
         test_time.append(time.time() - start_pred)
 
-        MSE_loss.append(mean_squared_error(pred, y[test_index]))
+        MSE_loss.append(mean_squared_error(pred, y_test))
     loss = np.mean(MSE_loss)
 
     print("test_time", test_time)
@@ -79,7 +77,9 @@ def run_bayes_optimize(num_of_iteration=10, data_index=2):
     global X_train, y_train,X_val, y_val, X_test, y_test, Material_ID
     X_train, y_train, X_test, y_test, Material_ID = relate_data[data_index]
     preprocess = sklearn.preprocessing.StandardScaler().fit(X_train)
-    print(X_test)
+    print(X_test.shape)
+    print(X_train.shape)
+    exit()
     # normalize it
     X_train = preprocess.transform(X_train)
 

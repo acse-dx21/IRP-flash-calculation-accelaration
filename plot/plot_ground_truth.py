@@ -28,12 +28,13 @@ import matplotlib.pyplot as plt
 All_ID = ['Methane','Ethane', 'Propane', 'N-Butane','N-Pentane', 'N-Hexane', 'Heptane']
 id_index=0
 IDs=list(combinations(All_ID,2))
-IDs=['Ethane','N-Pentane']
+IDs=['Methane','N-Butane']
 constants, properties = ChemicalConstantsPackage.from_IDs(IDs)
 dic={"material":All_ID,"Tc":constants.Tcs,"Pc":constants.Pcs,"Ac":constants.omegas}
 print(dic)
 
 num=100
+
 Ts=[310]*num
 Ps=np.linspace(1e5,10e5,num)
 Zs=[[0.5,0.5]]*num
@@ -58,7 +59,7 @@ model_ANN.load_model(
 
 model_XGB= XGBRegressor()
 model_XGB.load_model(
-    "E:\\Ic document\\IRP_flash_calculation_accelaration\\XGB_experience\\mixture.json")
+    "E:\\Ic document\\IRP_flash_calculation_accelaration\\XGB_experience\\saved_model\\mini_dataset_mixture\\mini_data_3\\mix_2\\mixture.json")
 
 mean=np.array([4.29042626e+06, 3.32385527e+06, 3.27222181e+02, 4.75159252e+02,
  1.20214372e-01, 2.64128853e-01, 5.05477944e+02, 5.50226799e+05,
@@ -127,7 +128,7 @@ for i,(x,y) in enumerate(data_loader):
     Ethe_Pen_ANN["V"].append(predANN[0][4])
     Ethe_Pen_ANN["L"].append(predANN[0][5])
 
-    predXGB=model_XGB.predict((x - mean) / std)
+    predXGB=model_XGB.predict(x)
 
 
     Ethe_Pen_XGB["T"].append(Ts[i])
@@ -151,7 +152,7 @@ fig=plt.figure(figsize=(16, 4))
 
 sparse=20
 x="P"
-comment="(K)"
+comment="(Pa)"
 #1
 ax1 = fig.add_subplot(1, 6, 1)
 ax1.plot(data_g[x],data_g['v_1'],color='black',label="ground_truth")
